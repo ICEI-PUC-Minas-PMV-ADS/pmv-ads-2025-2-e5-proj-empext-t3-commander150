@@ -21,7 +21,7 @@ A arquitetura definida para o projeto segue o modelo de aplicação em camadas, 
 - **API-Backend**: a comunicação entre front-end e back-end será realizada por meio de uma API RESTful, permitindo a troca de dados de forma padronizada, segura e escalável.
 
 A imagem abaixo representa visualmente a arquitetura para a aplicação:
-
+![Arquitetura da Solução](img/Arquitetura.png)
 ## Project Model Canvas
 
 Deve ser desenvolvido a partir do microfundamento: Empreendedorismo e inovação.
