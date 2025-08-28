@@ -55,44 +55,40 @@ Para mais informações, consulte os microfundamentos Fundamentos de Engenharia 
 |RF-013| A loja pode editar mesas manualmente | MÉDIA |
 |RF-014| A loja pode ajustar o sistema de pontuação do torneio | MÉDIA |
 |RF-015| O Sistema deve ter um sistema de ranking com filtros | BAIXA |
-|RF-016| O usuário pode checar o histórico de torneio | BAIXA |
+|RF-016| O usuário pode verificar o histórico de torneio | BAIXA |
 
 ### Requisitos não Funcionais
 
-|ID     | Descrição do Requisito  |Prioridade |
-|-------|-------------------------|----|
-|RNF-001| O sistema deve ser responsivo para rodar em um dispositivos móvel | MÉDIA | 
-|RNF-002| Deve processar requisições do usuário em no máximo 3s |  BAIXA | 
+|ID     | Descrição do Requisito                                                                 | Prioridade |
+|-------|-----------------------------------------------------------------------------------------|------------|
+|RNF-001| O sistema deve ser responsivo para rodar em dispositivos desktop                        | ALTA       |
+|RNF-002| O sistema deve respeitar a LGPD (Lei Geral de Proteção de Dados)                        | ALTA       |
+|RNF-003| O sistema deve permitir que o usuário aprenda a utilizá-lo de forma intuitiva             | MÉDIA      |
+|RNF-004| O sistema deve ser projetado de forma escalável, permitindo a adição de novas funções   | MÉDIA      |
+|RNF-005| O sistema deve garantir autenticação e controle de acesso seguro às funcionalidades     | ALTA       |
+|RNF-006| O sistema deve ter tempo de resposta máximo de 3 segundos em 95% das requisições        | ALTA       |
+|RNF-007| O sistema deve ser compatível com os principais navegadores do mercado (Chrome, Edge, Firefox, Safari) | MÉDIA |
+|RNF-008| O sistema deve ser monitorado para identificar e resolver falhas ou problemas de desempenho | ALTA |
+|RNF-009| O sistema deve permitir exportação de dados (resultados, partidas e classificações) em formatos CSV e PDF | MÉDIA |
+|RNF-010| O sistema deve manter logs de auditoria para ações críticas (inscrição, geração de rodada, lançamento/edição de resultados, ajustes de pontuação) | ALTA |
+|RNF-011| A operação de geração de rodadas deve ser atômica, garantindo consistência nos emparelhamentos | ALTA |
+|RNF-012| O sistema deve utilizar datas e horários no formato brasileiro (dd/mm/aaaa, 24h, fuso horário America/São_Paulo) | MÉDIA |
+|RNF-013| O sistema deve garantir armazenamento seguro e backup periódico dos dados de torneios e partidas | ALTA |
+|RNF-014| O sistema deve fornecer relatórios e telas de impressão amigáveis para Scores e Rodadas  | MÉDIA      |
+|RNF-015| O sistema deve possuir mecanismos de auditoria e rastreabilidade para ajustes manuais em mesas e pontuações | ALTA |
 
-Com base nas Histórias de Usuário, enumere os requisitos da sua solução. Classifique esses requisitos em dois grupos:
-
-- [Requisitos Funcionais
- (RF)](https://pt.wikipedia.org/wiki/Requisito_funcional):
- correspondem a uma funcionalidade que deve estar presente na
-  plataforma (ex: cadastro de usuário).
-- [Requisitos Não Funcionais
-  (RNF)](https://pt.wikipedia.org/wiki/Requisito_n%C3%A3o_funcional):
-  correspondem a uma característica técnica, seja de usabilidade,
-  desempenho, confiabilidade, segurança ou outro (ex: suporte a
-  dispositivos iOS e Android).
-Lembre-se que cada requisito deve corresponder à uma e somente uma
-característica alvo da sua solução. Além disso, certifique-se de que
-todos os aspectos capturados nas Histórias de Usuário foram cobertos.
 
 ## Restrições
 
 O projeto está restrito pelos itens apresentados na tabela a seguir.
 
-|ID| Restrição                                             |
-|--|-------------------------------------------------------|
-|01| O projeto deverá ser entregue até o final do semestre |
-|02| Não pode ser desenvolvido um módulo de backend        |
+|ID | Restrição                                                                 |
+|---|---------------------------------------------------------------------------|
+|01 | O projeto deverá ser entregue até o final do semestre 2025-2              |
+|02 | Não pode ser desenvolvido um módulo de backend                            |
+|03 | O sistema deve ser desenvolvido majoritariamente utilizando tecnologias open-source devido ao limitado orçamento |
+|04 | O orçamento disponível para o projeto é limitado                          |
 
-Enumere as restrições à sua solução. Lembre-se de que as restrições geralmente limitam a solução candidata.
-
-> **Links Úteis**:
-> - [O que são Requisitos Funcionais e Requisitos Não Funcionais?](https://codificar.com.br/requisitos-funcionais-nao-funcionais/)
-> - [O que são requisitos funcionais e requisitos não funcionais?](https://analisederequisitos.com.br/requisitos-funcionais-e-requisitos-nao-funcionais-o-que-sao/)
 
 ## Diagrama de Caso de Uso
 
