@@ -39,8 +39,22 @@ Para mais informações, consulte os microfundamentos Fundamentos de Engenharia 
 
 |ID    | Descrição do Requisito  | Prioridade |
 |------|-----------------------------------------|----|
-|RF-001| Permitir que o usuário cadastre tarefas | ALTA | 
-|RF-002| Emitir um relatório de tarefas no mês   | MÉDIA |
+|RF-001| Criar e gerenciar dados de login | ALTA | 
+|RF-002| O usuário deve conseguir recuperar a senha | ALTA |
+|RF-003| O sistema deve redirecionar os usuários para a interface correspondente ao seu nível de permissão | ALTA |
+|RF-004| O jogador pode se inscrever no começo do torneio | ALTA |
+|RF-005| O jogador pode se desinscrever entre as rodadas do torneio | ALTA |
+|RF-006| A loja pode inscrever e desinscrever jogadores no começo e entre as rodadas do torneio | ALTA |
+|RF-007| O usuário deve visualizar as mesas e o score da rodada | ALTA |
+|RF-008| O usuário pode reportar o resultado da partida | ALTA |
+|RF-009| O sistema deve gerar, exibir, atualizar e salvar a tabela de score de acordo com os critérios de desempate | ALTA |
+|RF-010| A loja pode editar lançamentos de resultado | ALTA |
+|RF-011| A loja pode criar e gerenciar torneios | ALTA |
+|RF-012| O sistema deve salvar e armazenar dados de partidas | MÉDIA |
+|RF-013| A loja pode editar mesas manualmente | MÉDIA |
+|RF-014| A loja pode ajustar o sistema de pontuação do torneio | MÉDIA |
+|RF-015| O Sistema deve ter um sistema de ranking com filtros | BAIXA |
+|RF-016| O usuário pode checar o histórico de torneio | BAIXA |
 
 ### Requisitos não Funcionais
 
