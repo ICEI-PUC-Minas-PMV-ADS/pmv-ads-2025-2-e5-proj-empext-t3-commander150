@@ -1,25 +1,12 @@
 # Introdução
 
-Texto descritivo apresentando a compreensão sobre extensão universitária discutido no microfundamento de nivelamento, relacionando a situação-problema da organização e ao sistema sociotécnico que será desenvolvido e implantado.
+Este projeto surge como resposta a uma demanda concreta da comunidade de jogadores de Magic: The Gathering, que busca formas mais eficientes de organizar torneios no formato 2x2, uma modalidade cooperativa que promove novas dinâmicas e estratégias entre os participantes. A ausência de suporte oficial para esse formato representa uma situação-problema que afeta diretamente a experiência dos jogadores e organizadores.
 
-## Problema
-Nesse momento o grupo deve apresentar a situação-problema (dor/oportunidade) do parceiro onde será desenvolvido sistema sociotécnico.
+A proposta de desenvolvimento de um sistema web/aplicativo para gestão automatizada desses torneios se insere no contexto da extensão universitária, ao articular conhecimento técnico com necessidades reais da sociedade. O projeto promove a integração entre universidade e comunidade, contribuindo para a transformação social por meio da tecnologia. Ao considerar os aspectos humanos, organizacionais e tecnológicos envolvidos, o sistema será concebido como uma solução sociotécnica, capaz de impactar positivamente o ecossistema de jogos e eventos.
 
-> **Links Úteis**:
-> - [Objetivos, Problema de pesquisa e Justificativa](https://medium.com/@versioparole/objetivos-problema-de-pesquisa-e-justificativa-c98c8233b9c3)
-> - [Matriz Certezas, Suposições e Dúvidas](https://medium.com/educa%C3%A7%C3%A3o-fora-da-caixa/matriz-certezas-suposi%C3%A7%C3%B5es-e-d%C3%BAvidas-fa2263633655)
-> - [Brainstorming](https://www.euax.com.br/2018/09/brainstorming/)
+## Problema, Objetivos e Justificativa
 
-## Objetivos
-
-Aqui o grupo deve descrever os objetivos do trabalho indicando que o objetivo é aplicar os conceitos de extensão universitária no desenvolvimento de um sistema sociotécnico que impacte positivamente a comunidade.
-
-## Justificativa
-
-Descreva as dores/dificuldades do parceiro que motivam trabalhar na construção da solução.
-
-> **Links Úteis**:
-> - [Como montar a justificativa](https://guiadamonografia.com.br/como-montar-justificativa-do-tcc/)
+Esses tópicos se encontram no Project Model Canvas na  <a href="02-Especificação do Projeto.md"> Especificação do Projeto</a></span>
 
 ## Relação com a Extensão Universitária
 
