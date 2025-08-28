@@ -28,4 +28,6 @@ Apresentar aqui como este projeto extensionista transforma a realidade do parcei
 
 ## Descrição do Parceiro
 
-Apresente uma descrição resumida sobre a organização onde o projeto será desenvolvido para que possa ser compreendido o cenário do sistema sociotécnico.
+O cenário em que o projeto será desenvolvido é a comunidade de jogadores de Magic: The Gathering da região. Os torneios organizados reúnem participantes de diferentes perfis e idades, promovendo um espaço de convivência, aprendizado e competição saudável.
+
+Atualmente, a formação de duplas no formato 2v2 é feita de maneira manual e improvisada, com o auxílio do software Companion MTG.
