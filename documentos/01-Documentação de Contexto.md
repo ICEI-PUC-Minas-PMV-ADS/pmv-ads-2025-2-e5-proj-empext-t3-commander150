@@ -10,8 +10,9 @@ Esses tópicos se encontram no Project Model Canvas na  <a href="02-Especificaç
 
 ## Relação com a Extensão Universitária
 
-Relacionar a situação-problema da organização com o impacto social esperado com a implantação do sistema sociotécnico.
-Apresentar aqui como este projeto extensionista transforma a realidade do parceiro e dos alunos.
+O projeto estabelece uma ponte entre universidade e comunidade ao responder a uma demanda da organização de torneios de _Magic: The Gathering_ no formato 2v2. A ausência de suporte oficial e o uso de métodos manuais e improvisados criam dificuldades para jogadores e organizadores, impactando a qualidade da experiência. Com a criação de um sistema sociotécnico de gestão automatizada, a iniciativa visa promover a transformação social ao oferecer uma solução tecnológica acessível, eficiente e inclusiva, fortalecendo a comunidade e ampliando o alcance dos eventos.
+
+Do ponto de vista acadêmico, a proposta insere-se no contexto da extensão universitária por articular teoria e prática. A equipe de estudantes de Análise e Desenvolvimento de Sistemas aplica os seus conhecimentos em um problema real, e veem todo o ciclo de desenvolvimento de um software, exercitando habilidades técnicas e sociais. Assim, o projeto contribui tanto para a formação profissional e cidadã dos alunos quanto para a melhoria efetiva da realidade da comunidade parceira.
 
 ## Descrição do Parceiro
 
