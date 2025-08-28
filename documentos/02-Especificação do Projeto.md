@@ -2,24 +2,25 @@
 
 <span style="color:red">Pré-requisitos: <a href="01-Documentação de Contexto.md"> Documentação de Contexto</a></span>
 
-Definição do problema e ideia de solução a partir da perspectiva do usuário. 
-
 ## Usuários
 | Tipo de Usuário   | Descrição | Responsabilidades |
 |------------------|-----------|------------------|
-| **xxx** | xxxxx | xxxxx |
-
-### Exemplo
-
-| Tipo de Usuário   | Descrição | Responsabilidades |
-|------------------|-----------|------------------|
-| **Administrador** | Gerencia a aplicação e os usuários. | Gerenciar usuários, configurar o sistema, acessar todos os relatórios. |
-| **Funcionário** | Usa a aplicação para suas tarefas principais. | Criar e editar registros, visualizar relatórios. |
-
+| **Loja(Administrador)** | Gerencia a aplicação, os usuários e os torneios | Criar e gerenciar usuários, pontuação e torneios.  |
+| **Jogador** |  Usa a aplicação durante os torneios | Se inscrever e desinscrever de torneios, visualizar a pontuação e a organização das mesas.  |
 
 ## Arquitetura e Tecnologias
 
-Descreva brevemente a arquitetura definida para o projeto e as tecnologias a serem utilizadas. Sugere-se a criação de um diagrama de componentes da solução.
+A arquitetura definida para o projeto segue o modelo de aplicação em camadas, garantindo separação de responsabilidades, escalabilidade e facilidade de manutenção.
+
+- **Front-end**: desenvolvido em React.js, responsável pela interface web e pela experiência do usuário. Essa camada consome os serviços disponibilizados pela API, exibindo dados de forma dinâmica e interativa.
+
+- **Back-end**: implementado em Django (Python), responsável pelas regras de negócio, controle de autenticação, autorização e integração com o banco de dados.
+
+- **Banco de Dados**: será utilizado o PostgreSQL, um sistema de gerenciamento de banco de dados relacional robusto e confiável, adequado para lidar com grandes volumes de informação.
+
+- **API-Backend**: a comunicação entre front-end e back-end será realizada por meio de uma API RESTful, permitindo a troca de dados de forma padronizada, segura e escalável.
+
+A imagem abaixo representa visualmente a arquitetura para a aplicação:
 
 ## Project Model Canvas
 
