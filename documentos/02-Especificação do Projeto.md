@@ -109,10 +109,10 @@ As referências abaixo irão auxiliá-lo na geração do artefato “Diagrama de
 
 - ### MER (Modelo Entidade-Relacionamento)
 O MER representa através de um diagrama como as entidades (coisas, objetos) se relacionam entre si na aplicação interativa.
-![Modelo ER](https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e5-proj-empext-t3-commander150/blob/main/documentos/img/MER_Comander150.pdf.png?raw=true)
+> ![Modelo ER](https://raw.githubusercontent.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e5-proj-empext-t3-commander150/refs/heads/main/documentos/img/MER_Comander150.png)
 
 - ### Modelo Físico
-Scripts de criação das tabelas do banco de dados incluído dentro da pasta src\bd.
-> - [Modelo físico do banco de dados](../src/bd/pucare_database.sql)
+Scripts de criação das tabelas do banco de dados incluído dentro da pasta documentos/img/pucare_database.sql.
+> [Modelo físico do banco de dados](../documentos/img/pucare_database.sql)
 
 
