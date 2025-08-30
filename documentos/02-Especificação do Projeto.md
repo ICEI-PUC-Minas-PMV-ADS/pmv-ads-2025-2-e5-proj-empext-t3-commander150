@@ -24,11 +24,7 @@ A imagem abaixo representa visualmente a arquitetura para a aplicação:
 ![Arquitetura da Solução](img/Arquitetura.png)
 ## Project Model Canvas
 
-Deve ser desenvolvido a partir do microfundamento: Empreendedorismo e inovação.
-Colocar a imagem do modelo construído apresentando a proposta de solução.
-
-> **Links Úteis**:
-> Disponíveis em material de apoio do projeto
+![Arquitetura da Solução](img/project_model_canvas_commander_150.jpg)
 
 ## Requisitos
 
