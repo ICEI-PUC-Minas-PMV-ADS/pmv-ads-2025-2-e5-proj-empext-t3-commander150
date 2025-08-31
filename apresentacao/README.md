@@ -1,6 +1,6 @@
 # Etapa 1 - Apresentação da proposta da Solução
-Arquivo de apresentação (em slides) da proposta de solução  
-Deve conter a descrição do cliente, o Project Model Canvas e o Diagrama de Caso de Uso.
+
+Apresentação da proposta da solução (Etapa 1) disponível <a href="Apresentação da proposta da solucao_etapa_1.pdf"> aqui</a></span>.
 
 # Etapa 5 - Apresentação da Solução
 - Apresentação para Mostra de Extensão Eixo 5 ADS:
