@@ -1,4 +1,4 @@
-# Instruções de utilização (***Ainda em edição)
+# Instruções de utilização
 
 ### Pré-Requisitos para utilizar a API (localmente):
 1. **Clone o repositório em sua máquina local usando o comando abaixo ou faça manualmente em sua IDE** 
