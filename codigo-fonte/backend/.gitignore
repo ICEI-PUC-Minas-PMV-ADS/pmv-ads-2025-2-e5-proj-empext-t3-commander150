@@ -1,0 +1,48 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.manifest
+*.spec
+
+# ---- Virtual Environments ----
+venv/
+.código-fonte/backend/venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ---- Django ----
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+
+# ---- Envs ----
+*.env
+/codigo-fonte/backend/api/core/.env
+
+# ---- VSCode ----
+.vscode/
+*.code-workspace
+/codigo-fonte/backend/pmv-ads-2025-2-e5-proj-empext-t3-commander150.code-workspace
+
+# ---- PyCharm ----
+.idea/
+/codigo-fonte/backend/.idea/
+
+
+# ---- System ----
+.DS_Store
+Thumbs.db
