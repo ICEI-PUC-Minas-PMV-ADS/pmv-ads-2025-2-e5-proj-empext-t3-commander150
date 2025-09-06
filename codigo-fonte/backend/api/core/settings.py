@@ -40,17 +40,6 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'commander150',  # Nome do banco de dados
-#         'USER': 'postgres',  # Usuário do PostgreSQL
-#         'PASSWORD': 'password',  # Senha
-#         'HOST': 'localhost',  # Host
-#         'PORT': '5432',  # Porta padrão do PostgreSQL
-#     }
-# }
-
 # Configuração do envio de emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -59,26 +48,36 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD', default='')
 
-# Configuração do CORS
+# Configuração do CORS e CSRF
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
 CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = []
 
 # Configuração do modelo de usuário customizado
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
+# Garantir que createsuperuser defina tipo=ADMIN
+DJANGO_SUPERUSER_TIPO = 'ADMIN'
+
 # Configuração do Django Rest Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
+        "usuarios.authentication.SessionAuthenticationSemCSRF",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
 }
 
-# Configuração de sessão via cache
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
+# Configurações de sessão
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = not DEBUG  # True em produção (HTTPS)
+SESSION_COOKIE_SAMESITE = 'Lax'  # Ou 'Strict' para mais segurança
+SESSION_COOKIE_AGE = 1209600  # 2 semanas em segundos (opcional)
+SESSION_SAVE_EVERY_REQUEST = True  # Renova a sessão a cada request
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 # Aplicações instaladas
 INSTALLED_APPS = [
@@ -101,7 +100,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Deve vir antes de CommonMiddleware
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

@@ -14,10 +14,6 @@ class Usuario(AbstractUser):
     """
 
     class TipoUsuario(models.TextChoices):
-        """
-        Define as opções para o campo 'tipo' de usuário.
-        Isso garante que apenas valores válidos possam ser salvos no banco.
-        """
         JOGADOR = 'JOGADOR', 'Jogador'
         LOJA = 'LOJA', 'Loja'
         ADMIN = 'ADMIN', 'Admin'
@@ -25,7 +21,8 @@ class Usuario(AbstractUser):
     tipo = models.CharField(
         max_length=10,
         choices=TipoUsuario.choices,
-        default=TipoUsuario.JOGADOR,
+        blank=False,
+        null=False,
         help_text="Define o nível de permissão do usuário na plataforma."
     )
 
@@ -35,9 +32,12 @@ class Usuario(AbstractUser):
         help_text="Status do usuário (ex: ativo, inativo, banido)."
     )
 
+    # Usar email como username
+    email = models.EmailField(unique=True)
+
+    # Definir o campo de username para email
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
     def __str__(self):
-        """
-        Define a representação em string do objeto, facilitando a
-        visualização no painel de administração do Django.
-        """
-        return self.username
+        return self.email

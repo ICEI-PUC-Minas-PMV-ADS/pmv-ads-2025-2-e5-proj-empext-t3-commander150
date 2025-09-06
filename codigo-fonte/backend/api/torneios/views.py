@@ -51,3 +51,4 @@ class MesaViewSet(viewsets.ModelViewSet):
     queryset = Mesa.objects.all()
     serializer_class = MesaSerializer
     permission_classes = [IsLojaOuAdmin | IsApenasLeitura]
+
