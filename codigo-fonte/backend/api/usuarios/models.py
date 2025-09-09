@@ -21,8 +21,7 @@ class Usuario(AbstractUser):
     tipo = models.CharField(
         max_length=10,
         choices=TipoUsuario.choices,
-        blank=False,
-        null=False,
+
         help_text="Define o nível de permissão do usuário na plataforma."
     )
 
@@ -34,6 +33,13 @@ class Usuario(AbstractUser):
 
     # Usar email como username
     email = models.EmailField(unique=True)
+
+    token_redefinir_senha = models.CharField(
+        max_length=16,
+        blank=True,
+        null=True,
+        help_text="Token usado na redefinição de senha (16 dígitos aleatórios)."
+    )
 
     # Definir o campo de username para email
     USERNAME_FIELD = 'email'

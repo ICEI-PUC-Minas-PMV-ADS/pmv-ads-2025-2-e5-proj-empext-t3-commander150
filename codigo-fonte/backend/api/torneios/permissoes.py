@@ -48,3 +48,42 @@ class IsApenasLeitura(BasePermission):
 
     def has_permission(self, request, view):
         return request.method in SAFE_METHODS
+
+
+class IsOwnerOrAdmin(BasePermission):
+    """
+    Permissão que concede acesso se:
+    1. O usuário for ADMIN (acesso total)
+    2. O usuário for o DONO do objeto (acesso ao próprio recurso)
+
+    Usada para operações em objetos específicos onde apenas o proprietário
+    ou administradores devem ter acesso.
+    """
+
+    def has_permission(self, request, view):
+        """
+        Verificação inicial de permissão no nível da view.
+        Retorna True para permitir que a verificação específica do objeto seja realizada.
+        """
+        # Permite que a verificação prossiga para o nível do objeto
+        return request.user and request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        """
+        Verificação específica de permissão no nível do objeto.
+        Determina se o usuário atual tem acesso ao objeto específico.
+
+        Args:
+            request: HttpRequest object
+            view: Viewset ou APIView
+            obj: Instância do modelo sendo acessada
+
+        Returns:
+            bool: True se usuário for admin ou dono do objeto, False caso contrário
+        """
+        # ADMIN tem acesso a tudo
+        if request.user.tipo == 'ADMIN':
+            return True
+
+        # Usuário comum só acessa seus próprios recursos
+        return obj == request.user

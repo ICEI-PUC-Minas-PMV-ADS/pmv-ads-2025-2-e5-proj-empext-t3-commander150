@@ -1,8 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
 
+# Exemplos:
 # http://localhost:8000/api/v1/auth/login/      # POST - Login
 # http://localhost:8000/api/v1/auth/logout/     # POST - Logout
+# http://localhost:8000/api/v1/auth/usuarios/   # POST - Criar novos usuários
+# http://localhost:8000/api/v1/auth/usuarios/   # GET - Listar usuários
+# http://localhost:8000/api/v1/auth/usuarios/{id}/  # GET - Listar detalhes usuário
 # http://localhost:8000/api/v1/torneios/...     # Endpoints de torneios
 # http://localhost:8000/admin/                  # Admin Django
 # http://localhost:8000/api-auth/...            # DRF browser auth
