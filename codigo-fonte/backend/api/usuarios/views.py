@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -10,6 +12,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_400_B
 from rest_framework.views import APIView
 
 from torneios.permissoes import IsOwnerOrAdmin
+from .authentication import SessionAuthenticationSemCSRF
 from .models import Usuario
 from .serializers import (RequisitarTrocaSenhaSerializer, ValidarTokenRedefinirSenhaSerializer,
                           UsuarioSerializer, UsuarioCreateSerializer, AlterarSenhaSerializer)
@@ -49,19 +52,37 @@ class LogoutView(APIView):
     """
     Endpoint para realizar o logout na aplicação.
     """
+    authentication_classes = [SessionAuthenticationSemCSRF]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # Armazena a session id para debug (opcional)
         session_id = request.session.session_key
 
-        # Realiza o logout
         logout(request)
 
         return Response({
             "message": "Logout realizado com sucesso",
             "sessionid_anterior": session_id
         }, status=HTTP_200_OK)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ValidarSessaoView(APIView):
+    """
+    Endpoint que retorna os dados do usuário autenticado via sessão.
+    O frontend usa este endpoint para verificar se o usuário já está logado
+    quando a aplicação é carregada.
+    A permissão IsAuthenticated já garante que, se esta view for
+    # acessada com sucesso, o request.user é um usuário válido.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """
+        Retorna os dados serializados do usuário logado (request.user).
+        """
+        serializer = UsuarioSerializer(request.user)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class RequisitarTrocaSenhaView(APIView):

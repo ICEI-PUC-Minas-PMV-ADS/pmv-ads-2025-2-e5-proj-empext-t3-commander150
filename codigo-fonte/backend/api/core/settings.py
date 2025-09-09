@@ -74,7 +74,9 @@ REST_FRAMEWORK = {
 # Configurações de sessão
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = not DEBUG  # True em produção (HTTPS)
-SESSION_COOKIE_SAMESITE = 'Lax'  # Ou 'Strict' para mais segurança
+# Alteramos SESSION_COOKIE_SAMESITE para None, pois estamos tendo problemas com cookies por conta
+# das origens das requisições, e não há problema, já que estamos trabalhando com uma API e não um site.
+SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_AGE = 1209600  # 2 semanas em segundos (opcional)
 SESSION_SAVE_EVERY_REQUEST = True  # Renova a sessão a cada request
 SESSION_ENGINE = "django.contrib.sessions.backends.db"

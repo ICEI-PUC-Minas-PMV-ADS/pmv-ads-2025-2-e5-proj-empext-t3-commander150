@@ -1,7 +1,7 @@
 import styles from "./LoginPage.module.css";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login, getSessionId, getTipoUsuario } from "../../services/authService";
+import { login, getSessionId, getTipoUsuario } from "../../services/authServico";
 import Swal from "sweetalert2";
 
 export default function LoginPage() {

@@ -1,17 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import profile from "../../assets/profile.png";
 import NavItem from "../NavItem";
 import "./style.css";
-import { logout, getDadosUsuario } from "../../services/authService";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-
-    const { nome, tipo_usuario } = getDadosUsuario(); // Dados do usuário
 
     const navItems = [
         { label: "Teste", url: "/teste" },
@@ -29,7 +25,6 @@ export default function Navbar() {
 
     const handleLogout = async () => {
         setIsMenuOpen(false);
-        await logout();
         navigate("/login");
     };
 
@@ -58,9 +53,9 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen((prev) => !prev)}
             >
                 <div>
-                <p className="nav-name">{nome || "Usuário"}</p>
+                <p className="nav-name">{"Usuário"}</p>
                 </div>
-                <p className="nav-name">{nome || "Sair"}</p>
+                <p className="nav-name">{"Sair"}</p>
             </button>
 
             {isMenuOpen && (

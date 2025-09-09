@@ -4,7 +4,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import LoginView, LogoutView, UsuariosViewSet, RequisitarTrocaSenhaView, ValidarTokenRedefinirSenhaView, \
-    AlterarSenhaView
+    AlterarSenhaView, ValidarSessaoView
 
 router = DefaultRouter()
 router.register(r'usuarios', UsuariosViewSet, basename='usuario')
@@ -16,5 +16,6 @@ urlpatterns = [
     path('validar-token-redefinir-senha/', ValidarTokenRedefinirSenhaView.as_view(),
          name='validar_token_redefinir_senha'),
     path('alterar-senha/<int:user_id>/', AlterarSenhaView.as_view(), name='alterar_senha'),
+    path('validar-sessao/', ValidarSessaoView.as_view(), name='validar-sessao'),
     path('', include(router.urls)),
 ]
