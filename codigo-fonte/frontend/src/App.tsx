@@ -1,91 +1,67 @@
 // src/App.tsx
 
-/**
- *
- * Este componente foi modificado temporariamente para testar as funções
- * do serviço de autenticação (authServico.ts). Ele contém botões
- * para simular login e logout, e verifica a sessão ao ser carregado.
- *
- * O objetivo é usar as "Ferramentas do Desenvolvedor" do navegador para
- * observar as requisições de rede e as mensagens no console, garantindo
- * que nossa comunicação com o backend está funcionando como esperado.
- *
- * Após os testes, este código será descartado e substituído pelo
- * componente principal da aplicação.
- */
-
-import { useEffect } from 'react';
 import './App.css';
 
-// Importar as funções que queremos testar do serviço.
-import { efetuarLogin, efetuarLogout, verificarSessao } from './services/authServico';
+// Importa o hook 'useSessao' para acessar o "Placar Central" de autenticação.
+import { useSessao } from './contextos/AuthContexto';
 
 function App() {
+  // Acessa as informações e funções do nosso contexto.
+  // Agora, este componente não precisa mais saber como o login ou logout
+  // funcionam, ele apenas consome os dados e funções que o
+  // GerenciadorSessao fornece.
+  const { usuario, carregandoSessao, login, logout } = useSessao();
 
-  // Teste 1: Verificar se existe uma sessão ativa ao carregar a página.
-  useEffect(() => {
-    console.log("APP MONTADO: Tentando verificar a sessão...");
-
-    const checarSessao = async () => {
-      try {
-        // Chamamos a função do serviço.
-        const usuario = await verificarSessao();
-        // Se der certo, exibimos os dados do usuário no console.
-        console.log("SUCESSO [verificarSessao]: Sessão válida. Usuário:", usuario);
-      } catch (error) {
-        // Se der errado (ex: cookie inválido ou expirado), a API retornará um erro (401).
-        console.error("ERRO [verificarSessao]: Nenhuma sessão ativa ou sessão inválida.", error);
-      }
-    };
-
-    checarSessao();
-  }, []); // O array vazio [] garante que este efeito rode apenas uma vez, quando o componente é montado.
-
-
-  // Teste 2: Função para simular o clique no botão de Login.
+  // Função para lidar com o clique no botão de login.
   const handleLogin = async () => {
-    console.log("BOTÃO CLICADO: Tentando efetuar login...");
     try {
-      // ATENÇÃO: Substitua com um email e senha de um usuário que REALMENTE
-      // existe no seu banco de dados do backend para o teste funcionar.
+      // Usa as credenciais de teste.
       const credenciais = {
         email: 'novo@email.com',
         password: 'senha123'
       };
-
-      // Chamamos a função de login do serviço.
-      const usuarioLogado = await efetuarLogin(credenciais);
-
-      // Se o login for bem-sucedido, exibimos os dados no console.
-      console.log("SUCESSO [efetuarLogin]: Login realizado com sucesso! Usuário:", usuarioLogado);
+      // Chama a função 'login' que vem do nosso contexto.
+      // Toda a lógica de chamada da API e tratamento de erro
+      // está encapsulada dentro do AuthContexto.
+      await login(credenciais);
+      console.log("SUCESSO: Login realizado através do contexto.");
     } catch (error) {
-      // Se as credenciais estiverem erradas, a API retornará um erro (401).
-      console.error("ERRO [efetuarLogin]: Falha no login. Verifique as credenciais.", error);
+      // O contexto já exibe o alerta de erro (Swal), mas podemos
+      // registrar o erro no console para fins de depuração.
+      console.error("ERRO: Ocorreu um erro durante o login.", error);
     }
   };
 
-
-  // Teste 3: Função para simular o clique no botão de Logout.
+  // Função para lidar com o clique no botão de logout.
   const handleLogout = async () => {
-    console.log("BOTÃO CLICADO: Tentando efetuar logout...");
-    try {
-      // Chamamos a função de logout do serviço.
-      await efetuarLogout();
-
-      // Se o logout for bem-sucedido, exibimos uma mensagem no console.
-      console.log("SUCESSO [efetuarLogout]: Logout realizado com sucesso!");
-    } catch (error) {
-      // Se ocorrer um erro na API, ele será exibido aqui.
-      console.error("ERRO [efetuarLogout]: Falha ao fazer logout.", error);
-    }
+    // Chama a função 'logout' do contexto.
+    await logout();
+    console.log("SUCESSO: Logout realizado através do contexto.");
   };
 
-
-  // A interface visual para os botões de teste.
+  // Renderiza a tela de acordo com o estado do contexto.
   return (
     <>
-      <h1>Testes - authServico</h1>
-      <p>Abra o console do navegador (F12) para ver os resultados dos testes.</p>
+      <h1>Teste do AuthContexto</h1>
+      <p>Abra o console do navegador (F12) para ver os logs.</p>
+
+      <div style={{ border: '1px solid #ccc', padding: '10px', marginTop: '20px' }}>
+        <h2>Estado Atual do "Placar Central"</h2>
+        {/*
+          Enquanto a sessão inicial está sendo verificada, exibe uma mensagem
+          de carregamento. Isso evita que o usuário veja a tela errada por
+          uma fração de segundo ao recarregar a página.
+        */}
+        {carregandoSessao ? (
+          <p>Verificando sessão...</p>
+        ) : (
+          // Quando o carregamento termina, exibe o status do usuário.
+          <p>
+            Usuário Logado: {usuario ? `${usuario.username} (${usuario.email})` : 'Nenhum'}
+          </p>
+        )}
+      </div>
+
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <button onClick={handleLogin}>
           Testar Login

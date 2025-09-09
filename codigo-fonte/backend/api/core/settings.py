@@ -55,6 +55,17 @@ CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
 CSRF_TRUSTED_ORIGINS = []
 
+# Configurações de sessão
+SESSION_COOKIE_PATH = '/api/v1/'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True  # True em produção (HTTPS)
+# Alteramos SESSION_COOKIE_SAMESITE para None, pois estamos tendo problemas com cookies por conta
+# das origens das requisições, e não há problema, já que estamos trabalhando com uma API e não um site.
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_AGE = 1209600  # 2 semanas em segundos (opcional)
+SESSION_SAVE_EVERY_REQUEST = True  # Renova a sessão a cada request
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
 # Configuração do modelo de usuário customizado
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
@@ -70,16 +81,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
 }
-
-# Configurações de sessão
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = not DEBUG  # True em produção (HTTPS)
-# Alteramos SESSION_COOKIE_SAMESITE para None, pois estamos tendo problemas com cookies por conta
-# das origens das requisições, e não há problema, já que estamos trabalhando com uma API e não um site.
-SESSION_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_AGE = 1209600  # 2 semanas em segundos (opcional)
-SESSION_SAVE_EVERY_REQUEST = True  # Renova a sessão a cada request
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 # Aplicações instaladas
 INSTALLED_APPS = [
