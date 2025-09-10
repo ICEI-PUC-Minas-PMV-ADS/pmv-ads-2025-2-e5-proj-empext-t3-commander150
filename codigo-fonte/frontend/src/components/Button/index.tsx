@@ -43,7 +43,7 @@ const Button = ({
   label,
   onClick,
   icon,
-  width = 'auto',
+  width = '100%',
   height = '38px',
   backgroundColor = '#003A70',
   textColor = '#FFFFFF',

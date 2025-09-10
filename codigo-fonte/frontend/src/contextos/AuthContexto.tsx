@@ -47,6 +47,7 @@ import type { IUsuario, ILoginCredenciais } from '../tipos/tipos';
 interface IAuthContexto {
   usuario: IUsuario | null;
   carregandoSessao: boolean;
+  qtdCaracteresSenha: number;
   login: (credenciais: ILoginCredenciais) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -87,6 +88,9 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
 
     checarSessaoAoCarregar();
   }, []);
+  
+  // Define a quantidade mínima de caracteres para a senha.
+  const qtdCaracteresSenha = 4;
 
   // Função para realizar o login do usuário.
   const login = async (credenciais: ILoginCredenciais) => {
@@ -120,6 +124,7 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
   const valor = {
     usuario,
     carregandoSessao,
+    qtdCaracteresSenha,
     login,
     logout,
   };

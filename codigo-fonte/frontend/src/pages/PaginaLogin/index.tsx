@@ -10,7 +10,7 @@
  */
 
 import { useState, type FormEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useSessao } from '../../contextos/AuthContexto';
 import styles from './PaginaLogin.module.css';
 import Input from '../../components/Input';
@@ -20,7 +20,7 @@ const PaginaLogin = () => {
   // Hooks do React para gerir o estado e a navegação.
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, usuario } = useSessao();
+  const { login, usuario, qtdCaracteresSenha } = useSessao();
 
   // Estados locais para armazenar os valores dos campos do formulário.
   const [email, setEmail] = useState('');
@@ -71,47 +71,47 @@ const PaginaLogin = () => {
   };
 
   return (
-    // Aplica a classe para o fundo azul-acinzentado e centralização.
-    <div className={styles.pagina}>
-      {/* Aplica a classe para o card branco central. */}
-      <div className={styles.card}>
-        <h1 className={styles.titulo}>Login</h1>
+    <div className={styles.container}>
+      <form className={styles.card} onSubmit={handleSubmit}>
+        <h2 className={styles.title}>Login</h2>
 
-        <form onSubmit={handleSubmit} className={styles.formulario}>
-          {/* Substitui os inputs HTML pelo componente Input reutilizável. */}
-          <Input
-            label="Email"
-            type="email"
-            name="email"
-            placeholder="exemplo@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+        <Input
+          type="email"
+          name="email"
+          label="Email"
+          placeholder="exemplo@exemplo.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-          <Input
-            label="Senha"
-            type="password"
-            name="senha"
-            placeholder="********"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-          />
-
-          <Button
+        <Input
+          type="password"
+          name="senha"
+          label="Senha"
+          placeholder="**********"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          required
+          minLength={qtdCaracteresSenha}
+        />
+        
+        <Button
           label="Entrar"
           type="submit"
-          //backgroundColor="#2c7a64"
-          //height="42px"
-          //fontSize="14px"
-          //borderRadius="6px"
-          //fontWeight={600}
         />
-        </form>
-      </div>
+
+        <Link to="/recuperar-senha" className={styles.link}>
+          Esqueceu a senha?
+        </Link>
+
+        <Link to="/cadastrar" className={styles.link}>
+          Ainda não possui conta? Cadastre-se
+        </Link>
+      
+      </form> 
     </div>
   );
-};
+}
 
 export default PaginaLogin;
