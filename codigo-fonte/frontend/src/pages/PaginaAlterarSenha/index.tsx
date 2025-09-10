@@ -62,8 +62,8 @@ const PaginaAlterarSenha = () => {
   if (resultado.success) {
     Swal.fire({
       icon: "success",
-      title: "Senha alterada com sucesso! Faça login novamente para autenticar.",
-      text: resultado.message,
+      title: "Senha alterada com sucesso!",
+      text:  "Faça login novamente para autenticar.",
       confirmButtonText: "Ok"
     }).then(() => {
       navigate("/login/");
