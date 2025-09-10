@@ -12,7 +12,7 @@
 import { useState, type FormEvent } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useSessao } from '../../contextos/AuthContexto';
-import styles from './PaginaLogin.module.css';
+import styles from './styles.module.css';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
@@ -101,11 +101,11 @@ const PaginaLogin = () => {
           type="submit"
         />
 
-        <Link to="/recuperar-senha" className={styles.link}>
+        <Link to="/recuperar-senha/" className={styles.link}>
           Esqueceu a senha?
         </Link>
 
-        <Link to="/cadastrar" className={styles.link}>
+        <Link to="/cadastrar/" className={styles.link}>
           Ainda não possui conta? Cadastre-se
         </Link>
       

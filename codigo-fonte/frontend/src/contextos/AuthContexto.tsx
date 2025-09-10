@@ -39,7 +39,7 @@ import { createContext, useState, useEffect, useContext, type ReactNode } from '
 import { AxiosError } from 'axios';
 import Swal from 'sweetalert2';
 
-import { efetuarLogin, efetuarLogout, verificarSessao } from '../services/authServico';
+import { efetuarLogin, efetuarLogout, verificarSessao} from '../services/authServico';
 import type { IUsuario, ILoginCredenciais } from '../tipos/tipos';
 
 // Define a "planta baixa" do contexto, especificando quais
@@ -48,9 +48,10 @@ interface IAuthContexto {
   usuario: IUsuario | null;
   carregandoSessao: boolean;
   qtdCaracteresSenha: number;
+  qtdCaracteresToken: number;
   login: (credenciais: ILoginCredenciais) => Promise<void>;
   logout: () => Promise<void>;
-}
+  };
 
 // Cria o Contexto React. O valor inicial é 'undefined', pois só será
 // populado pelo componente 'GerenciadorSessao'.
@@ -92,6 +93,9 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
   // Define a quantidade mínima de caracteres para a senha.
   const qtdCaracteresSenha = 4;
 
+  // Define a quantidade mínima de caracteres para o token de recuperação.
+  const qtdCaracteresToken = 4;
+
   // Função para realizar o login do usuário.
   const login = async (credenciais: ILoginCredenciais) => {
     try {
@@ -114,8 +118,6 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
       await efetuarLogout();
       setUsuario(null);
     } catch {
-      // O 'error' foi removido do catch pois não estava sendo utilizado,
-      // resolvendo o aviso do ESLint.
       Swal.fire('Erro no Logout', 'Não foi possível encerrar a sessão.', 'error');
     }
   };
@@ -125,6 +127,7 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
     usuario,
     carregandoSessao,
     qtdCaracteresSenha,
+    qtdCaracteresToken,
     login,
     logout,
   };

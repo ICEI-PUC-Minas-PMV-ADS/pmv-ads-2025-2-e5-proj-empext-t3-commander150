@@ -50,3 +50,34 @@ export const verificarSessao = async (): Promise<IUsuario> => {
   const resposta = await api.get('/auth/validar-sessao/');
   return resposta.data;
 };
+
+/**
+ * Solicita a API o token de recuperação de senha do usuário
+ * Se der certo, envia o token para o email do usuário.
+ * Se a chamada falhar, o erro será propagado para ser tratado.
+ */
+export const solicitarTokenRecuperacaoSenha = async (email: string): Promise<boolean> => {
+    const resposta = await api.post("/auth/requisitar-troca-senha/", { email });
+    
+    if (resposta.status === 200) {
+    return true;
+    } else {
+    return false;
+    }
+}
+
+
+/**
+ * Envia para a API o token de recuperação para validação.
+ * Se der certo, envia a nova senha para o email do usuário.
+ * Se a chamada falhar, o erro será propagado para ser tratado.
+ */
+export const validarTokenRecuperacao = async (email: string, token: string): Promise<boolean> => {
+  const resposta = await api.post('/auth/validar-token-redefinir-senha/', {"email": email, "token": token});
+  // A API de login retorna um objeto com uma chave "dados" que contém o usuário.
+  if (resposta.status === 200) {
+    return true;
+    } else {
+    return false;
+    }
+};
