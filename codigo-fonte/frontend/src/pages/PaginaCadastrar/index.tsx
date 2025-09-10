@@ -1,68 +1,66 @@
+// src/pages/PaginaCadastrar/index.tsx
+
 /**
- * Página de Login
+ * Página de Cadastro
  *
  * RESPONSABILIDADES:
  * 1. Renderizar a estrutura visual da página de Cadastro (fundo, card).
- * 2. Utilizar componentes reutilizáveis (Input, Botão) para construir o formulário.
- * 3. Manter o estado dos campos
+ * 2. Utilizar componentes reutilizáveis (Input, Botão, Radio) para construir o formulário.
+ * 3. Manter o estado dos campos do formulário.
  * 4. Chamar a função de cadastro do authServico ao submeter o formulário.
  * 5. Redirecionar o utilizador após um cadastro bem-sucedido.
  */
 
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useSessao } from '../../contextos/AuthContexto';
 import styles from './styles.module.css';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import { cadastrarUsuario} from '../../services/authServico';
+import Radio from '../../components/Radio';
+import { cadastrarUsuario } from '../../services/authServico';
 import Swal from 'sweetalert2';
 
-
+// 2. Define as opções para o nosso grupo de rádio.
+// Manter isto como uma constante fora do componente evita que seja recriado a cada renderização.
+const opcoesTipoUsuario = [
+  { valor: 'JOGADOR', rotulo: 'Sou um Jogador' },
+  { valor: 'LOJA', rotulo: 'Sou uma Loja' },
+];
 
 const PaginaCadastrar = () => {
-  // Hooks do React para gerir o estado e a navegação.
   const navigate = useNavigate();
-  const { qtdCaracteresSenha } = useSessao();
 
-  // Estados locais para armazenar os valores dos campos do formulário.
   const [email, setEmail] = useState('');
   const [nome, setNome] = useState('');
   const [senha, setSenha] = useState('');
+  // O estado 'tipo' agora será controlado pelo componente de Rádio.
   const [tipo, setTipo] = useState('');
 
-  // Função executada quando o formulário é submetido.
   const handleSubmit = async (evento: FormEvent) => {
     evento.preventDefault();
-    
+
     if (!email || !senha || !nome || !tipo) {
-        Swal.fire(
-            'Erro no Cadastro',
-            'Prencha todos os campos.',
-            'error'
-            );
+      Swal.fire('Erro no Cadastro', 'Preencha todos os campos.', 'error');
       return;
     }
 
-    // Lógica de cadastro
     try {
       await cadastrarUsuario({
         email,
         username: nome,
         password: senha,
-        tipo: tipo as 'JOGADOR' | 'LOJA' | 'ADMIN',
-        });
+        tipo: tipo as 'JOGADOR' | 'LOJA', // O tipo já é garantido pelo Radio
+      });
 
-        Swal.fire(
-            'Sucesso no Cadastro',
-            `Sucesso para registrar o usuário ${nome}. Agora faça o login.`,
-            'success'
-            );
-        // Redireciona para a página de login após o cadastro.
-        navigate('/login/');
+      Swal.fire(
+        'Sucesso no Cadastro',
+        `Sucesso ao registrar o usuário ${nome}. Agora faça o login.`,
+        'success'
+      );
+      navigate('/login/');
 
     } catch (error) {
-        Swal.fire("Erro no cadastro!", (error as Error).message, "error");
+      Swal.fire("Erro no cadastro!", (error as Error).message, "error");
     }
   };
 
@@ -96,31 +94,27 @@ const PaginaCadastrar = () => {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           required
-          minLength={qtdCaracteresSenha}
         />
-        <Input
-          type="text"
+
+        {/* 3. Substitui o Input de texto pelo componente Radio. */}
+        <Radio
+          labelPrincipal="Tipo de Usuário"
           name="tipo"
-          label="Tipo de Usuário"
-          placeholder="Loja, Jogador ou Admin"
-          value={tipo}
+          opcoes={opcoesTipoUsuario}
+          valorSelecionado={tipo}
           onChange={(e) => setTipo(e.target.value)}
-          required
         />
+
         <Button
           label="Cadastrar"
           type="submit"
         />
 
-        <Link to="/recuperar-senha/" className={styles.link}>
-          Esqueceu a senha?
-        </Link>
-
         <Link to="/login/" className={styles.link}>
           Já possui cadastro? Faça seu login!
         </Link>
-      
-      </form> 
+
+      </form>
     </div>
   );
 }

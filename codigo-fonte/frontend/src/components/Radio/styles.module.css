@@ -1,0 +1,103 @@
+/* src/components/Radio/style.module.css */
+
+/**
+ * Estilos para o componente de Grupo de Rádio.
+ *
+ * A técnica utilizada aqui esconde o input de rádio padrão do navegador,
+ * que é difícil de estilizar, e cria um novo elemento visual customizado
+ * usando pseudo-elementos (::before e ::after).
+ */
+
+/* Define as variáveis de cor com base no Figma */
+:root {
+  --cor-texto-principal: #181c32;
+  --cor-fundo-radio: #ffffff;
+  --cor-borda-radio: #e0e0e0;
+  --cor-radio-selecionado: #003a70; /* Azul-escuro do botão */
+  --fonte-principal: 'Poppins', sans-serif;
+}
+
+/* O container que agrupa o rótulo principal e todas as opções de rádio. */
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espaço entre o rótulo principal e as opções */
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+/* O rótulo principal do grupo (ex: "Tipo de Utilizador") */
+.labelPrincipal {
+  font-family: var(--fonte-principal);
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--cor-texto-principal);
+  margin-bottom: 4px;
+}
+
+/* O container para as opções de rádio, para alinhamento. */
+.opcoesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* O rótulo para cada opção de rádio individual. */
+.labelOpcao {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--fonte-principal);
+  font-size: 14px;
+  color: var(--cor-texto-principal);
+  position: relative;
+}
+
+/*
+ * O input de rádio real.
+ * Usamos 'opacity: 0' e 'position: absolute' para escondê-lo visualmente,
+ * mas mantê-lo funcional para acessibilidade e eventos de clique.
+ */
+.inputRadio {
+  opacity: 0;
+  position: absolute;
+}
+
+/*
+ * O círculo exterior customizado do nosso botão de rádio.
+ * É criado usando um pseudo-elemento ::before no rótulo.
+ */
+.labelOpcao::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--cor-borda-radio);
+  background-color: var(--cor-fundo-radio);
+  margin-right: 8px;
+  transition: border-color 0.2s;
+  display: inline-block;
+}
+
+/*
+ * O círculo interior que aparece quando a opção é selecionada.
+ * É criado usando um pseudo-elemento ::after.
+ */
+.inputRadio:checked + .labelOpcao::after {
+  content: '';
+  position: absolute;
+  /* Agora estes valores são relativos ao .labelOpcao */
+  left: 5px;
+  /* Ajuste vertical para alinhar com o centro do círculo exterior */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--cor-radio-selecionado);
+}
+
+/* Muda a cor da borda exterior quando a opção está selecionada. */
+.inputRadio:checked + .labelOpcao::before {
+  border-color: var(--cor-radio-selecionado);
+}
