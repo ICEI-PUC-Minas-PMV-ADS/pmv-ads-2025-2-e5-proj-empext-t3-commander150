@@ -4,7 +4,15 @@
  * reutilização em toda a aplicação.
  */
 
-// Define a estrutura dos dados de um usuário, como recebido da nossa API.
+// Para cadastro (requisição)
+export interface IUsuarioCadastro {
+  email: string;
+  username: string;
+  password: string;
+  tipo: 'JOGADOR' | 'LOJA' | 'ADMIN';
+}
+
+// Para resposta (retorno da API)
 export interface IUsuario {
   id: number;
   email: string;

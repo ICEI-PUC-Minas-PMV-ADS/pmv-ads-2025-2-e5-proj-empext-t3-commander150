@@ -15,6 +15,8 @@ import { useSessao } from '../../contextos/AuthContexto';
 import styles from './styles.module.css';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
+import Swal from 'sweetalert2';
+
 
 const PaginaLogin = () => {
   // Hooks do React para gerir o estado e a navegação.
@@ -51,7 +53,11 @@ const PaginaLogin = () => {
     evento.preventDefault();
     
     if (!email || !senha) {
-      alert('Por favor, preencha o email e a senha.');
+      Swal.fire(
+                  'Erro no Login',
+                  'Prencha todos os campos.',
+                  'error'
+                  );
       return;
     }
 
@@ -59,7 +65,6 @@ const PaginaLogin = () => {
       await login({ email, password: senha });
       
       // Redireciona o utilizador para a  para a página padrão ou para a página de origem
-      console.log(deOndeVeio)
       if (!deOndeVeio || deOndeVeio === "/") {
         redirecionarUsuario(usuario?.tipo ?? 'JOGADOR');
       } else {

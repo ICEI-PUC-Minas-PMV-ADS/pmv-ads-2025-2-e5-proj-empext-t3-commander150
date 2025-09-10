@@ -26,7 +26,7 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        # Incluímos todos os campos necessários para o cadastro.
+        # Campos necessários para o cadastro.
         fields = ['email', 'username', 'tipo', 'password']
 
         # 'password' como 'write_only' significa que NUNCA será retornado em uma resposta da API (leitura).

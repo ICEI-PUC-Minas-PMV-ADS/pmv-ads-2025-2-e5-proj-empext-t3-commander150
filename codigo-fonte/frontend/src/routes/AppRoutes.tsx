@@ -10,6 +10,7 @@ import { RotaSegura } from "./RotaSegura";
 import JogadorTeste from "../pages/Testes/JogadorTeste";
 import LojaTeste from "../pages/Testes/LojaTeste";
 import PaginaRecuperarSenha from "../pages/PaginaRecuperarSenha";
+import PaginaCadastrar from "../pages/PaginaCadastrar";
 
 export default function AppRoutes() {
   return (
@@ -21,6 +22,7 @@ export default function AppRoutes() {
       */}
       <Route path="/login/" element={<PaginaLogin />} />
       <Route path="/recuperar-senha/" element={<PaginaRecuperarSenha />} />
+      <Route path="/cadastrar/" element={<PaginaCadastrar />} />
 
 
       {/* --- Grupo 2: Rotas Protegidas com Layout --- */}

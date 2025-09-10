@@ -15,8 +15,8 @@
  */
 
 import api from './api';
-import type { ILoginCredenciais, IUsuario } from '../tipos/tipos';
-
+import type { ILoginCredenciais, IUsuarioCadastro, IUsuario } from '../tipos/tipos';
+import { AxiosError } from "axios";
 /**
  * Envia as credenciais para a API para tentar autenticar o usuário.
  * A função é direta: se a chamada da API for bem-sucedida, retorna os dados.
@@ -80,4 +80,46 @@ export const validarTokenRecuperacao = async (email: string, token: string): Pro
     } else {
     return false;
     }
+};
+
+/**
+ * Solicita a API um cadastro de usuário.
+ * Se der certo, retorna os dados do usuário cadastrado.
+ * Se a chamada falhar, identifica o erro.
+ */
+// services/authServico.ts
+export const cadastrarUsuario = async (
+  usuario: IUsuarioCadastro
+): Promise<IUsuario> => {
+  try {
+    const resposta = await api.post("/auth/usuarios/", usuario);
+    return resposta.data;
+  } catch (erro) {
+    const axiosErro = erro as AxiosError<any>;
+
+    if (axiosErro.response && axiosErro.response.data) {
+      const data = axiosErro.response.data;
+
+      // Monta uma lista com "campo: mensagem"
+      const mensagens: string[] = [];
+
+      Object.keys(data).forEach((campo) => {
+        const mensagensCampo = data[campo];
+        if (Array.isArray(mensagensCampo)) {
+          mensagensCampo.forEach((msg: string) => {
+            mensagens.push(`${campo}: ${msg}`);
+          });
+        } else if (typeof mensagensCampo === "string") {
+          mensagens.push(`${campo}: ${mensagensCampo}`);
+        }
+      });
+
+      // Se conseguiu extrair mensagens, lança todas unidas
+      if (mensagens.length > 0) {
+        throw new Error(mensagens.join("\n"));
+      }
+    }
+
+    throw new Error("Erro ao cadastrar usuário. Tente novamente.");
+  }
 };

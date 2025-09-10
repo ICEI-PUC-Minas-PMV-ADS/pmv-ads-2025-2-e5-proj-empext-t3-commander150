@@ -117,7 +117,7 @@ export default function PaginaRecuperarSenha() {
                 <p className={styles.subtitle}>
                 Sua nova senha foi enviada para o e-mail informado. Recomendamos que você a altere após o login.
                 </p>
-                <div>
+                <div className={styles.finalActions}>
                 <Link to="/login/" className={styles.link}>
                     Ir para tela de login
                 </Link>
