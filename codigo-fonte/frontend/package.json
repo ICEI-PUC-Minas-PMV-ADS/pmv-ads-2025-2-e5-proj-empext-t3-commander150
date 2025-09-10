@@ -13,6 +13,7 @@
     "axios": "^1.11.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.8.2",
     "sweetalert2": "^11.23.0"
   },

@@ -6,7 +6,6 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 
 import AppRoutes from './routes/AppRoutes';
-// Importa o provedor de autenticação.
 import { GerenciadorSessao } from './contextos/AuthContexto';
 
 // Encontra o elemento 'root' no HTML.
@@ -19,10 +18,9 @@ if (rootElement) {
       {/* O BrowserRouter habilita o sistema de rotas na aplicação. */}
       <BrowserRouter>
         {/*
-          O GerenciadorSessao agora "envolve" toda a aplicação.
+          O GerenciadorSessao "envolve" toda a aplicação.
           Isso significa que qualquer componente dentro de AppRoutes
-          (ou seja, todas as nossas páginas) terá acesso ao "Placar Central" 
-          de autenticação (os dados do Usuário e Sessão) usando o hook 'useSessao'.
+          (ou seja, todas as páginas) terá acesso ao estado de autenticação (os dados do Usuário e Sessão) usando o hook 'useSessao'.
         */}
         <GerenciadorSessao>
           <AppRoutes />

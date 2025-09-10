@@ -1,0 +1,59 @@
+/**
+ * Estilos para a PaginaLogin.
+ *
+ * Utiliza CSS Modules para garantir que estes estilos sejam aplicados
+ * apenas ao componente PaginaLogin, evitando conflitos com outros
+ * estilos da aplicação.
+ */
+
+/*
+ * Define o container principal da página.
+ * - 'min-height: 100vh' garante que ele ocupe no mínimo a altura total da tela.
+ * - 'display: flex' e as propriedades 'align-items' e 'justify-content' são
+ * usadas para centralizar perfeitamente o card de login na tela.
+ * - A cor de fundo é a que foi definida no Figma.
+ */
+.pagina {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #1e293b;
+  padding: 20px;
+}
+
+/*
+ * Define o card branco onde o formulário ficará.
+ * As propriedades de cor, arredondamento, sombra e dimensões
+ * foram retiradas diretamente do Figma.
+ */
+.card {
+  background-color: #ffffff;
+  padding: 40px 32px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 420px; /* Garante que o card não fique excessivamente largo em telas grandes */
+  text-align: center;
+}
+
+/*
+ * Estilo para o título ("Login") dentro do card.
+ */
+.titulo {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: #181c32;
+  margin-bottom: 30px;
+}
+
+/*
+ * Estilo para o formulário, para garantir que os elementos
+ * internos fiquem bem organizados.
+ */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Adiciona um espaço entre os inputs */
+}

@@ -7,7 +7,8 @@ import App from "../App";
 
 // Importa os nossos componentes de lógica de rota
 import { RotaSegura } from "./RotaSegura";
-import PaginaDashboard from "../pages/Dashboard";
+import JogadorTeste from "../pages/Testes/JogadorTeste";
+import LojaTeste from "../pages/Testes/LojaTeste";
 
 export default function AppRoutes() {
   return (
@@ -32,7 +33,9 @@ export default function AppRoutes() {
       <Route element={<RotaSegura />}>
         <Route element={<Layout />}>
           <Route path="/" element={<App />} />
-          <Route path="/dashboard" element={<PaginaDashboard />} />
+          <Route path="/jogador" element={<JogadorTeste />} />
+          <Route path="/loja" element={<LojaTeste />} />
+          <Route path="/admin" element={<App />} />
 
           {/* Adicionar outras rotas protegidas aqui no futuro */}
         </Route>

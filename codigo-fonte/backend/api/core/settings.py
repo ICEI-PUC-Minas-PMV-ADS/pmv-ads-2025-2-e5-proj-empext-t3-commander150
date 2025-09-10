@@ -59,8 +59,8 @@ CSRF_TRUSTED_ORIGINS = []
 SESSION_COOKIE_PATH = '/api/v1/'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True  # True em produção (HTTPS)
-# Alteramos SESSION_COOKIE_SAMESITE para None, pois estamos tendo problemas com cookies por conta
-# das origens das requisições, e não há problema, já que estamos trabalhando com uma API e não um site.
+# Alterado o SESSION_COOKIE_SAMESITE para None, pois o Lax estava dando problemas por conta das origens
+# das requisições. Já que estamos trabalhando com uma API e não um site, é aceitável.
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_AGE = 1209600  # 2 semanas em segundos (opcional)
 SESSION_SAVE_EVERY_REQUEST = True  # Renova a sessão a cada request

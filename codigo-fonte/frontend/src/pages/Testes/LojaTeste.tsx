@@ -1,14 +1,18 @@
+/**
+ * Página de Testes
+ */
 
-import './App.css';
-import { useSessao } from './contextos/AuthContexto';
+// Importa o hook para acessar os dados da sessão
+import { useSessao } from '../../contextos/AuthContexto';
 
+// Define o componente da página do Testes
+const LojaTeste = () => {
+  // Obtém os dados e funções do contexto de autenticação
+  const { usuario, logout } = useSessao();
 
-function App() {
-    const { usuario, logout } = useSessao();
-  
   return (
     <div>
-      <h1>PAGINA INICIAL TESTES</h1>
+      <h1>LOJA TESTES</h1>
       {/* Exibe os dados do usuário se eles existirem */}
       {usuario && (
         <div style={{ border: '1px solid #ccc', padding: '10px', marginTop: '20px' }}>
@@ -31,4 +35,4 @@ function App() {
   );
 };
 
-export default App;
+export default LojaTeste;

@@ -1,97 +1,115 @@
-// src/pages/Login/index.tsx
-
 /**
  * Página de Login
  *
- * O QUE É E POR QUE EXISTE?
- * Este componente renderiza o formulário de login e contém a lógica para
- * autenticar o utilizador. É a porta de entrada para as áreas protegidas
- * da aplicação.
- *
  * RESPONSABILIDADES:
- * 1. Manter o estado dos campos de email e senha.
- * 2. Utilizar o 'useSessao' para aceder à função de login do contexto.
- * 3. Após um login bem-sucedido, redirecionar o utilizador para a página
- * que ele tentou aceder originalmente ou para a página inicial.
+ * 1. Renderizar a estrutura visual da página de login (fundo, card).
+ * 2. Utilizar componentes reutilizáveis (Input, Botão) para construir o formulário.
+ * 3. Manter o estado dos campos de email e senha.
+ * 4. Chamar a função de login do AuthContexto ao submeter o formulário.
+ * 5. Redirecionar o utilizador após um login bem-sucedido.
  */
 
 import { useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-// Importa o hook para aceder aos dados e funções da sessão.
 import { useSessao } from '../../contextos/AuthContexto';
+import styles from './PaginaLogin.module.css';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
 
 const PaginaLogin = () => {
   // Hooks do React para gerir o estado e a navegação.
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useSessao();
+  const { login, usuario } = useSessao();
 
   // Estados locais para armazenar os valores dos campos do formulário.
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
   // Tenta obter a rota de origem de onde o utilizador foi redirecionado.
-  // O 'state' é passado pelo componente RotaSegura.
   const deOndeVeio = location.state?.from?.pathname || '/';
+
+  // Função para redireciorionar o utilizador após o login.
+  const redirecionarUsuario = (tipo: string) => {
+    switch (tipo) {
+      case "LOJA":
+        navigate("/loja");
+        break;
+      case "JOGADOR":
+        navigate("/jogador");
+        break;
+      case "ADMIN":
+        navigate("/admin");
+        break;
+      default:
+        navigate("/");
+    }
+  };
 
   // Função executada quando o formulário é submetido.
   const handleSubmit = async (evento: FormEvent) => {
-    // Previne o comportamento padrão do formulário, que é recarregar a página.
     evento.preventDefault();
-
-    // Validação simples para garantir que os campos não estão vazios.
+    
     if (!email || !senha) {
       alert('Por favor, preencha o email e a senha.');
       return;
     }
 
     try {
-      // Chama a função 'login' do nosso contexto com as credenciais.
-      // O AuthContexto é quem lida com a chamada à API e com os alertas de erro.
       await login({ email, password: senha });
-
-      // Se o login for bem-sucedido, redireciona o utilizador para a página
-      // de onde ele veio (ex: /dashboard) ou para a página inicial.
-      // 'replace: true' substitui a página de login no histórico do navegador.
-      navigate(deOndeVeio, { replace: true });
-
+      
+      // Redireciona o utilizador para a  para a página padrão ou para a página de origem
+      console.log(deOndeVeio)
+      if (!deOndeVeio || deOndeVeio === "/") {
+        redirecionarUsuario(usuario?.tipo ?? 'JOGADOR');
+      } else {
+        navigate(deOndeVeio, { replace: true });
+      }
     } catch (error) {
-      // O AuthContexto já exibe um alerta de erro (Swal.fire).
-      // Apenas registamos o erro no console para fins de depuração,
-      // pois a função 'login' do contexto relança o erro.
       console.error("Falha na tentativa de login:", error);
     }
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
+    // Aplica a classe para o fundo azul-acinzentado e centralização.
+    <div className={styles.pagina}>
+      {/* Aplica a classe para o card branco central. */}
+      <div className={styles.card}>
+        <h1 className={styles.titulo}>Login</h1>
+
+        <form onSubmit={handleSubmit} className={styles.formulario}>
+          {/* Substitui os inputs HTML pelo componente Input reutilizável. */}
+          <Input
+            label="Email"
             type="email"
-            id="email"
+            name="email"
+            placeholder="exemplo@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </div>
-        <div style={{ marginTop: '10px' }}>
-          <label htmlFor="senha">Senha:</label>
-          <input
+
+          <Input
+            label="Senha"
             type="password"
-            id="senha"
+            name="senha"
+            placeholder="********"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             required
           />
-        </div>
-        <button type="submit" style={{ marginTop: '20px' }}>
-          Entrar
-        </button>
-      </form>
+
+          <Button
+          label="Entrar"
+          type="submit"
+          //backgroundColor="#2c7a64"
+          //height="42px"
+          //fontSize="14px"
+          //borderRadius="6px"
+          //fontWeight={600}
+        />
+        </form>
+      </div>
     </div>
   );
 };

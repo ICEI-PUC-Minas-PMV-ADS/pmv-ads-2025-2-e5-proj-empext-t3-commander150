@@ -1,0 +1,88 @@
+/* src/components/Input/style.module.css */
+
+/*
+ * Estilos para o componente de Input.
+ * As cores e a tipografia foram baseadas no design system do Figma.
+ * O uso de variáveis CSS (--cor-primaria, etc.) facilita a manutenção
+ * e a consistência visual do projeto.
+ */
+
+/* Define as variáveis de cor com base no Figma */
+:root {
+  --cor-texto-principal: #181C32;
+  --cor-fundo-input: #FFFFFF;
+  --cor-borda-input: #E0E0E0; /* Um cinzento claro para a borda */
+  --cor-placeholder: #A9A9A9;
+  --cor-icone: #666;
+  --cor-erro: #D32F2F; /* Um vermelho mais padrão para erros */
+  --fonte-principal: 'Poppins', sans-serif;
+}
+
+/* O container que agrupa o rótulo (label) e o campo de input */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Espaçamento entre o rótulo e o input, conforme o Figma */
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+/* Estilo do rótulo (label) acima do campo de input */
+.label {
+  font-family: var(--fonte-principal);
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--cor-texto-principal);
+}
+
+/* O wrapper que contém o input e o ícone de olho (para senhas) */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Estilo principal do campo de input */
+.input {
+  flex-grow: 1; /* Garante que o input ocupe todo o espaço disponível */
+  padding: 12px;
+  border: 1px solid var(--cor-borda-input);
+  border-radius: 6px; /* Arredondamento conforme o Figma */
+  background-color: var(--cor-fundo-input);
+  font-family: var(--fonte-principal);
+  font-size: 14px;
+  color: var(--cor-texto-principal);
+  outline: none; /* Remove a borda de foco padrão do navegador */
+  transition: border-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+/* Estilo do placeholder */
+.input::placeholder {
+  color: var(--cor-placeholder);
+}
+
+/* Efeito de foco: muda a cor da borda quando o utilizador clica no input */
+.input:focus {
+  border-color: var(--cor-texto-principal);
+}
+
+/* Estilo do ícone de olho para mostrar/ocultar a senha */
+.eyeIcon {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  color: var(--cor-icone);
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Estilo da mensagem de erro (ex: email inválido) */
+.error {
+  color: var(--cor-erro);
+  font-family: var(--fonte-principal);
+  font-size: 12px;
+  margin-top: 4px;
+}

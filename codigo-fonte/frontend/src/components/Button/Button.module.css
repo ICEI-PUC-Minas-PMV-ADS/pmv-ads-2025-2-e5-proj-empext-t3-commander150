@@ -1,0 +1,33 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espaço entre ícone e texto */
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Efeito hover */
+.button:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* Container do ícone */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 768px) {
+  .button {
+    width: 120px;
+    height: 40px;
+    font-size: 13px;
+    padding: 6px 16px;
+  }
+}
