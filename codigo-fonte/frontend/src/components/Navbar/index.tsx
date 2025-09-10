@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import NavItem from "../NavItem";
 import "./style.css";
+import { useSessao } from '../../contextos/AuthContexto';
+
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const { logout } = useSessao();
+    
 
     const navItems = [
         { label: "Teste", url: "/teste" },
@@ -25,7 +29,7 @@ export default function Navbar() {
 
     const handleLogout = async () => {
         setIsMenuOpen(false);
-        navigate("/login");
+        logout();
     };
 
     const handleChangePassword = () => {

@@ -123,3 +123,30 @@ export const cadastrarUsuario = async (
     throw new Error("Erro ao cadastrar usuário. Tente novamente.");
   }
 };
+
+/**
+ * Solicita a API a troca senha do usuário
+ * Se der certo, altera a senha.
+ * Se a chamada falhar, o erro será propagado para ser tratado.
+ */
+// services/authServico.ts
+export const alterarSenhaUsuario = async (
+  userId: number,
+  senhaAntiga: string,
+  novaSenha: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const resposta = await api.post(`/auth/alterar-senha/${userId}/`, {
+      senha_antiga: senhaAntiga,
+      nova_senha: novaSenha,
+    });
+
+    return { success: true, message: resposta.data.message };
+  } catch (error: any) {
+    if (error.response && error.response.data) {
+      const mensagens = Object.values(error.response.data).flat();
+      return { success: false, message: mensagens.join(" ") };
+    }
+    return { success: false, message: "Erro ao alterar senha." };
+  }
+};

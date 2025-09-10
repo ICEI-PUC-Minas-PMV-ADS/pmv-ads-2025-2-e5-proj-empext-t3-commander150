@@ -11,6 +11,7 @@ import JogadorTeste from "../pages/Testes/JogadorTeste";
 import LojaTeste from "../pages/Testes/LojaTeste";
 import PaginaRecuperarSenha from "../pages/PaginaRecuperarSenha";
 import PaginaCadastrar from "../pages/PaginaCadastrar";
+import PaginaAlterarSenha from "../pages/PaginaAlterarSenha";
 
 export default function AppRoutes() {
   return (
@@ -40,6 +41,7 @@ export default function AppRoutes() {
           <Route path="/jogador/" element={<JogadorTeste />} />
           <Route path="/loja/" element={<LojaTeste />} />
           <Route path="/admin/" element={<App />} />
+          <Route path="/alterar-senha/" element={<PaginaAlterarSenha />} />
 
           {/* Adicionar outras rotas protegidas aqui no futuro */}
         </Route>

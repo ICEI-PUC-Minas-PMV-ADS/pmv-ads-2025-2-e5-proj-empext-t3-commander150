@@ -10,7 +10,7 @@
  */
 
 import { useState, type FormEvent } from 'react';
-import { useNavigate, Link, data } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useSessao } from '../../contextos/AuthContexto';
 import styles from './styles.module.css';
 import Input from '../../components/Input';
