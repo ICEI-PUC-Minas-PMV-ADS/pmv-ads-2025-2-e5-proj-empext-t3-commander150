@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -15,7 +16,7 @@ from torneios.permissoes import IsOwnerOrAdmin
 from .authentication import SessionAuthenticationSemCSRF
 from .models import Usuario
 from .serializers import (RequisitarTrocaSenhaSerializer, ValidarTokenRedefinirSenhaSerializer,
-                          UsuarioSerializer, UsuarioCreateSerializer, AlterarSenhaSerializer)
+                          UsuarioSerializer, UsuarioCreateSerializer, AlterarSenhaSerializer, LoginSerializer)
 
 
 class LoginView(APIView):
@@ -24,6 +25,10 @@ class LoginView(APIView):
     """
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={200: UsuarioSerializer(many=False)}
+    )
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -55,6 +60,9 @@ class LogoutView(APIView):
     authentication_classes = [SessionAuthenticationSemCSRF]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={200: 'Logout realizado com sucesso'}
+    )
     def post(self, request):
         session_id = request.session.session_key
 
@@ -69,7 +77,9 @@ class LogoutView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class ValidarSessaoView(APIView):
     """
-    Endpoint que retorna os dados do usuário autenticado via sessão.
+    Endpoint para validar sessão.
+
+    Retorna os dados do usuário autenticado via sessão.
     O frontend usa este endpoint para verificar se o usuário já está logado
     quando a aplicação é carregada.
     A permissão IsAuthenticated já garante que, se esta view for
@@ -77,6 +87,9 @@ class ValidarSessaoView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={200: UsuarioSerializer(many=False)}
+    )
     def get(self, request):
         """
         Retorna os dados serializados do usuário logado (request.user).
@@ -86,8 +99,17 @@ class ValidarSessaoView(APIView):
 
 
 class RequisitarTrocaSenhaView(APIView):
+    """
+    Endpoint para requisitar o Token.
+
+    Em caso de sucesso, envia o Token de Recuperação de Senha para o email do usuário.
+    """
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=RequisitarTrocaSenhaSerializer,
+        responses={200: 'Token enviado com sucesso'}
+    )
     def post(self, request):
         serializer = RequisitarTrocaSenhaSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -123,8 +145,18 @@ class RequisitarTrocaSenhaView(APIView):
 
 
 class ValidarTokenRedefinirSenhaView(APIView):
+    """
+        Endpoint para requisitar a Nova Senha
+
+        Utilizado após estar em posse do Token.
+        Em caso de sucesso, envia o a Nova Senha para o email do usuário.
+        """
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=ValidarTokenRedefinirSenhaSerializer,
+        responses={200: 'Senha redefinida com sucesso'}
+    )
     def post(self, request):
         serializer = ValidarTokenRedefinirSenhaSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -172,6 +204,10 @@ class AlterarSenhaView(APIView):
     """
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
+    @swagger_auto_schema(
+        request_body=AlterarSenhaSerializer,
+        responses={200: 'Senha alterada com sucesso', 400: 'Erro de validação', 404: 'Usuário não encontrado'}
+    )
     def post(self, request, user_id):
         """
         Altera a senha do usuário especificado.

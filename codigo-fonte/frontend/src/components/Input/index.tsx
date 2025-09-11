@@ -31,6 +31,7 @@ interface InputProps {
   minLength?: number;
   required?: boolean;
   label?: string;
+  labelAlign?: "left" | "center" | "right";
 }
 
 const Input = ({
@@ -42,6 +43,7 @@ const Input = ({
   minLength,
   required = false,
   label,
+  labelAlign
 }: InputProps) => {
   // Estado para controlar a visibilidade da senha.
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -69,7 +71,12 @@ const Input = ({
   return (
     <div className={styles.inputGroup}>
       {/* O rótulo (label) só é renderizado se a prop 'label' for fornecida. */}
-      {label && <label htmlFor={name} className={styles.label}>{label}</label>}
+      {label && <label htmlFor={name}
+       className={styles.label}
+       style={{ textAlign: labelAlign ?? "left" }} // default left
+       >
+      {label}
+      </label>}
 
       <div className={styles.inputWrapper}>
         <input

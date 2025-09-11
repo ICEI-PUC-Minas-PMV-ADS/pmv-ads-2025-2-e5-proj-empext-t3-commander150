@@ -51,6 +51,7 @@ interface IAuthContexto {
   qtdCaracteresToken: number;
   login: (credenciais: ILoginCredenciais) => Promise<void>;
   logout: () => Promise<void>;
+  resetUsuario: () => void;
   };
 
 // Cria o Contexto React. O valor inicial é 'undefined', pois só será
@@ -69,6 +70,10 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
   // evitando que a tela "pisque" ou mostre conteúdo indevido enquanto
   // a sessão inicial está sendo verificada.
   const [carregandoSessao, setCarregandoSessao] = useState(true);
+
+  // forçar reset do usuário
+  const resetUsuario = () => setUsuario(null);
+
 
   // Efeito que executa apenas uma vez na inicialização do componente
   // para verificar se já existe uma sessão de usuário válida.
@@ -94,7 +99,7 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
   const qtdCaracteresSenha = 4;
 
   // Define a quantidade mínima de caracteres para o token de recuperação.
-  const qtdCaracteresToken = 4;
+  const qtdCaracteresToken = 16;
 
   // Função para realizar o login do usuário.
   const login = async (credenciais: ILoginCredenciais) => {
@@ -130,6 +135,7 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
     qtdCaracteresToken,
     login,
     logout,
+    resetUsuario
   };
 
   // O componente Provedor que disponibiliza o 'valor' para todos os seus 'filhos'.

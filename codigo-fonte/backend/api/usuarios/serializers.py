@@ -90,3 +90,11 @@ class AlterarSenhaSerializer(serializers.Serializer):
         if data['senha_antiga'] == data['nova_senha']:
             raise serializers.ValidationError("A nova senha não pode ser igual à senha antiga.")
         return data
+
+
+class LoginSerializer(serializers.Serializer):
+    """
+    Utilizado somente para a documentação do Swagger para automatizar os campos na documentação.
+    """
+    email = serializers.EmailField()
+    password = serializers.CharField()

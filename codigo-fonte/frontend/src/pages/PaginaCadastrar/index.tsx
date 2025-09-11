@@ -19,6 +19,8 @@ import Button from '../../components/Button';
 import Radio from '../../components/Radio';
 import { cadastrarUsuario } from '../../services/authServico';
 import Swal from 'sweetalert2';
+import { useSessao } from '../../contextos/AuthContexto';
+
 
 // 2. Define as opções para o nosso grupo de rádio.
 // Manter isto como uma constante fora do componente evita que seja recriado a cada renderização.
@@ -29,12 +31,15 @@ const opcoesTipoUsuario = [
 
 const PaginaCadastrar = () => {
   const navigate = useNavigate();
+    const { login } = useSessao();
 
   const [email, setEmail] = useState('');
   const [nome, setNome] = useState('');
   const [senha, setSenha] = useState('');
   // O estado 'tipo' agora será controlado pelo componente de Rádio.
   const [tipo, setTipo] = useState('');
+  const [loading, setLoading] = useState(false); 
+
 
   const handleSubmit = async (evento: FormEvent) => {
     evento.preventDefault();
@@ -45,22 +50,33 @@ const PaginaCadastrar = () => {
     }
 
     try {
+      setLoading(true);
+
+      // 1. Cadastra o usuário
       await cadastrarUsuario({
         email,
         username: nome,
         password: senha,
-        tipo: tipo as 'JOGADOR' | 'LOJA', // O tipo já é garantido pelo Radio
+        tipo: tipo as 'JOGADOR' | 'LOJA',
       });
 
+      // 2. Faz login automático
+      await login({ email, password: senha });
+
+      // 3. Exibe sucesso e redireciona para página inicial (ou dashboard)
       Swal.fire(
-        'Sucesso no Cadastro',
-        `Sucesso ao registrar o usuário ${nome}. Agora faça o login.`,
+        'Cadastro e Login Realizados!',
+        `Bem-vindo, ${nome}!`,
         'success'
-      );
-      navigate('/login/');
+      ).then(() => {
+        // Redireciona para a página de acordo com o tipo de usuário
+        navigate('/');
+      });
 
     } catch (error) {
       Swal.fire("Erro no cadastro!", (error as Error).message, "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,6 +124,7 @@ const PaginaCadastrar = () => {
         <Button
           label="Cadastrar"
           type="submit"
+          disabled={loading}
         />
 
         <Link to="/login/" className={styles.link}>

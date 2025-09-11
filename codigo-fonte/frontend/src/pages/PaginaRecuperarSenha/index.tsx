@@ -1,4 +1,3 @@
-// ForgotPasswordPage.tsx
 import styles from "./styels.module.css";
 import InputCustom from "../../components/Input";
 import Button from "../../components/Button";
@@ -9,53 +8,60 @@ import { solicitarTokenRecuperacaoSenha, validarTokenRecuperacao} from '../../se
 import Swal from 'sweetalert2';
 
 
-
-
 export default function PaginaRecuperarSenha() {
     const [email, setEmail] = useState("");
     const [token, setToken] = useState("");
     const [etapa, setEtapa] = useState<"email" | "token" | "finalizado">("email");
     const {qtdCaracteresToken } = useSessao();
-    
+    const [isLoading, setIsLoading] = useState(false);
+
     // Função para enviar o email e solicitar o Token de redefinição de senha.
     const handleEnviarEmail = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        let resposta
-        try {
-            resposta = await solicitarTokenRecuperacaoSenha(email);
-        } catch {
-            Swal.fire(
-            'Erro na Recuperação de Senha',
-            'Não foi possível enviar o Token de Recuperação para o email informado. Verifique o email.',
-            'error'
-            );
-        }
+  e.preventDefault();
+  setIsLoading(true);
 
-        if (resposta) {
-            setTimeout(() => setEtapa("token"), 0);
-        }
-    };
+  let resposta;
+  try {
+    resposta = await solicitarTokenRecuperacaoSenha(email);
+  } catch {
+    Swal.fire(
+      "Erro na Recuperação de Senha",
+      "Não foi possível enviar o Token de Recuperação para o email informado. Verifique o email.",
+      "error"
+    );
+  } finally {
+    setIsLoading(false);
+  }
+
+  if (resposta) {
+    setTimeout(() => setEtapa("token"), 0);
+  }
+};
+
 
     // Função para enviar o Token e solicitar nova senha
     const handleEnviarToken = async (e: React.FormEvent) => {
-        e.preventDefault();
-        let resposta
-        try {
-            resposta = await validarTokenRecuperacao(email, token);
-        } catch {
-            Swal.fire(
-            'Erro na Recuperação de Senha',
-            'Não foi possível enviar a Nova Senha utilizando o Token informado. Verifique o Token.',
-            'error'
-            );
-        }
+  e.preventDefault();
+  setIsLoading(true);
 
-        if (resposta) {
-            setTimeout(() => setEtapa("finalizado"), 0);
-        }
-    
-    };
+  let resposta;
+  try {
+    resposta = await validarTokenRecuperacao(email, token);
+  } catch {
+    Swal.fire(
+      "Erro na Recuperação de Senha",
+      "Não foi possível enviar a Nova Senha utilizando o Token informado. Verifique o Token.",
+      "error"
+    );
+  } finally {
+    setIsLoading(false);
+  }
+
+  if (resposta) {
+    setTimeout(() => setEtapa("finalizado"), 0);
+  }
+};
+
 
 
     const handleTrocarEmail = () => {
@@ -138,9 +144,11 @@ export default function PaginaRecuperarSenha() {
         {etapa !== "finalizado" && (
           <div className={styles.buttonRow}>
             <Button
-              label={etapa === "email" ? "Enviar" : "Enviar token"}
-              type="submit"
+                label={isLoading ? "Aguarde..." : etapa === "email" ? "Enviar" : "Enviar token"}
+                type="submit"
+                disabled={isLoading}
             />
+
           </div>
         )}
 

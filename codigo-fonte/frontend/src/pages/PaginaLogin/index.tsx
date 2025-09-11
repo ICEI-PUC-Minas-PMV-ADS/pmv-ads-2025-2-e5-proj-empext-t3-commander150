@@ -9,8 +9,8 @@
  * 5. Redirecionar o utilizador após um login bem-sucedido.
  */
 
-import { useState, type FormEvent } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useLocation, useNavigate, Link} from 'react-router-dom';
 import { useSessao } from '../../contextos/AuthContexto';
 import styles from './styles.module.css';
 import Input from '../../components/Input';
@@ -27,27 +27,40 @@ const PaginaLogin = () => {
   // Estados locais para armazenar os valores dos campos do formulário.
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+   const [loading, setLoading] = useState(false); 
+
 
   // Tenta obter a rota de origem de onde o utilizador foi redirecionado.
   const deOndeVeio = location.state?.from?.pathname || '/';
 
-  // Função para redireciorionar o utilizador após o login.
-  const redirecionarUsuario = (tipo: string) => {
-    switch (tipo) {
-      case "LOJA":
-        navigate("/loja");
-        break;
-      case "JOGADOR":
-        navigate("/jogador");
-        break;
-      case "ADMIN":
-        navigate("/admin");
-        break;
-      default:
-        navigate("/");
-    }
-  };
+  // Redireciona o utilizador assim que o estado 'usuario' é atualizado.
+  useEffect(() => {
+  if (usuario) {
+    const redirecionarUsuario = (tipo: string) => {
+      switch (tipo) {
+        case "LOJA":
+          navigate("/loja");
+          break;
+        case "JOGADOR":
+          navigate("/jogador");
+          break;
+        case "ADMIN":
+          navigate("/admin");
+          break;
+        default:
+          navigate("/");
+      }
+    };
 
+    if (!deOndeVeio || deOndeVeio === "/") {
+      redirecionarUsuario(usuario.tipo ?? "JOGADOR");
+    } else {
+      navigate(deOndeVeio, { replace: true });
+    }
+  }
+}, [usuario, deOndeVeio, navigate]);
+
+  
   // Função executada quando o formulário é submetido.
   const handleSubmit = async (evento: FormEvent) => {
     evento.preventDefault();
@@ -62,16 +75,12 @@ const PaginaLogin = () => {
     }
 
     try {
+      setLoading(true);
       await login({ email, password: senha });
-      
-      // Redireciona o utilizador para a  para a página padrão ou para a página de origem
-      if (!deOndeVeio || deOndeVeio === "/") {
-        redirecionarUsuario(usuario?.tipo ?? 'JOGADOR');
-      } else {
-        navigate(deOndeVeio, { replace: true });
-      }
     } catch (error) {
       console.error("Falha na tentativa de login:", error);
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -104,6 +113,7 @@ const PaginaLogin = () => {
         <Button
           label="Entrar"
           type="submit"
+          disabled={loading}
         />
 
         <Link to="/recuperar-senha/" className={styles.link}>

@@ -1,5 +1,5 @@
 /**
- * Página de Login
+ * Página de Alterar Senha
  *
  * RESPONSABILIDADES:
  * 1. Renderizar a estrutura visual da página de Alteração de senha (fundo, card).
@@ -22,7 +22,8 @@ import Swal from "sweetalert2";
 const PaginaAlterarSenha = () => {
   // Hooks do React para gerir o estado e a navegação.
   const navigate = useNavigate();
-  const { qtdCaracteresSenha, usuario } = useSessao();
+  const { qtdCaracteresSenha, usuario, resetUsuario  } = useSessao();
+   const [loading, setLoading] = useState(false); 
 
   // Estados locais para armazenar os valores dos campos do formulário.
   const [senhaAntiga, setSenhaAntiga] = useState('');
@@ -49,35 +50,43 @@ const PaginaAlterarSenha = () => {
       text: "Usuário não autenticado. Faça login novamente.",
       confirmButtonText: "Tentar novamente"
     })
+      resetUsuario();
       navigate("/login/");
       return;
     }
+    try {
+      setLoading(true);
+      const resultado = await alterarSenhaUsuario(usuario.id, senhaAntiga, novaSenha);
 
-    const resultado = await alterarSenhaUsuario(
-    usuario.id, // vem do contexto do usuário autenticado
-    senhaAntiga,
-    novaSenha
-  );
-
-  if (resultado.success) {
-    Swal.fire({
-      icon: "success",
-      title: "Senha alterada com sucesso!",
-      text:  "Faça login novamente para autenticar.",
-      confirmButtonText: "Ok"
-    }).then(() => {
-      navigate("/login/");
-    });
-  } else {
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: resultado.message,
-      confirmButtonText: "Tentar novamente"
-    });
-  }
+      if (resultado.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Senha alterada com sucesso!",
+          text:  "Faça login novamente para autenticar.",
+          confirmButtonText: "Ok"
+        }).then(() => {
+          resetUsuario();
+          navigate("/login/");
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text: resultado.message,
+          confirmButtonText: "Tentar novamente"
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Erro",
+        text: `Ocorreu um erro inesperado. Tente novamente. (${error})`,
+        confirmButtonText: "Ok"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
-
   return (
     <div className={styles.container}>
       <form className={styles.card} onSubmit={handleSubmit}>
@@ -106,10 +115,11 @@ const PaginaAlterarSenha = () => {
         <Button
           label="Alterar Senha"
           type="submit"
+          disabled={loading}
         />
         <Button
           label="Cancelar"
-          type="submit"
+          type="button"
           onClick={() => navigate(-1)}
         />
       

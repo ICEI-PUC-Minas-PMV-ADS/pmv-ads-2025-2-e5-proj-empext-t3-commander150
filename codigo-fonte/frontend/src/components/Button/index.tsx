@@ -18,7 +18,7 @@ interface ButtonProps {
   paddingVertical?: string;
   paddingHorizontal?: string;
   className?: string;
-
+  disabled?: boolean;
   type?: ButtonType;
 };
 
@@ -27,6 +27,7 @@ interface ButtonProps {
  * 
  * @param label Texto exibido no botão
  * @param onClick Função chamada ao clicar no botão
+ * @param disabled Define se o botão está desabilitado
  * @param icon Ícone opcional exibido à esquerda do texto
  * @param width Largura do botão (ex: '140px')
  * @param height Altura do botão (ex: '44px')
@@ -42,6 +43,7 @@ interface ButtonProps {
 const Button = ({
   label,
   onClick,
+  disabled = false,
   icon,
   width = '100%',
   height = '38px',
@@ -59,25 +61,27 @@ const Button = ({
   
   return (
     <button
-      className={`${styles.button} ${className ?? ''}`}
+  className={`${styles.button} ${className ?? ''}`}
+  type={type}
+  onClick={onClick}
+  disabled={disabled} // <- Novo
+  style={{
+    width,
+    height,
+    backgroundColor,
+    color: textColor,
+    borderRadius,
+    padding: `${paddingVertical} ${paddingHorizontal}`,
+    fontSize,
+    fontWeight,
+    cursor: disabled ? "not-allowed" : "pointer", // <- cursor diferente
+    opacity: disabled ? 0.6 : 1, // <- visual de botão desabilitado
+  }}
+>
+  {icon && <span className={styles.icon}>{icon}</span>}
+  {label}
+</button>
 
-      type={type}
-      onClick={onClick}
-
-      style={{
-        width,
-        height,
-        backgroundColor,
-        color: textColor,
-        borderRadius,
-        padding: `${paddingVertical} ${paddingHorizontal}`,
-        fontSize,
-        fontWeight,
-      }}
-    >
-      {icon && <span className={styles.icon}>{icon}</span>}
-      {label}
-    </button>
   );
 };
 export default Button;

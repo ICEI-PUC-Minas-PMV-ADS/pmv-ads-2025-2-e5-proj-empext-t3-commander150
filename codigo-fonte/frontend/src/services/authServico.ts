@@ -95,6 +95,7 @@ export const cadastrarUsuario = async (
     const resposta = await api.post("/auth/usuarios/", usuario);
     return resposta.data;
   } catch (erro) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const axiosErro = erro as AxiosError<any>;
 
     if (axiosErro.response && axiosErro.response.data) {
@@ -142,6 +143,7 @@ export const alterarSenhaUsuario = async (
     });
 
     return { success: true, message: resposta.data.message };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.response && error.response.data) {
       const mensagens = Object.values(error.response.data).flat();
