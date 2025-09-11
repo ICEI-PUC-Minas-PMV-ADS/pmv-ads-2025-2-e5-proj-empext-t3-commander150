@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
-
+from rest_framework import permissions
+from .models import MesaJogador
 
 class IsAdmin(BasePermission):
     """
@@ -35,9 +36,12 @@ class IsLojaOuAdmin(BasePermission):
     """
 
     def has_permission(self, request, view):
-        is_loja = request.user.tipo == 'LOJA'
-        is_admin = request.user.tipo == 'ADMIN'
-        return bool(request.user and request.user.is_authenticated and (is_loja or is_admin))
+        # PRIMEIRO verifica se está autenticado
+        if not request.user.is_authenticated:
+            return False
+
+        # DEPOIS verifica o tipo do usuário
+        return request.user.tipo in ['LOJA', 'ADMIN']
 
 
 class IsApenasLeitura(BasePermission):
@@ -87,3 +91,14 @@ class IsOwnerOrAdmin(BasePermission):
 
         # Usuário comum só acessa seus próprios recursos
         return obj == request.user
+
+
+class IsJogadorNaMesa(permissions.BasePermission):
+    """Permissão para jogadores que estão na mesa específica"""
+    def has_object_permission(self, request, view, obj):
+        if not request.user.is_authenticated:
+            return False
+        return MesaJogador.objects.filter(
+            id_mesa=obj,
+            id_usuario=request.user
+        ).exists()
