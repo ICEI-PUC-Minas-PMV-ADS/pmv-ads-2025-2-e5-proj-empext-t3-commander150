@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 
 from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador
 
@@ -17,10 +18,93 @@ class TorneioSerializer(serializers.ModelSerializer):
 
 class InscricaoSerializer(serializers.ModelSerializer):
     """Serializer para o modelo Inscricao."""
+    username = serializers.CharField(source='id_usuario.username', read_only=True)
+    email = serializers.CharField(source='id_usuario.email', read_only=True)
+    nome_torneio = serializers.CharField(source='id_torneio.nome', read_only=True)
 
     class Meta:
         model = Inscricao
-        fields = '__all__'
+        fields = ['id', 'id_usuario', 'username', 'email', 'id_torneio', 'nome_torneio', 
+                 'decklist', 'status', 'data_inscricao']
+        read_only_fields = ['id', 'data_inscricao']
+
+
+class InscricaoCreateSerializer(serializers.ModelSerializer):
+    """Serializer específico para criação de inscrições."""
+    
+    class Meta:
+        model = Inscricao
+        fields = ['id_torneio', 'decklist']
+    
+    def validate_id_torneio(self, value):
+        """Valida se o torneio existe e está aberto para inscrições de jogadores."""
+        if not value:
+            raise serializers.ValidationError("Torneio é obrigatório.")
+        
+        # Jogadores só podem se inscrever em torneios abertos
+        if value.status != 'Aberto':
+            raise serializers.ValidationError(
+                f"Jogadores só podem se inscrever em torneios abertos. Status atual: {value.status}"
+            )
+        
+        return value
+    
+    def validate(self, data):
+        """Validações adicionais para criação de inscrição."""
+        torneio = data.get('id_torneio')
+        
+        # Verifica se o usuário já está inscrito no torneio
+        if Inscricao.objects.filter(
+            id_usuario=self.context['request'].user,
+            id_torneio=torneio
+        ).exists():
+            raise serializers.ValidationError(
+                "Você já está inscrito neste torneio."
+            )
+        
+        return data
+
+
+class InscricaoLojaSerializer(serializers.ModelSerializer):
+    """Serializer para loja gerenciar inscrições de outros jogadores."""
+    username = serializers.CharField(source='id_usuario.username', read_only=True)
+    email = serializers.CharField(source='id_usuario.email', read_only=True)
+    
+    class Meta:
+        model = Inscricao
+        fields = ['id', 'id_usuario', 'username', 'email', 'id_torneio', 
+                 'decklist', 'status', 'data_inscricao']
+        read_only_fields = ['id', 'data_inscricao']
+    
+    def validate_id_usuario(self, value):
+        """Valida se o usuário é um jogador."""
+        if value.tipo != 'JOGADOR':
+            raise serializers.ValidationError(
+                "Apenas jogadores podem ser inscritos em torneios."
+            )
+        return value
+    
+    def validate_id_torneio(self, value):
+        """Valida se o torneio pertence à loja ou se é admin."""
+        user = self.context['request'].user
+        
+        # Admin pode gerenciar qualquer torneio
+        if user.tipo == 'ADMIN':
+            return value
+        
+        # Loja só pode gerenciar seus próprios torneios
+        if value.id_loja != user:
+            raise serializers.ValidationError(
+                "Você só pode gerenciar inscrições dos seus próprios torneios."
+            )
+        
+        # Loja pode inscrever jogadores em torneios abertos ou em andamento
+        if value.status not in ['Aberto', 'Em Andamento']:
+            raise serializers.ValidationError(
+                f"Lojas só podem inscrever jogadores em torneios abertos ou em andamento. Status atual: {value.status}"
+            )
+        
+        return value
 
 
 class RodadaSerializer(serializers.ModelSerializer):
@@ -137,3 +221,60 @@ class VisualizacaoMesaJogadorSerializer(serializers.ModelSerializer):
         """Retorna os 2 jogadores do time 2"""
         jogadores_time_2 = obj.jogadores_na_mesa.filter(time=2).order_by('id')
         return MesaJogadorSerializer(jogadores_time_2, many=True).data
+
+
+# Serializers para documentação do Swagger
+class DesinscreverPayloadSerializer(serializers.Serializer):
+    """Payload para desinscrição de jogador"""
+    torneio_id = serializers.IntegerField(
+        help_text="ID do torneio do qual o jogador quer se desinscrever"
+    )
+
+
+class GerenciarInscricaoPayloadSerializer(serializers.Serializer):
+    """Payload para loja gerenciar inscrições"""
+    id_usuario = serializers.IntegerField(
+        help_text="ID do usuário jogador a ser inscrito"
+    )
+    id_torneio = serializers.IntegerField(
+        help_text="ID do torneio"
+    )
+    decklist = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Lista de cartas do deck do jogador"
+    )
+    status = serializers.ChoiceField(
+        choices=['Inscrito', 'Confirmado', 'Desclassificado'],
+        required=False,
+        default='Inscrito',
+        help_text="Status da inscrição"
+    )
+
+
+class RemoverInscricaoPayloadSerializer(serializers.Serializer):
+    """Payload para remoção de inscrição"""
+    usuario_id = serializers.IntegerField(
+        help_text="ID do usuário jogador"
+    )
+    torneio_id = serializers.IntegerField(
+        help_text="ID do torneio"
+    )
+
+
+class InscricaoResponseSerializer(serializers.Serializer):
+    """Response padrão para operações de inscrição"""
+    message = serializers.CharField(help_text="Mensagem de sucesso")
+    inscricao = InscricaoSerializer(required=False, help_text="Dados da inscrição")
+
+
+class DesinscricaoResponseSerializer(serializers.Serializer):
+    """Response para desinscrição"""
+    message = serializers.CharField(help_text="Mensagem de sucesso")
+
+
+class ListaInscricoesResponseSerializer(serializers.Serializer):
+    """Response para lista de inscrições de um torneio"""
+    torneio = TorneioSerializer(help_text="Dados do torneio")
+    inscricoes = InscricaoSerializer(many=True, help_text="Lista de inscrições")
+    total_inscritos = serializers.IntegerField(help_text="Total de jogadores inscritos")
