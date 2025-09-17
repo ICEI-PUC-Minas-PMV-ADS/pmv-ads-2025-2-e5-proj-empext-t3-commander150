@@ -4,12 +4,25 @@
   padding: 0;
   box-sizing: border-box;
   border: 0;
+  border-radius: 80%;
   background: transparent;
   font-family: "Poppins", sans-serif;
+  --var-cor-primaria:#003A70;
+  --var-cor-secundaria: #1E293B; 
+  --var-cor-terciaria: #0F172A;
+  --var-cor-rosa:  rgba(186, 150, 213, 80%);
+  --var-cor-cinza-placeholder: #C9C9C9;
+  --var-cor-cinza-titulos: #CFCFCF;
+  --var-cor-branca: #FFFFFF;
+  --var-cor-azul-fundo-section: #192231;
+  /* --var-borda-section: 1px solid var(--var-cor-rosa); */
+  --var-borda-section: 1px solid rgba(186, 150, 213, 0.5);
+
 }
 
 body {
   min-height: 100vh;
   width: 100vw;
   margin: 0;
+  background-color: var(--var-cor-secundaria);
 }

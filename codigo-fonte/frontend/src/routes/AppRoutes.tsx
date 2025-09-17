@@ -12,6 +12,7 @@ import LojaTeste from "../pages/Testes/LojaTeste";
 import PaginaRecuperarSenha from "../pages/PaginaRecuperarSenha";
 import PaginaCadastrar from "../pages/PaginaCadastrar";
 import PaginaAlterarSenha from "../pages/PaginaAlterarSenha";
+import InscricaoTorneio from "../pages/InscricaoTorneio";
 
 export default function AppRoutes() {
   return (
@@ -38,7 +39,8 @@ export default function AppRoutes() {
       <Route element={<RotaSegura />}>
         <Route element={<Layout />}>
           <Route path="/" element={<App />} />
-          <Route path="/jogador/" element={<JogadorTeste />} />
+          {/* <Route path="/jogador/" element={<JogadorTeste />} /> */}
+          <Route path="/jogador/" element={<InscricaoTorneio />} />
           <Route path="/loja/" element={<LojaTeste />} />
           <Route path="/admin/" element={<App />} />
           <Route path="/alterar-senha/" element={<PaginaAlterarSenha />} />

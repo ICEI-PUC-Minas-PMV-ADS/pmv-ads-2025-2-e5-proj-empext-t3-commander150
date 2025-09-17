@@ -27,7 +27,9 @@ const PaginaLogin = () => {
   // Estados locais para armazenar os valores dos campos do formulário.
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-   const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false); 
+  const corTextInputs = "var(--cor-texto-principal)";
+  const corBackgroundInputs = "#FFFFFF";
 
 
   // Tenta obter a rota de origem de onde o utilizador foi redirecionado.
@@ -97,6 +99,8 @@ const PaginaLogin = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          backgroundColor={corBackgroundInputs}
+          textColor={corTextInputs}
         />
 
         <Input
@@ -108,6 +112,9 @@ const PaginaLogin = () => {
           onChange={(e) => setSenha(e.target.value)}
           required
           minLength={qtdCaracteresSenha}
+          backgroundColor={corBackgroundInputs}
+          textColor={corTextInputs}
+
         />
         
         <Button

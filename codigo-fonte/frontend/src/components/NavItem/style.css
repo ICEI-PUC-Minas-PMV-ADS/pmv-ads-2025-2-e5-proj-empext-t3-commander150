@@ -8,7 +8,7 @@
 
         &.active, 
         &:hover{
-            color: #000000;
+            color: #FFFFFF;
             border-bottom: 2px solid midnightblue;
         }
     }

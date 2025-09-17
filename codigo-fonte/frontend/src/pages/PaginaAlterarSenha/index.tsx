@@ -23,11 +23,15 @@ const PaginaAlterarSenha = () => {
   // Hooks do React para gerir o estado e a navegação.
   const navigate = useNavigate();
   const { qtdCaracteresSenha, usuario, resetUsuario  } = useSessao();
-   const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false); 
 
   // Estados locais para armazenar os valores dos campos do formulário.
   const [senhaAntiga, setSenhaAntiga] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
+
+  // Estilos
+  const corTextInputs = "var(--cor-texto-principal)";
+  const corBackgroundInputs = "#FFFFFF";
 
   // Função executada quando o formulário é submetido.
   const handleSubmit = async (evento: FormEvent) => {
@@ -100,6 +104,8 @@ const PaginaAlterarSenha = () => {
           onChange={(e) => setSenhaAntiga(e.target.value)}
           required
           minLength={qtdCaracteresSenha}
+          backgroundColor={corBackgroundInputs}
+          textColor={corTextInputs}
         />
         <Input
           type="password"
@@ -110,6 +116,8 @@ const PaginaAlterarSenha = () => {
           onChange={(e) => setNovaSenha(e.target.value)}
           required
           minLength={qtdCaracteresSenha}
+          backgroundColor={corBackgroundInputs}
+          textColor={corTextInputs}
         />
         
         <Button

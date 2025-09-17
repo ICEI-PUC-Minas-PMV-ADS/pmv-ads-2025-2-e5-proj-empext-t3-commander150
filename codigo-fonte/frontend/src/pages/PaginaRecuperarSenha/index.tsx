@@ -1,5 +1,5 @@
 import styles from "./styels.module.css";
-import InputCustom from "../../components/Input";
+import Input from "../../components/Input";
 import Button from "../../components/Button";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -14,6 +14,8 @@ export default function PaginaRecuperarSenha() {
     const [etapa, setEtapa] = useState<"email" | "token" | "finalizado">("email");
     const {qtdCaracteresToken } = useSessao();
     const [isLoading, setIsLoading] = useState(false);
+    const corTextInputs = "var(--cor-texto-principal)";
+  const corBackgroundInputs = "#FFFFFF";
 
     // Função para enviar o email e solicitar o Token de redefinição de senha.
     const handleEnviarEmail = async (e: React.FormEvent) => {
@@ -79,7 +81,7 @@ export default function PaginaRecuperarSenha() {
                 <p className={styles.subtitle}>
                 Digite o seu e-mail no campo abaixo e lhe enviaremos uma nova senha.
                 </p>
-                <InputCustom
+                <Input
                 type="email"
                 name="email"
                 label="Email"
@@ -87,6 +89,8 @@ export default function PaginaRecuperarSenha() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                backgroundColor={corBackgroundInputs}
+                textColor={corTextInputs}
                 />
             </>
             );
@@ -97,7 +101,7 @@ export default function PaginaRecuperarSenha() {
                 <p className={styles.subtitle}>
                 Enviamos um código para o seu e-mail. Cole abaixo para confirmar sua identidade.
                 </p>
-                <InputCustom
+                <Input
                 type="text"
                 name="token"
                 label="Token"
@@ -106,6 +110,8 @@ export default function PaginaRecuperarSenha() {
                 onChange={(e) => setToken(e.target.value)}
                 required
                 minLength={qtdCaracteresToken}
+                backgroundColor={corBackgroundInputs}
+                textColor={corTextInputs}
                 />
                 
                 <Button

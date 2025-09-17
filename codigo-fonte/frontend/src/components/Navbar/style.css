@@ -4,7 +4,7 @@ header {
         align-items: center;
         justify-content: space-between;
         padding: 0px 40px 0px 0px;
-        background-color: rgb(255, 255, 255);
+        background-color: #13111D;
         box-shadow: 0px 11px 12px -7px rgba(0, 0, 0, 0.1);
     };
 
@@ -58,11 +58,12 @@ header {
 
 button{
     background-color: transparent;
-    color: #505050;
+    color: #FFFFFF;
 }
 
 p{
-    color: #505050;
+    color: #FFFFFF;
+    font-weight: bold;
 }
 
 .dropdown-menu {
@@ -87,6 +88,7 @@ p{
     cursor: pointer;
     font-size: 14px;
     border-radius: 4px;
+    color: #202020;
 }
 
 .dropdown-item:hover {

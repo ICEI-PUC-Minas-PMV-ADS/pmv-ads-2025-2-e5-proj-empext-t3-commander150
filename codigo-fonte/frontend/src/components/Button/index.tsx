@@ -64,7 +64,7 @@ const Button = ({
   className={`${styles.button} ${className ?? ''}`}
   type={type}
   onClick={onClick}
-  disabled={disabled} // <- Novo
+  disabled={disabled}
   style={{
     width,
     height,

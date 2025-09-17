@@ -26,12 +26,16 @@ interface InputProps {
   type: "text" | "email" | "password";
   name: string;
   placeholder?: string;
+  placeholderColor?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   minLength?: number;
   required?: boolean;
   label?: string;
   labelAlign?: "left" | "center" | "right";
+  labelColor?: string;
+  textColor?: string;
+  backgroundColor?: string;
 }
 
 const Input = ({
@@ -43,7 +47,11 @@ const Input = ({
   minLength,
   required = false,
   label,
-  labelAlign
+  labelAlign,
+  labelColor,
+  textColor,
+  backgroundColor,
+
 }: InputProps) => {
   // Estado para controlar a visibilidade da senha.
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -73,7 +81,10 @@ const Input = ({
       {/* O rótulo (label) só é renderizado se a prop 'label' for fornecida. */}
       {label && <label htmlFor={name}
        className={styles.label}
-       style={{ textAlign: labelAlign ?? "left" }} // default left
+       style={{
+            textAlign: labelAlign ?? "left",
+            color: labelColor ?? "var(--cor-texto-principal)"
+          }}
        >
       {label}
       </label>}
@@ -91,6 +102,10 @@ const Input = ({
           onChange={type === "email" ? handleValidacaoEmail : onChange}
           required={required}
           minLength={type === "password" && minLength ? minLength : undefined}
+          style={{ 
+            color: textColor ?? "var(--var-cor-cinza-titulos)" ,
+            backgroundColor: backgroundColor ?? "var(--var-cor-azul-fundo-section)",
+          }}
         />
 
         {/* O ícone de olho só é renderizado se o tipo for 'password'. */}
