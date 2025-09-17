@@ -3,7 +3,7 @@
 ### Pré-Requisitos para utilizar a API (localmente):
 1. **Clone o repositório em sua máquina local usando o comando abaixo ou faça manualmente em sua IDE** 
   ````
-  git clone https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e5-proj-empext-t3-commander150150.git
+  git clone https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e5-proj-empext-t3-commander150.git
   ````
 2. **Instalar o Python**
 - Certifique-se de ter o Python 3.12.4 instalado. Você pode fazer o download em [Python 3.12.4](https://www.python.org/downloads/release/python-3124/)

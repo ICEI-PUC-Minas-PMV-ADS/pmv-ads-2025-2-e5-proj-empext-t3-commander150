@@ -147,6 +147,7 @@ class MesaDetailSerializer(serializers.ModelSerializer):
             'pontuacao_time_2', 'jogadores'
         ]
 
+# OK para RF-012
 class ReportarResultadoSerializer(serializers.Serializer):
     """Serializer para reportar resultados de partida"""
     pontuacao_time_1 = serializers.IntegerField(min_value=0)

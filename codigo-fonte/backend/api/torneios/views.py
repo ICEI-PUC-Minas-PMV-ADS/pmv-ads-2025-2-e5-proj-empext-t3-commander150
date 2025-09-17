@@ -2,8 +2,12 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from django.shortcuts import get_object_or_404
+from django.db import transaction
+
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador
 from .permissoes import IsLojaOuAdmin, IsApenasLeitura, IsJogadorNaMesa
@@ -333,24 +337,74 @@ class MesaViewSet(viewsets.ModelViewSet):
             return MesaDetailSerializer
         return MesaSerializer
 
+    @swagger_auto_schema(
+        method="post",
+        request_body=ReportarResultadoSerializer,
+        responses={
+            200: openapi.Response("Resultado registrado com sucesso", schema=MesaDetailSerializer),
+            400: "Erro de validação (placar, composição 2v2, payload)",
+            403: "A rodada não está 'Em Andamento' ou permissão negada",
+            404: "Mesa não encontrada"
+        },
+        operation_summary="Reportar resultado da mesa (RF-012)",
+        operation_description=(
+                "Permite que o jogador da mesa reporte/edite o resultado da partida.\n\n"
+                "Regras:\n"
+                "- Rodada deve estar 'Em Andamento'.\n"
+                "- Mesa deve estar completa no formato 2v2 (02 jogadores no Time 1 e 02 no Time 2).\n"
+                "- Valida coerência entre pontuações e `time_vencedor`.\n\n"
+                "Campos:\n"
+                "- `pontuacao_time_1` (int ≥ 0)\n"
+                "- `pontuacao_time_2` (int ≥ 0)\n"
+                "- `time_vencedor` (0=Empate, 1=Time 1, 2=Time 2)"
+        ),
+    )
+
     @action(detail=True, methods=['post'], permission_classes=[IsJogadorNaMesa])
     def reportar_resultado(self, request, pk=None):
-        """Permite que jogadores reportem resultados da partida"""
-        mesa = self.get_object()
-        serializer = ReportarResultadoSerializer(data=request.data)
+        # Aqui é um bloqueio transacional > evitar processamento de dois reports simultâneos
+        with (transaction.atomic()):
+            # lock pessimista na mesa
+            # É um bloqueio exclusivo de linha feito pelo banco quando usamos select_for_update().
+            # Enquanto uma transação está rodando (no bloco with transaction.atomic():),
+            # a dada linha da tabela (neste caso, a mesa específica) fica bloqueada para escrita por outros usuários/processos.
+            # impede que dois jogadores tentem reportar o resultado da mesma mesa, ao mesmo tempo, teríamos uma inconsistência.
+            mesa = Mesa.objects.select_for_update().select_related('id_rodada').get(pk=pk)
 
-        if serializer.is_valid():
+            # para evitar um 500 se o pk não existir
+            if not mesa:
+                return Response({"detail": "Mesa não encontrada."}, status=status.HTTP_404_NOT_FOUND)
+
+            # é necessário que Rodada precisa estar 'Em Andamento'
+            if getattr(mesa.id_rodada, 'status', None) != 'Em Andamento':
+                return Response(
+                    {"detail": "Não é possível reportar resultado: a rodada não está 'Em Andamento'."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Mesa precisa estar completa: 2v2
+            jogadores = list(MesaJogador.objects.filter(id_mesa=mesa).only('time'))
+            if len(jogadores) != 4 or sum(j.time == 1 for j in jogadores) != 2 or sum(j.time == 2 for j in jogadores) != 2:
+                return Response(
+                    {"detail": "Mesa inválida: é necessário haver 2 jogadores no Time 1 e 2 no Time 2 (2x2)."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # validacao de payload
+            serializer = ReportarResultadoSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            # aplicacao de resultado
             mesa.pontuacao_time_1 = serializer.validated_data['pontuacao_time_1']
             mesa.pontuacao_time_2 = serializer.validated_data['pontuacao_time_2']
-            mesa.time_vencedor = serializer.validated_data['time_vencedor']
-            mesa.save()
+            mesa.time_vencedor    = serializer.validated_data['time_vencedor']
+            mesa.save(update_fields=['pontuacao_time_1', 'pontuacao_time_2', 'time_vencedor'])
 
-            return Response({
-                'message': 'Resultado reportado com sucesso',
-                'mesa': MesaDetailSerializer(mesa).data
-            }, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # resposta
+        return Response({
+            'message': 'Resultado reportado com sucesso',
+            'mesa': MesaDetailSerializer(mesa).data
+        }, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'], permission_classes=[IsLojaOuAdmin])
     def editar_manual(self, request, pk=None):
