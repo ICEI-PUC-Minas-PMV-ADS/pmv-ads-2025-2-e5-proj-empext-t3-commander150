@@ -9,12 +9,12 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 
 | Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Assertivas |
 |---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|------------|
-| Login         | Acessar              | CT-001-S | Credenciais válidas                   | CPF válido, senha válida                            | Sucesso         | Redireciona para página inicial |
-| Login         | Acessar              | CT-001-I | Credenciais inválidas                 | CPF válido, senha inválida                          | Insucesso       | Mensagem "Login inválido" |
-| Login         | Recuperar senha      | CT-002-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Link de redefinição enviado |
-| Login         | Recuperar senha      | CT-002-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Mensagem "Email não cadastrado" |
-| Permissão     | Redirecionar         | CT-003-S | Acesso como administrador             | Usuário com perfil admin                            | Sucesso         | Vai para interface de administração |
-| Permissão     | Redirecionar         | CT-003-I | Perfil inexistente                     | Usuário sem perfil                                  | Insucesso       | Mensagem de erro |
+| Autenticação  | Realizar Login       | CT-001-S | Credenciais válidas                   | Email válido, senha válida                          | Sucesso         | Cria uma sessão e retorna os dados do usuário |
+| Autenticação  | Realizar Login       | CT-001-I | Credenciais inválidas                 | Email válido, senha inválida                      | Insucesso       | Retorna código e mensagem de erro |
+| Autenticação  | Recuperar senha      | CT-002-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
+| Autenticação  | Recuperar senha      | CT-002-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Retorna código e mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-003-S | Acesso aos próprios dados             | ID de usuário igual a ID da sessão logada           | Sucesso         | Retorna os dados requisitados |
+| Permissão     | Controlar Acesso     | CT-003-I | Acesso a dados que pertencem a outro usuário                    | ID de usuário diferente da ID da sessão logada                                 | Insucesso       | Retorna código e mensagem de erro |
 | Torneio       | Inscrição            | CT-004-S | Jogador se inscreve                   | Dados válidos, torneio aberto                       | Sucesso         | Jogador inscrito |
 | Torneio       | Inscrição            | CT-004-I | Inscrição fora do prazo               | Jogador válido, torneio encerrado                   | Insucesso       | Mensagem "Inscrição indisponível" |
 | Torneio       | Desinscrição         | CT-005-S | Jogador se desinscreve                | Jogador inscrito, rodada entre turnos               | Sucesso         | Jogador removido |
@@ -22,7 +22,7 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Loja          | Inscrição jogador    | CT-006-S | Inscrição pela loja                   | Jogador válido, torneio aberto                      | Sucesso         | Jogador inscrito pela loja |
 | Loja          | Desinscrição jogador | CT-006-I | Desinscrição após término             | Jogador válido, torneio encerrado                   | Insucesso       | Mensagem de erro |
 | Rodada        | Visualizar score     | CT-007-S | Visualização de mesas e score         | Rodada ativa                                        | Sucesso         | Exibe mesas e pontuação |
-| Rodada        | Visualizar score     | CT-007-I | Erro ao carregar mesas                 | Rodada inexistente                                  | Insucesso       | Mensagem "Dados indisponíveis" |
+| Rodada        | Visualizar score     | CT-007-I | Erro ao carregar mesas                | Rodada inexistente                                  | Insucesso       | Mensagem "Dados indisponíveis" |
 | Partida       | Reportar resultado   | CT-008-S | Reporte válido                        | Partida ativa, resultado válido                     | Sucesso         | Resultado registrado |
 | Partida       | Reportar resultado   | CT-008-I | Reporte inválido                      | Resultado fora do padrão                            | Insucesso       | Mensagem de erro |
 | Score         | Gerar tabela         | CT-009-S | Geração automática                    | Partidas válidas                                    | Sucesso         | Tabela de score atualizada |
@@ -37,6 +37,13 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Mesas         | Editar manualmente   | CT-013-I | Edição inválida                       | Número de mesa inexistente                          | Insucesso       | Mensagem de erro |
 | Pontuação     | Ajustar sistema      | CT-014-S | Ajuste válido                         | Critérios válidos                                   | Sucesso         | Sistema aplica novas regras |
 | Pontuação     | Ajustar sistema      | CT-014-I | Ajuste inválido                       | Critérios fora do padrão                            | Insucesso       | Mensagem de erro |
+| Autenticação  | Recuperar senha      | CT-015-S | Recuperação com token válido          | Token válido                                        | Sucesso         | Nova senha enviada para email |
+| Autenticação  | Recuperar senha      | CT-015-I | Recuperação com token inválido        | Token inválido                                      | Insucesso       | Retorna código e mensagem de erro |
+| Autenticação  | Alterar senha        | CT-016-S | Alteração de senha com senha atual válida          | Senha atual válida                     | Sucesso         | Altera a senha |
+| Autenticação  | Alterar senha        | CT-016-I | Alteração de senha com senha atual inválida        | Senha atual inválida                                | Insucesso       | Retorna código e mensagem de erro |
+| Autenticação  | Alterar senha        | CT-017-I | Alteração de senha com nova senha igual a senha atual        | Nova senha igual a senha atual                                | Insucesso       | Retorna código e mensagem de erro |
+| Autenticação  | Realizar Login       | CT-018-I | Credenciais inválidas                 | Email inválido, senha válida                        | Insucesso       | Retorna código e mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-019-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Retorna os dados requisitados |
 
 ### ETAPA 3
 Criar casos de teste da etapa 3
@@ -187,11 +194,11 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
 ### Exemplo
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-001<br>Login com credenciais válidas</th>
+    <th colspan="6" width="1000">CT-001<br>Autenticação com credenciais válidas</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O sistema deve redirecionar o usuário para a página inicial do aplicativo após o login bem-sucedido.</td>
+    <td colspan="5">O sistema deve redirecionar o usuário para a página inicial do aplicativo após o Autenticação bem-sucedido.</td>
   </tr>
     <tr>
       <td><strong>Responsável pela funcionalidade</strong></td>
@@ -203,7 +210,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O sistema está permitindo o login corretamente.</td>
+    <td colspan="5">O sistema está permitindo o Autenticação corretamente.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
