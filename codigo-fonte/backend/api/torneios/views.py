@@ -1,18 +1,14 @@
-from rest_framework import viewsets, permissions, status, serializers
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
-from drf_yasg.utils import swagger_auto_schema
 
 from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador
 from .permissoes import IsLojaOuAdmin, IsApenasLeitura, IsJogadorNaMesa
 from .serializers import (
     TorneioSerializer, InscricaoSerializer, InscricaoCreateSerializer, InscricaoLojaSerializer, RodadaSerializer,
     MesaSerializer, MesaDetailSerializer, ReportarResultadoSerializer,
-    MesaJogadorSerializer, EditarJogadoresMesaSerializer, VisualizacaoMesaJogadorSerializer,
-    DesinscreverPayloadSerializer, GerenciarInscricaoPayloadSerializer, RemoverInscricaoPayloadSerializer,
-    InscricaoResponseSerializer, DesinscricaoResponseSerializer, ListaInscricoesResponseSerializer
+    EditarJogadoresMesaSerializer, VisualizacaoMesaJogadorSerializer, InscricaoResponseSerializer
 )
 
 
@@ -90,19 +86,19 @@ class InscricaoViewSet(viewsets.ModelViewSet):
     serializer_class = InscricaoSerializer
     http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']  # remove patch
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         """
         Filtra as inscrições visíveis baseado no tipo do usuário.
         """
         user = self.request.user
-        
+
         if user.tipo == 'ADMIN':
             return Inscricao.objects.all()
         elif user.tipo == 'LOJA':
             return Inscricao.objects.filter(id_torneio__id_loja=user)
         return Inscricao.objects.filter(id_usuario=user)
-    
+
     def get_serializer_class(self):
         """
         Define serializer baseado na ação e tipo de usuário:
@@ -112,7 +108,7 @@ class InscricaoViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return InscricaoCreateSerializer if self.request.user.tipo == 'JOGADOR' else InscricaoLojaSerializer
         return InscricaoSerializer
-    
+
     @swagger_auto_schema(
         request_body=InscricaoCreateSerializer,
         responses={
@@ -145,8 +141,8 @@ class InscricaoViewSet(viewsets.ModelViewSet):
 
     # Removidas implementações de put e delete pois a validação de rodada ativa
     # já está implementada no serializer InscricaoSerializer
-    
-    
+
+
 class RodadaViewSet(viewsets.ModelViewSet):
     """
     Endpoint para visualizar e gerenciar as rodadas de um torneio.
