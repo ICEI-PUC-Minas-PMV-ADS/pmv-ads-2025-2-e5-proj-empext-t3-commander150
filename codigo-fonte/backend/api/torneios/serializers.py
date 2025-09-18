@@ -17,7 +17,11 @@ class TorneioSerializer(serializers.ModelSerializer):
 
 
 class InscricaoSerializer(serializers.ModelSerializer):
-    """Serializer para o modelo Inscricao."""
+    """
+    Serializer padrão para modelo Inscricao.
+    Usado para operações de leitura e atualização.
+    Inclui informações do usuário e do torneio.
+    """
     username = serializers.CharField(source='id_usuario.username', read_only=True)
     email = serializers.CharField(source='id_usuario.email', read_only=True)
     nome_torneio = serializers.CharField(source='id_torneio.nome', read_only=True)
@@ -28,45 +32,63 @@ class InscricaoSerializer(serializers.ModelSerializer):
                  'decklist', 'status', 'data_inscricao']
         read_only_fields = ['id', 'data_inscricao']
 
+    def validate(self, data):
+        """
+        Validações gerais para atualização de inscrição:
+        - Verifica se o torneio não está em rodada ativa
+        """
+        if self.instance:  # Validação apenas para atualização
+            rodada_ativa = Rodada.objects.filter(
+                id_torneio_id=self.instance.id_torneio_id,
+                status='Em Andamento'
+            ).exists()
+            
+            if rodada_ativa:
+                raise serializers.ValidationError(
+                    "Não é possível alterar inscrição durante uma rodada ativa."
+                )
+        
+        return data
+
 
 class InscricaoCreateSerializer(serializers.ModelSerializer):
-    """Serializer específico para criação de inscrições."""
-    
+    """
+    Serializer específico para criação de inscrições por jogadores.
+    Campos reduzidos e validações específicas para jogadores.
+    """
     class Meta:
         model = Inscricao
         fields = ['id_torneio', 'decklist']
     
     def validate_id_torneio(self, value):
-        """Valida se o torneio existe e está aberto para inscrições de jogadores."""
+        """
+        Validações específicas para torneio:
+        - Torneio deve existir e estar aberto
+        - Jogador não pode estar já inscrito
+        """
         if not value:
             raise serializers.ValidationError("Torneio é obrigatório.")
         
-        # Jogadores só podem se inscrever em torneios abertos
         if value.status != 'Aberto':
             raise serializers.ValidationError(
                 f"Jogadores só podem se inscrever em torneios abertos. Status atual: {value.status}"
             )
-        
-        return value
-    
-    def validate(self, data):
-        """Validações adicionais para criação de inscrição."""
-        torneio = data.get('id_torneio')
-        
-        # Verifica se o usuário já está inscrito no torneio
+
+        # Verifica se o usuário já está inscrito
         if Inscricao.objects.filter(
             id_usuario=self.context['request'].user,
-            id_torneio=torneio
+            id_torneio=value
         ).exists():
-            raise serializers.ValidationError(
-                "Você já está inscrito neste torneio."
-            )
+            raise serializers.ValidationError("Você já está inscrito neste torneio.")
         
-        return data
+        return value
 
 
 class InscricaoLojaSerializer(serializers.ModelSerializer):
-    """Serializer para loja gerenciar inscrições de outros jogadores."""
+    """
+    Serializer para loja/admin gerenciar inscrições.
+    Inclui campos adicionais e validações específicas para gestão.
+    """
     username = serializers.CharField(source='id_usuario.username', read_only=True)
     email = serializers.CharField(source='id_usuario.email', read_only=True)
     
@@ -76,35 +98,49 @@ class InscricaoLojaSerializer(serializers.ModelSerializer):
                  'decklist', 'status', 'data_inscricao']
         read_only_fields = ['id', 'data_inscricao']
     
-    def validate_id_usuario(self, value):
-        """Valida se o usuário é um jogador."""
-        if value.tipo != 'JOGADOR':
+    def validate(self, data):
+        """
+        Validações para criação/atualização por loja/admin:
+        - Usuário deve ser jogador
+        - Torneio deve pertencer à loja (exceto admin)
+        - Validações de status do torneio
+        - Verificação de rodada ativa para atualizações
+        """
+        user = self.context['request'].user
+        usuario = data.get('id_usuario')
+        torneio = data.get('id_torneio')
+
+        # Validação de tipo de usuário
+        if usuario and usuario.tipo != 'JOGADOR':
             raise serializers.ValidationError(
                 "Apenas jogadores podem ser inscritos em torneios."
             )
-        return value
-    
-    def validate_id_torneio(self, value):
-        """Valida se o torneio pertence à loja ou se é admin."""
-        user = self.context['request'].user
+
+        # Validações específicas para loja (admin ignora estas validações)
+        if user.tipo != 'ADMIN':
+            if torneio.id_loja != user:
+                raise serializers.ValidationError(
+                    "Você só pode gerenciar inscrições dos seus próprios torneios."
+                )
+            
+            if torneio.status not in ['Aberto', 'Em Andamento']:
+                raise serializers.ValidationError(
+                    f"Lojas só podem inscrever jogadores em torneios abertos ou em andamento. Status atual: {torneio.status}"
+                )
+
+        # Validação de rodada ativa para atualizações
+        if self.instance:
+            rodada_ativa = Rodada.objects.filter(
+                id_torneio_id=self.instance.id_torneio_id,
+                status='Em Andamento'
+            ).exists()
+            
+            if rodada_ativa:
+                raise serializers.ValidationError(
+                    "Não é possível alterar inscrição durante uma rodada ativa."
+                )
         
-        # Admin pode gerenciar qualquer torneio
-        if user.tipo == 'ADMIN':
-            return value
-        
-        # Loja só pode gerenciar seus próprios torneios
-        if value.id_loja != user:
-            raise serializers.ValidationError(
-                "Você só pode gerenciar inscrições dos seus próprios torneios."
-            )
-        
-        # Loja pode inscrever jogadores em torneios abertos ou em andamento
-        if value.status not in ['Aberto', 'Em Andamento']:
-            raise serializers.ValidationError(
-                f"Lojas só podem inscrever jogadores em torneios abertos ou em andamento. Status atual: {value.status}"
-            )
-        
-        return value
+        return data
 
 
 class RodadaSerializer(serializers.ModelSerializer):
@@ -200,7 +236,7 @@ class VisualizacaoMesaJogadorSerializer(serializers.ModelSerializer):
     numero_rodada = serializers.IntegerField(source='id_rodada.numero_rodada', read_only=True)
     status_rodada = serializers.CharField(source='id_rodada.status', read_only=True)
 
-    # Times com 2 jogadores cada
+    # Times com 2 jogadores cada 
     time_1 = serializers.SerializerMethodField()
     time_2 = serializers.SerializerMethodField()
 
@@ -223,43 +259,7 @@ class VisualizacaoMesaJogadorSerializer(serializers.ModelSerializer):
         return MesaJogadorSerializer(jogadores_time_2, many=True).data
 
 
-# Serializers para documentação do Swagger
-class DesinscreverPayloadSerializer(serializers.Serializer):
-    """Payload para desinscrição de jogador"""
-    torneio_id = serializers.IntegerField(
-        help_text="ID do torneio do qual o jogador quer se desinscrever"
-    )
-
-
-class GerenciarInscricaoPayloadSerializer(serializers.Serializer):
-    """Payload para loja gerenciar inscrições"""
-    id_usuario = serializers.IntegerField(
-        help_text="ID do usuário jogador a ser inscrito"
-    )
-    id_torneio = serializers.IntegerField(
-        help_text="ID do torneio"
-    )
-    decklist = serializers.CharField(
-        required=False,
-        allow_blank=True,
-        help_text="Lista de cartas do deck do jogador"
-    )
-    status = serializers.ChoiceField(
-        choices=['Inscrito', 'Confirmado', 'Desclassificado'],
-        required=False,
-        default='Inscrito',
-        help_text="Status da inscrição"
-    )
-
-
-class RemoverInscricaoPayloadSerializer(serializers.Serializer):
-    """Payload para remoção de inscrição"""
-    usuario_id = serializers.IntegerField(
-        help_text="ID do usuário jogador"
-    )
-    torneio_id = serializers.IntegerField(
-        help_text="ID do torneio"
-    )
+# Serializers para respostas padrão
 
 
 class InscricaoResponseSerializer(serializers.Serializer):
