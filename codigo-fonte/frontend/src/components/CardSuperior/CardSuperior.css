@@ -1,0 +1,55 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 100px;
+  border: 2px solid #a78bfa;
+  border-radius: 12px;
+  background-color: #111827;
+  color: #fff;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.card.active {
+  border-color: #facc15;
+  color: #facc15;
+
+  .card-count {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .card-label {
+    font-size: 14px;
+  }
+}
+
+.card.inactive {
+  border-color: #a78bfa;
+  color: #a78bfa;
+
+  .card-count {
+    font-size: 20px;
+    font-weight: bold;
+    color: #CFCFCF;
+  }
+
+  .card-label {
+    font-size: 14px;
+    color: #CFCFCF;
+  }
+}
+
+.card-icon {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
