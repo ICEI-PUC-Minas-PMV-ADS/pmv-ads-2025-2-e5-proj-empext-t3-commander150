@@ -10,11 +10,11 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Assertivas |
 |---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|------------|
 | Autenticação  | Realizar Login       | CT-001-S | Credenciais válidas                   | Email válido, senha válida                          | Sucesso         | Cria uma sessão e retorna os dados do usuário |
-| Autenticação  | Realizar Login       | CT-001-I | Credenciais inválidas                 | Email válido, senha inválida                      | Insucesso       | Retorna código e mensagem de erro |
+| Autenticação  | Realizar Login       | CT-001-I | Credenciais inválidas                 | Email válido, senha inválida                        | Insucesso       | Retorna código e mensagem de erro |
 | Autenticação  | Recuperar senha      | CT-002-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
 | Autenticação  | Recuperar senha      | CT-002-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Retorna código e mensagem de erro |
-| Permissão     | Controlar Acesso     | CT-003-S | Acesso aos próprios dados             | ID de usuário igual a ID da sessão logada           | Sucesso         | Retorna os dados requisitados |
-| Permissão     | Controlar Acesso     | CT-003-I | Acesso a dados que pertencem a outro usuário                    | ID de usuário diferente da ID da sessão logada                                 | Insucesso       | Retorna código e mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-003-S | Acesso aos próprios dados             | SessionID atrelado ao dono dos dados                | Sucesso         | Retorna os dados requisitados |
+| Permissão     | Controlar Acesso     | CT-003-I | Acesso a dados que pertencem a outro usuário                    | SessionID não atrelado ao dono dos dados                                  | Insucesso       | Retorna código e mensagem de erro |
 | Torneio       | Inscrição            | CT-004-S | Jogador se inscreve                   | Dados válidos, torneio aberto                       | Sucesso         | Jogador inscrito |
 | Torneio       | Inscrição            | CT-004-I | Inscrição fora do prazo               | Jogador válido, torneio encerrado                   | Insucesso       | Mensagem "Inscrição indisponível" |
 | Torneio       | Desinscrição         | CT-005-S | Jogador se desinscreve                | Jogador inscrito, rodada entre turnos               | Sucesso         | Jogador removido |
@@ -42,8 +42,7 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Autenticação  | Alterar senha        | CT-016-S | Alteração de senha com senha atual válida          | Senha atual válida                     | Sucesso         | Altera a senha |
 | Autenticação  | Alterar senha        | CT-016-I | Alteração de senha com senha atual inválida        | Senha atual inválida                                | Insucesso       | Retorna código e mensagem de erro |
 | Autenticação  | Alterar senha        | CT-017-I | Alteração de senha com nova senha igual a senha atual        | Nova senha igual a senha atual                                | Insucesso       | Retorna código e mensagem de erro |
-| Autenticação  | Realizar Login       | CT-018-I | Credenciais inválidas                 | Email inválido, senha válida                        | Insucesso       | Retorna código e mensagem de erro |
-| Permissão     | Controlar Acesso     | CT-019-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Retorna os dados requisitados |
+| Permissão     | Controlar Acesso     | CT-018-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Retorna os dados requisitados |
 
 ### ETAPA 3
 Criar casos de teste da etapa 3
@@ -60,6 +59,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
 
 ### ETAPA 2
 
+<!-- Teste Gaby -->
 <table>
   <tr>
     <th colspan="6" width="1000">CT-011-S - A loja pode criar e gerenciar torneios</th>
@@ -179,6 +179,319 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
 </table>
 
+<!-- Testes Lucas -->
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-001-S <br>Autenticação com credenciais válidas</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve conseguir se autenticar na aplicação, recebendo um código 200, a sessionID e seus dados no retorno da requisição.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A API retornou o código 200, dados do usuário que foi autenticado e criou um sessionID com sucesso.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-001-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-001-I <br>Autenticação com credenciais inválidas</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve conseguir se autenticar na aplicação, recebendo um código 403 e uma mensagem de erro.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A API retornou o código 403 e uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-001-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-002-S <br>Recuperação de senha com email válido</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve receber um token de validação em seu email.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu seu token de validação por email, além de um código 200 e uma mensagem de êxito na response da API.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-002-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-002-I <br>Recuperação de senha com email inválido</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve receber o token por email, recebendo um código 400 e uma mensagem de erro.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A API retornou o código 400 e uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-002-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-003-S <br>Acesso aos própios dados</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve receber os dados requisitados.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu os dados requisitados, além de um código 200 e uma mensagem de êxito na response da API, visto que o sessionID enviado na requisição está atrelado ao dono dos dados requisitados.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-003-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-003-I <br>Acesso aos dados de outro usuário</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve receber os dados requisitados.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A API retornou o código 403 e uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-003-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-015-S <br>Recuperação de senha com token válido</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve receber a nova senha em seu email.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu sua nova senha por email, além de um código 200 e uma mensagem de êxito na response da API.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-015-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-015-I <br>Recuperação de senha com token inválido</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve receber a nova senha em seu email.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A API retornou o código 400 e uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-015-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-016-S <br>Alteração de senha com senha atual válida</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve conseguir alterar sua senha.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário conseguiu realizar a alteração da senha, além de um código 200 e uma mensagem de êxito na response da API.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-016-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-016-I <br>Alteração de senha com senha atual inválida</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve conseguir alterar sua senha.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A API retornou o código 400 e uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-016-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-017-I <br>Alteração de senha com nova senha igual a senha atual</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve conseguir alterar sua senha.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A API retornou o código 400 e uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-017-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-018-S <br>Acesso aos dados de outro usuário sendo administrador do sistema (ADMIN)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve receber os dados requisitados.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">18/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu os dados requisitados, além de um código 200 e uma mensagem de êxito na response da API, visto que o sessionID enviado na requisição está atrelado a um usuário do tipo ADMIN.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-018-S.png"/></td>
+  </tr>
+</table>
+
 ### ETAPA 3
 Colocar evidências de teste da etapa 3
 
@@ -194,7 +507,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
 ### Exemplo
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-001<br>Autenticação com credenciais válidas</th>
+    <th colspan="6" width="1000">CT-001 (Exemplo)<br>Exemplo Autenticação com credenciais válidas</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
