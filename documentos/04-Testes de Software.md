@@ -214,7 +214,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O usuário não deve conseguir se autenticar na aplicação, recebendo um código 403 e uma mensagem de erro.</td>
+    <td colspan="5">O usuário não deve conseguir se autenticar na aplicação, recebendo um código 401 e uma mensagem de erro.</td>
   </tr>
     <tr>
     <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
@@ -224,7 +224,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">A API retornou o código 403 e uma mensagem de erro.</td>
+    <td colspan="5">A API retornou o código 401 e uma mensagem de erro.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -257,6 +257,9 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
   <tr>
     <td colspan="6" align="center"><br><img src="img/CT-002-S.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-002-S_2.png"/></td>
   </tr>
 </table>
 
@@ -310,6 +313,9 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   <tr>
     <td colspan="6" align="center"><br><img src="img/CT-003-S.png"/></td>
   </tr>
+   <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-003-S_2.png"/></td>
+  </tr>
 </table>
 
 <table>
@@ -336,6 +342,9 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   <tr>
     <td colspan="6" align="center"><br><img src="img/CT-003-I.png"/></td>
   </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-003-I_2.png"/></td>
+  </tr>
 </table>
 
 <table>
@@ -361,6 +370,15 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
   <tr>
     <td colspan="6" align="center"><br><img src="img/CT-015-S.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-015-S_2.png"/></td>
+  </tr>
+   <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-015-S_3.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-015-S_4.png"/></td>
   </tr>
 </table>
 
@@ -491,6 +509,9 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
   <tr>
     <td colspan="6" align="center"><br><img src="img/CT-018-S.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-018-S_2.png"/></td>
   </tr>
 </table>
 
