@@ -571,7 +571,86 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/CT-019-I.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-019-I.PNG"/></td>
+  </tr>
+</table>
+
+<!-- Teste Will -->
+<table>
+  <tr>
+    <th colspan= "6" width="1000">CT-008-S - Registro e armazenamento de dados das partidas</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve aceitar o reporte do resultado quando:
+      (a) a mesa está no formato 2v2 (2 jogadores em cada time),
+      (b) o <code>time_vencedor</code> é coerente com as pontuações, e
+      (c) o usuário está autenticado.</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">19/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Fluxo executado no Postman: (1) login para obter <code>sessionid</code>; (2) preenchimento do header
+      <code>Authorization: Bearer &lt;sessionid&gt;</code>; (3) POST em
+      <code>/torneios/mesas/{mesa_id}/reportar_resultado</code> com
+      <code>pontuacao_time_1=2</code>, <code>pontuacao_time_2=1</code> e <code>time_vencedor=1</code>.
+      Retorno <strong>200 OK</strong> com a mensagem “Resultado reportado com sucesso”.
+      As evidências seguem na ordem da execução.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center">CT-008-S_01<img src="img/CT-008-S_01.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center">CT-008-S_02<img src="img/CT-008-S_02.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center">CT-008-S_03<img src="img/CT-008-S_03.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-008-I - Regras de validação ao reportar partida</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5"> O sistema <strong>não</strong> deve permitir o reporte quando as regras forem violadas, como: a) <code>time_vencedor</code> inconsistente com as pontuações; b) mesa fora do formato 2v2.
+    </td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">19/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">
+        Foram exercitados dois cenários inválidos no Postman:<br/>
+      (1) Envio com pontuação do <code>time_vencedor</code>menor do que do outro time, onde <code>time_1</code> apresenta pontuação menor do que <code>time_2</code>. Retorno <strong>400</strong> com <em>detail:</em> “Time 1 não pode ser o vencedor com pontuação menor ou igual ao Time 2”.<br/>
+      (2) Envio com mesa sem 2 jogadores em cada time. Retorno <strong>400</strong> com
+      <em>detail:</em> “Mesa inválida: é necessário haver 2 jogadores no Time 1 e 2 no Time 2 (2x2)”.<br/> As evidências estão na ordem da requisição.
+    </td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center">CT-008-I_01<img src="img/CT-008-I_01.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center">CT-008-I_02<img src="img/CT-008-I_02.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center">CT-008-I_03<img src="img/CT-008-I_03.png"/></td>
   </tr>
 </table>
 
