@@ -54,6 +54,14 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Torneio  | Detalhes torneio      | CT-023-S | Capturar detalhes de um torneio        | ID torneio existente                                      | Sucesso       | Retorna detalhes do torneio |
 | Torneio  | Detalhes torneio      | CT-023-I | Procurar torneio inexistente        | ID torneio inexistente                                      | Insucesso       | Retorna 404 e mensagem de erro |
 
+| Torneio  | Reportar resultado      | CT-024-S | Reportar resultado corretamente    | Pontuação e time vencedor   | Sucesso       | Retorna os dados da mesa com o resultado correto |
+
+| Torneio  | Reportar resultado     | CT-024-I | Reportar resultado corretamente    | ID de rodada em andamento       | Insucesso       | Retorna 403 e mensagem de erro |
+
+| Torneio  | Loja edita resultado  | CT-025-s | Eviar resultado de rodad em andamento    | Pontuação e time vencedor       | Sucesso       | Retorna os dados da mesa com o resultado |
+
+| Torneio  | Loja edita resultado     | CT-025-I | Eviar ID de rodada inexistente    | ID de rodada inexistente      | Insucesso       | Retorna 404 e mensagem de erro |
+
 ### ETAPA 3
 Criar casos de teste da etapa 3
 
@@ -572,6 +580,319 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
   <tr>
     <td colspan="6" align="center"><br><img src="img/CT-019-I.PNG"/></td>
+  </tr>
+</table>
+
+<!-- Testes Guilherme -->
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-020-S - Detalhes da rodada</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar os detalhes da rodada quando informado um ID de rodada existente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes da rodada foi bem-sucedida (200), retornando os dados da rodada existente.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-020-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-020-I - Detalhes da rodada</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar erro 404 quando informado um ID de rodada inexistente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes de uma rodada inexistente retornou erro 404 com mensagem apropriada.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-020-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-021-S - Mesas da rodada</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar todas as mesas e jogadores de uma rodada quando informado um ID de rodada existente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta às mesas da rodada foi bem-sucedida (200), retornando as mesas e os jogadores associados.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-021-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-021-I - Mesas da rodada</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar erro 404 quando procurar mesas de uma rodada inexistente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta às mesas de uma rodada inexistente retornou erro 404 com mensagem apropriada.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-021-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-022-S - Detalhe da mesa</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar os detalhes da mesa e dos jogadores quando informado um ID de mesa existente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes da mesa foi bem-sucedida (200), retornando os dados da mesa e dos jogadores associados.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-022-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-022-I - Detalhe da mesa</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar erro 404 quando procurar uma mesa inexistente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes de uma mesa inexistente retornou erro 404 com mensagem apropriada.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-022-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-023-S - Detalhes do torneio</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar os detalhes do torneio quando informado um ID de torneio existente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes do torneio foi bem-sucedida (200), retornando os dados completos do torneio.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-023-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-023-I - Detalhes do torneio</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar erro 404 quando procurar um torneio inexistente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes de um torneio inexistente retornou erro 404 com mensagem apropriada.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-023-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-024-S - Reportar resultado</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve aceitar o reporte do resultado quando fornecidos pontuação e time vencedor válidos</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que o reporte do resultado foi bem-sucedido (200), retornando os dados da mesa com o resultado correto registrado.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-024-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-024-I - Reportar resultado</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar erro 403 quando tentar reportar resultado em rodada em andamento</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a tentativa de reportar resultado em rodada em andamento retornou erro 403 com mensagem apropriada.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-024-I.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-025-S - Loja edita resultado</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve permitir que a loja edite o resultado fornecendo pontuação e time vencedor válidos</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a edição do resultado pela loja foi bem-sucedida (200), retornando os dados da mesa com o resultado atualizado.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-025-S.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-025-I - Loja edita resultado</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema deve retornar erro 404 quando a loja tentar editar resultado com ID de rodada inexistente</td>
+  </tr>
+    <tr>
+    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+     <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">20/09/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a tentativa de editar resultado com ID de rodada inexistente retornou erro 404 com mensagem apropriada.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-025-I.png"/></td>
   </tr>
 </table>
 
