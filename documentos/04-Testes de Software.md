@@ -53,13 +53,9 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Mesas  | Detalhe mesa    | CT-022-I | Procurar mesa inexistente      | ID mesa inexistente                                    | Insucesso       | Retorna 404 e mensagem de erro |
 | Torneio  | Detalhes torneio      | CT-023-S | Capturar detalhes de um torneio        | ID torneio existente                                      | Sucesso       | Retorna detalhes do torneio |
 | Torneio  | Detalhes torneio      | CT-023-I | Procurar torneio inexistente        | ID torneio inexistente                                      | Insucesso       | Retorna 404 e mensagem de erro |
-
 | Torneio  | Reportar resultado      | CT-024-S | Reportar resultado corretamente    | Pontuação e time vencedor   | Sucesso       | Retorna os dados da mesa com o resultado correto |
-
 | Torneio  | Reportar resultado     | CT-024-I | Reportar resultado corretamente    | ID de rodada em andamento       | Insucesso       | Retorna 403 e mensagem de erro |
-
 | Torneio  | Loja edita resultado  | CT-025-s | Eviar resultado de rodad em andamento    | Pontuação e time vencedor       | Sucesso       | Retorna os dados da mesa com o resultado |
-
 | Torneio  | Loja edita resultado     | CT-025-I | Eviar ID de rodada inexistente    | ID de rodada inexistente      | Insucesso       | Retorna 404 e mensagem de erro |
 
 ### ETAPA 3
@@ -600,7 +596,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes da rodada foi bem-sucedida (200), retornando os dados da rodada existente.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a consulta aos detalhes da rodada foi bem-sucedida (200), retornando os dados da rodada existente.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -626,7 +622,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes de uma rodada inexistente retornou erro 404 com mensagem apropriada.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a consulta aos detalhes de uma rodada inexistente retornou erro 404 com mensagem apropriada.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -652,7 +648,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta às mesas da rodada foi bem-sucedida (200), retornando as mesas e os jogadores associados.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a consulta às mesas da rodada foi bem-sucedida (200), retornando as mesas e os jogadores associados.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -678,7 +674,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta às mesas de uma rodada inexistente retornou erro 404 com mensagem apropriada.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a consulta às mesas de uma rodada inexistente retornou erro 404 com mensagem apropriada.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -704,7 +700,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes da mesa foi bem-sucedida (200), retornando os dados da mesa e dos jogadores associados.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a consulta aos detalhes da mesa foi bem-sucedida (200), retornando os dados da mesa e dos jogadores associados.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -730,7 +726,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes de uma mesa inexistente retornou erro 404 com mensagem apropriada.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a consulta aos detalhes de uma mesa inexistente retornou erro 404 com mensagem apropriada.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -756,7 +752,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes do torneio foi bem-sucedida (200), retornando os dados completos do torneio.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a consulta aos detalhes do torneio foi bem-sucedida (200), retornando os dados completos do torneio.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -782,7 +778,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a consulta aos detalhes de um torneio inexistente retornou erro 404 com mensagem apropriada.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a consulta aos detalhes de um torneio inexistente retornou erro 404 com mensagem apropriada.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -808,7 +804,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que o reporte do resultado foi bem-sucedido (200), retornando os dados da mesa com o resultado correto registrado.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que o reporte do resultado foi bem-sucedido (200), retornando os dados da mesa com o resultado correto registrado.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -834,7 +830,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a tentativa de reportar resultado em rodada em andamento retornou erro 403 com mensagem apropriada.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a tentativa de reportar resultado em rodada em andamento retornou erro 403 com mensagem apropriada.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -860,7 +856,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a edição do resultado pela loja foi bem-sucedida (200), retornando os dados da mesa com o resultado atualizado.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a edição do resultado pela loja foi bem-sucedida (200), retornando os dados da mesa com o resultado atualizado.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
@@ -886,7 +882,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O teste foi realizado no Swagger, onde é possível ver que a tentativa de editar resultado com ID de rodada inexistente retornou erro 404 com mensagem apropriada.</td>
+    <td colspan="5">O teste foi realizado no Postman, onde é possível ver que a tentativa de editar resultado com ID de rodada inexistente retornou erro 404 com mensagem apropriada.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
