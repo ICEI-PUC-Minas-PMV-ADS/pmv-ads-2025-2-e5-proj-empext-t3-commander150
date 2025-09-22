@@ -1,6 +1,6 @@
 import React from "react";
 import type { IconType } from "react-icons";
-import "./CardSuperior.css";
+import "./style.module.css";
 
 type CardProps = {
   count: number;

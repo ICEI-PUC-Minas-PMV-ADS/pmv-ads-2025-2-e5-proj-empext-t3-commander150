@@ -1,0 +1,62 @@
+.tournament-card {
+  background-color: #111827;
+  border-radius: 12px;
+  padding: 16px;
+  color: #fff;
+  width: 320px;
+  border: 1px solid #BA96D5CC;
+}
+
+.tournament-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tournament-header h3 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.tournament-description {
+  font-size: 14px;
+  margin: 8px 0 12px;
+  color: #cbd5e1;
+}
+
+.tournament-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.tournament-info svg {
+  margin-right: 6px;
+}
+
+.status-tag {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.status-tag.em_andamento {
+  background-color: #35AE11;
+}
+
+.status-tag.em_breve {
+  background-color: #E4AF00;
+}
+
+.status-tag.encerrado {
+  background-color: #111827;
+  border: 1px solid #BA96D5CC;
+}
+
+.tournament-footer {
+  margin-top: 12px;
+}
