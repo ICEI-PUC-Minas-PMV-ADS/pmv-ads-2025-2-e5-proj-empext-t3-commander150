@@ -2,7 +2,7 @@ import React from "react";
 import { FiCalendar, FiClock, FiMapPin, FiUsers } from "react-icons/fi";
 import { FaMoneyBillWave } from "react-icons/fa";
 import Button from "../Button";
-import "./style.css";
+import "./style.module.css";
 
 type Status = "em_andamento" | "em_breve" | "encerrado";
 
