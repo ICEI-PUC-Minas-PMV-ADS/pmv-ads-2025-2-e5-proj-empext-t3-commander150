@@ -15,7 +15,7 @@ export default function PaginaRecuperarSenha() {
     const {qtdCaracteresToken } = useSessao();
     const [isLoading, setIsLoading] = useState(false);
     const corTextInputs = "var(--cor-texto-principal)";
-  const corBackgroundInputs = "#FFFFFF";
+  const corBackgroundInputs = "var(--cor-branca)";
 
     // Função para enviar o email e solicitar o Token de redefinição de senha.
     const handleEnviarEmail = async (e: React.FormEvent) => {
