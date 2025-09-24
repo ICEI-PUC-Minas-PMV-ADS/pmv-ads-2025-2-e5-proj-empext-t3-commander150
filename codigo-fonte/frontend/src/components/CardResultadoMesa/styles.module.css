@@ -1,0 +1,40 @@
+.container {
+    background-color: #151A1E;
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.title {
+    color: #FFFFFF;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.subtitle {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.inputsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.inputWrapper {
+    width: 100%;
+}
