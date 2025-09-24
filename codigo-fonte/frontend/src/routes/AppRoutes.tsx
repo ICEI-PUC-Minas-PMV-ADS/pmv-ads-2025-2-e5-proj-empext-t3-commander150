@@ -13,6 +13,7 @@ import PaginaRecuperarSenha from "../pages/PaginaRecuperarSenha";
 import PaginaCadastrar from "../pages/PaginaCadastrar";
 import PaginaAlterarSenha from "../pages/PaginaAlterarSenha";
 import InscricaoTorneio from "../pages/InscricaoTorneio";
+import PaginaTorneio from "../pages/PaginaTorneio";
 
 export default function AppRoutes() {
   return (
@@ -44,6 +45,7 @@ export default function AppRoutes() {
           <Route path="/loja/" element={<LojaTeste />} />
           <Route path="/admin/" element={<App />} />
           <Route path="/alterar-senha/" element={<PaginaAlterarSenha />} />
+          <Route path="/torneio/" element={<PaginaTorneio />} />
 
           {/* Adicionar outras rotas protegidas aqui no futuro */}
         </Route>
