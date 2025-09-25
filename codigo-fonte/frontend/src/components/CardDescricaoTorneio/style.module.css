@@ -1,30 +1,30 @@
-.tournament-card {
-  background-color: #111827;
+.tournamentCard {
+  background-color: var(--var-cor-azul-fundo-section);
   border-radius: 12px;
   padding: 16px;
-  color: #fff;
+  color: var(--var-cor-branca);
   width: 320px;
-  border: 1px solid #BA96D5CC;
+  border: var(--var-borda-section);
 }
 
-.tournament-header {
+.tournamentHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.tournament-header h3 {
+.tournamentHeader h3 {
   font-size: 16px;
   margin: 0;
 }
 
-.tournament-description {
+.tournamentDescription {
   font-size: 14px;
   margin: 8px 0 12px;
-  color: #cbd5e1;
+  color: var(--var-cor-cinza-titulos);
 }
 
-.tournament-info {
+.tournamentInfo {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px 16px;
@@ -32,31 +32,31 @@
   margin-bottom: 12px;
 }
 
-.tournament-info svg {
+.tournamentInfo svg {
   margin-right: 6px;
 }
 
-.status-tag {
+.statusTag {
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
-  color: #fff;
+  color: var(--var-cor-branca);
 }
 
-.status-tag.em_andamento {
+.statusTag.em_andamento {
   background-color: #35AE11;
 }
 
-.status-tag.em_breve {
+.statusTag.em_breve {
   background-color: #E4AF00;
 }
 
-.status-tag.encerrado {
+.statusTag.encerrado {
   background-color: #111827;
-  border: 1px solid #BA96D5CC;
+  border: var(--var-borda-section);
 }
 
-.tournament-footer {
+.tournamentFooter {
   margin-top: 12px;
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { FiCalendar, FiClock, FiMapPin, FiUsers } from "react-icons/fi";
 import { FaMoneyBillWave } from "react-icons/fa";
 import Button from "../Button";
-import "./style.module.css";
+import styles from "./style.module.css";
 
 type Status = "em_andamento" | "em_breve" | "encerrado";
 
@@ -44,14 +44,14 @@ const CardDescricaoTorneio: React.FC<CardDescricaoTorneioProps> = ({
     };
 
     return (
-        <div className="tournament-card">
-            <div className="tournament-header">
+        <div className={styles.tournamentCard}>
+            <div className={styles.tournamentHeader}>
                 <h3>{title}</h3>
-                <span className={`status-tag ${status}`}>{getStatusLabel()}</span>
+                <span className={`${styles.statusTag} ${styles[status]}`}>{getStatusLabel()}</span>
             </div>
-            <p className="tournament-description">{description}</p>
+            <p className={styles.tournamentDescription}>{description}</p>
 
-            <div className="tournament-info">
+            <div className={styles.tournamentInfo}>
                 <div><FiCalendar /> {date}</div>
                 <div><FiClock /> {time}</div>
                 <div><FiMapPin /> {location}</div>
@@ -60,7 +60,7 @@ const CardDescricaoTorneio: React.FC<CardDescricaoTorneioProps> = ({
             </div>
 
             {showButton && (
-                <div className="tournament-footer">
+                <div className={styles.tournamentFooter}>
                     <Button
                         label="Acessar mesa"
                         onClick={onButtonClick}

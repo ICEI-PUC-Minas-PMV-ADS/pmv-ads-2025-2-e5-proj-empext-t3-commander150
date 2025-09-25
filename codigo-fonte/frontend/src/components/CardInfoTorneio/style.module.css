@@ -1,0 +1,35 @@
+.card {
+  background-color: #0f172a; /* Fundo escuro */
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: var(--var-borda-section);
+  max-width: 300px;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+}
+
+.title {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--var-cor-rosa);
+  margin-bottom: 1.2rem;
+}
+
+.tournamentInfo {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  text-align: left;
+  padding-left: 1rem;
+  gap: 12px ;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.tournamentName {
+  font-size: 14px;
+  margin-bottom: 12px;
+  text-align: left;
+  padding-left: 1rem;
+}
+
