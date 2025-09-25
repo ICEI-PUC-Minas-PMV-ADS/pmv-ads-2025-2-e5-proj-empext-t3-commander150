@@ -1,83 +1,28 @@
-/* Container principal */
-.card {
-    display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 16px;
-    width: 100%;
-    background: #0f1115;
-    border: 1px solid #1b1f2a;
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-    border-color: #283047;
-}
-.desabilitado {
-    opacity: .6;
-    pointer-events: none;
-}
-
-
-/* Imagem */
-.media { position: relative; }
-.imagem {
-    width: 160px;
-    height: 160px;
-    object-fit: cover;
+.regras {
+    background-color: var(--var-cor-azul-fundo-section);
+    border: var(--var-borda-section);
     border-radius: 12px;
-    border: 1px solid #23283a;
+    padding: 16px;
+    color: var(--var-cor-branca);
+    width: 320px;
 }
 
-
-/* Conteúdo */
-.conteudo { display: flex; flex-direction: column; gap: 12px; }
-.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-.titulos { display: flex; flex-direction: column; gap: 4px; }
-.titulo { margin: 0; font-size: 1.25rem; font-weight: 700; color: #e6e9f0; }
-.subtitulo { margin: 0; font-size: .95rem; color: #aab2c8; }
-
-
-/* Badge de status */
-.badge {
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-size: .75rem;
+.titulo {
+    font-size: 16px;
     font-weight: 600;
-    border: 1px solid transparent;
+    margin-bottom: 12px;
+    color: var(--var-cor-branca);
 }
-.badge_aberto { background: #0a2b17; color: #86f1b2; border-color: #1a6a3f; }
-.badge_encerrado { background: #2a0f0f; color: #f5a3a3; border-color: #6b1d1d; }
-.badge_lotado { background: #2a1a0f; color: #ffd59e; border-color: #6b4b1d; }
-.badge_em_breve { background: #0f1f2a; color: #9fd1ff; border-color: #1d436b; }
 
+.lista {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+}
 
-/* Tags (chips) */
-.tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.tag { padding: 4px 10px; border-radius: 999px; font-size: .75rem; background: #171c29; color: #c7d2f0; border: 1px solid #23283a; }
-
-
-/* Metadados em lista de definição */
-.meta { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
-.metaItem { background: #0d1018; border: 1px solid #1a2030; border-radius: 12px; padding: 10px 12px; }
-.metaItem dt { font-size: .7rem; color: #8e97ad; margin-bottom: 4px; }
-.metaItem dd { margin: 0; color: #e2e7f3; font-weight: 600; }
-
-
-/* Extra */
-.extra { padding: 8px 0 0; color: #c7d2f0; }
-
-
-/* Área de ações */
-.acoes { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
-
-
-/* Responsivo */
-@media (max-width: 680px) {
-    .card { grid-template-columns: 1fr; }
-    .imagem { width: 100%; height: 180px; }
-    .meta { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.item {
+    font-size: 14px;
+    color: var(--var-cor-cinza-titulos);
 }
