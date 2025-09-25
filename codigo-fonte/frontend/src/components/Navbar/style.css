@@ -3,94 +3,164 @@ header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0px 40px 0px 0px;
-        background-color: #13111D;
-        box-shadow: 0px 11px 12px -7px rgba(0, 0, 0, 0.1);
-    };
-
-    a {
-        display: flex; 
-        align-items: center;
-        text-decoration: none;
-        color: #202020;
+        padding: 4px 32px;
+        background-color: var(--var-cor-terciaria);
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        min-height: 70px;
     }
 
-    .logo, .userLogo{
-        height: 35px;
+    .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .logo {
+        height: 60px;
         object-fit: contain;
     }
 
-    .nav-items{
+    .nav-items {
         display: flex;
-        gap: 32px;
+        gap: 16px;
         align-items: center;
         list-style: none;
+        margin: 0;
+        padding: 0;
     }
 
-    .nav-name{
-        font-size: 14px;
-        text-align: right;
-        margin: 5px;
-    }
-
-    .nav-occupation{
-        font-size: 12px;
-        text-align: right;
-        margin: 5px;
-    }
-
-    .nav-info{
+    .nav-item {
         display: flex;
         align-items: center;
-        gap: 15px;
-        cursor: pointer;
+        gap: 8px;
         text-decoration: none;
-        color: inherit;
-        border: 0;
+        color: #fefefe;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+        background-color: var(--var-cor-secundaria);
+    }
+
+    .nav-icon {
+        font-size: 16px;
+    }
+
+    .nav-label {
+        font-size: 16px;
     }
 
     .nav-user {
         position: relative;
         display: inline-block;
-        background-color: transparent;
     }
-}
 
-button{
-    background-color: transparent;
-    color: #FFFFFF;
-}
+    .nav-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--var-cor-terciaria);
+        border: 1px solid var(--var-cor-secundaria);
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
 
-p{
-    color: #FFFFFF;
-    font-weight: bold;
+    .nav-profile:hover {
+        background: var(--var-cor-secundaria);
+    }
+
+    .hamburger-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .hamburger-menu span {
+        width: 16px;
+        height: 2px;
+        background-color: #9ca3af;
+        border-radius: 1px;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        background-color: #9ca3af;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+    }
 }
 
 .dropdown-menu {
     position: absolute;
-    top: 100%; /* Coloca o menu abaixo do nav-info */
+    top: 100%;
     right: 0;
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--var-cor-terciaria);
+    border: 1px solid var(--var-cor-secundaria);
     border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    min-width: 150px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    min-width: 200px;
     z-index: 1000;
+    margin-top: 8px;
+}
+
+.user-info {
+    margin-bottom: 12px;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fefefe;
+    margin-bottom: 2px;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #fefefe;
+    margin: 12px 0;
 }
 
 .dropdown-item {
     background: none;
     border: none;
-    padding: 8px 12px;
+    padding: 8px;
     width: 100%;
     text-align: left;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
+    color: #fefefe;
     border-radius: 4px;
-    color: #202020;
+    transition: background-color 0.2s ease;
 }
 
 .dropdown-item:hover {
-    background: #f0f0f0;
+    background-color: #f3f4f6;
+    color: var(--var-cor-primaria);
 }

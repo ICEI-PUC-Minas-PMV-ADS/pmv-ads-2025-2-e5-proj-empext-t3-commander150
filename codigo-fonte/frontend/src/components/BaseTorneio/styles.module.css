@@ -1,0 +1,50 @@
+.container {
+    padding: 32px;
+    min-height: 100vh;
+    background-color: #0D1117;
+    color: #FFFFFF;
+}
+
+.header {
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #9B6BFF;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #FFFFFF;
+    opacity: 0.8;
+}
+
+.content {
+    display: flex;
+    gap: 24px;
+    min-height: calc(100vh - 200px);
+}
+
+.leftSection {
+    flex: 2;
+    background-color: #151A1E;
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.rightSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rightBlock {
+    background-color: #151A1E;
+    border-radius: 8px;
+    padding: 24px;
+    min-height: 100px; /* Minimum height for each block */
+}
