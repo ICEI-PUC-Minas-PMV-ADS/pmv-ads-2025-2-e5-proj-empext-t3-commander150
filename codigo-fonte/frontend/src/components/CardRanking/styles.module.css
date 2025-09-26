@@ -1,0 +1,98 @@
+.card {
+    display: grid;
+    grid-template-columns: 56px 56px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    background: var(--var-cor-azul-fundo-section);
+    border: var(--var-borda-section);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: var(--var-cor-branca);
+}
+.compacto { padding: 8px 10px; }
+
+.posicao {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    border: var(--var-borda-section);
+    background: var(--var-cor-terciaria);
+}
+.medalhaDefault { color: var(--var-cor-cinza-titulos); }
+.medalhaOuro { background: linear-gradient(135deg, #3a2f12, #7d5f1e); color: #ffe39a; }
+.medalhaPrata { background: linear-gradient(135deg, #2b2e35, #6a737d); color: #e3e8ef; }
+.medalhaBronze { background: linear-gradient(135deg, #3a2517, #7a4d2e); color: #ffd2b0; }
+
+.avatarWrap { width: 56px; height: 56px; }
+.avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: var(--var-borda-section);
+}
+.avatarPlaceholder {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: var(--var-borda-section);
+    background: var(--var-cor-terciaria);
+    color: var(--var-cor-rosa);
+    font-weight: 700;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: hidden;
+}
+.topLine {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+.nome {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--var-cor-branca);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.pontos { font-weight: 800; }
+.bottomLine {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--var-cor-cinza-titulos);
+    font-size: .9rem;
+}
+.loja { opacity: .9; }
+.record { opacity: .9; }
+.variacao {
+    margin-left: auto;
+    font-weight: 800;
+}
+.up { color: #86f1b2; }
+.down { color: #f5a3a3; }
+
+.rightSlot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 560px) {
+    .card { grid-template-columns: 44px 44px 1fr; }
+    .posicao { width: 38px; height: 38px; font-size: 1rem; }
+    .avatarWrap, .avatar, .avatarPlaceholder { width: 44px; height: 44px; }
+    .rightSlot { display: none; }
+}
