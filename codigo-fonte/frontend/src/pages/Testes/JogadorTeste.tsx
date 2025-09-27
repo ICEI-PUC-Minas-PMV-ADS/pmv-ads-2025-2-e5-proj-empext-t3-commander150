@@ -4,6 +4,7 @@
 
 // Importa o hook para acessar os dados da sessão
 import { useSessao } from '../../contextos/AuthContexto';
+import CardTorneio from '../../components/CardTorneio';
 
 // Define o componente da página do Testes
 const JogadorTeste = () => {
@@ -11,7 +12,7 @@ const JogadorTeste = () => {
   const { usuario, logout } = useSessao();
 
   return (
-    <div>
+    <div style={{ color: "#FFFFFF" }}>
       <h1>JOGADOR TESTES</h1>
       {/* Exibe os dados do usuário se eles existirem */}
       {usuario && (
@@ -31,7 +32,27 @@ const JogadorTeste = () => {
       >
         Sair (Logout)
       </button>
+    
+    
+      {/*Teste componente CardTorneio*/}
+    <br />
+    <br />
+    <br />
+    <div style={{ alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
+      <CardTorneio
+        imagem="./img_teste_card_torneio.jpg"
+        titulo="Campeonato Teste Card Torneio"
+        data="18.08.23"
+        hora="19:00"
+        tags={[
+          { texto: "Futebol", corFundo: "#10B981" },
+          { texto: "5v5", corFundo: "#3B82F6" },
+          { texto: "Iniciante", corFundo: "#F59E0B" },
+        ]}
+      />
     </div>
+    </div>
+   
   );
 };
 
