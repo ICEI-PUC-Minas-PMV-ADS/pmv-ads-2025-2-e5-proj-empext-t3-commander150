@@ -79,7 +79,7 @@ export default function PaginaRecuperarSenha() {
             <>
                 <h2 className={styles.title}>Redefinir senha</h2>
                 <p className={styles.subtitle}>
-                Digite o seu e-mail no campo abaixo e lhe enviaremos uma nova senha.
+                Digite o seu email no campo abaixo e lhe enviaremos uma nova senha.
                 </p>
                 <Input
                 type="email"
@@ -99,7 +99,7 @@ export default function PaginaRecuperarSenha() {
             <>
                 <h2 className={styles.title}>Validar token</h2>
                 <p className={styles.subtitle}>
-                Enviamos um código para o seu e-mail. Cole abaixo para confirmar sua identidade.
+                Enviamos um código para o seu email. Cole abaixo para confirmar sua identidade.
                 </p>
                 <Input
                 type="text"
@@ -127,7 +127,7 @@ export default function PaginaRecuperarSenha() {
             <>
                 <h2 className={styles.title}>Senha enviada!</h2>
                 <p className={styles.subtitle}>
-                Sua nova senha foi enviada para o e-mail informado. Recomendamos que você a altere após o login.
+                Sua nova senha foi enviada para o email informado. Recomendamos que você a altere após o login.
                 </p>
                 <div className={styles.finalActions}>
                 <Link to="/login/" className={styles.link}>

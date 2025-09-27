@@ -30,7 +30,15 @@
   font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 0.9rem;
-  color: #181C32;
+  color: var(--cor-texto-principal); 
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 1.0rem;
+  font-weight: 400;
+  margin-bottom: 0.9rem;
+  color: var(--cor-texto-principal); 
 }
 
 .link {
