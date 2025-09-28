@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import estilos from "./styles.module.css";
 
-import Input from "../../components/Input";
-import Button from "../../components/Button";
+import Input from "../../../components/Input";
+import Button from "../../../components/Button";
 
 import { FaCalendarAlt, FaClock, FaStore, FaMoneyBillAlt } from "react-icons/fa";
 import { MdOutlinePeople } from "react-icons/md";

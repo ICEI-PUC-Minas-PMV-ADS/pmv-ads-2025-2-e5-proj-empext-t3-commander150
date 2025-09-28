@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import BaseTorneio from '../../components/BaseTorneio';
+import BaseTorneio from '../../../components/BaseTorneio';
 import styles from './styles.module.css';
 
 // Componente temporário para premiação

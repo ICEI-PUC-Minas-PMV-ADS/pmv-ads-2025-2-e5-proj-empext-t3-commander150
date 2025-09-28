@@ -1,10 +1,10 @@
 import styles from "./styles.module.css";
-import Input from "../../components/Input";
-import Button from "../../components/Button";
+import Input from "../../../components/Input";
+import Button from "../../../components/Button";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useSessao } from '../../contextos/AuthContexto';
-import { solicitarTokenRecuperacaoSenha, validarTokenRecuperacao} from '../../services/authServico';
+import { useSessao } from '../../../contextos/AuthContexto';
+import { solicitarTokenRecuperacaoSenha, validarTokenRecuperacao} from '../../../services/authServico';
 import Swal from 'sweetalert2';
 
 

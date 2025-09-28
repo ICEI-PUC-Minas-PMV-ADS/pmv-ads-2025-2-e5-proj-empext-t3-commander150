@@ -14,12 +14,12 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from './styles.module.css';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import Radio from '../../components/Radio';
-import { cadastrarUsuario } from '../../services/authServico';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
+import Radio from '../../../components/Radio';
+import { cadastrarUsuario } from '../../../services/authServico';
 import Swal from 'sweetalert2';
-import { useSessao } from '../../contextos/AuthContexto';
+import { useSessao } from '../../../contextos/AuthContexto';
 
 
 // 2. Define as opções para o nosso grupo de rádio.

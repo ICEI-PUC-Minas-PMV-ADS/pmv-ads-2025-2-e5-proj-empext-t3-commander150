@@ -1,0 +1,278 @@
+/*As variáveis utilizadas vem do arquivo index.css principal*/
+
+section {
+  border: var(--var-borda-section);
+}
+
+.container {
+  min-height: 100vh;
+  color: var(--var-cor-cinza-titulos);
+}
+
+.conteudo {
+  background-color: var(--var-cor-secundaria);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.titulo {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--var-cor-rosa);
+  text-align: center;
+}
+
+.subtitulo {
+  font-size: 20px;
+  font-weight: 400;
+  text-align: center;
+  color: var(--var-cor-cinza-titulos);
+  margin-bottom: 30px;
+}
+
+/* Cartões */
+.cartao {
+  background-color: var(--var-cor-azul-fundo-section);
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.tituloSessao {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: left;
+  margin-bottom: 20px;
+  color: var(--var-cor-cinza-titulos);
+}
+
+.grupoInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+/* Input com ícone */
+.inputComIcone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.iconeInput {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--var-cor-cinza-titulos);
+  font-size: 16px;
+  pointer-events: none;
+  margin-top: 12px; /* Ajuste para alinhar com o input */
+}
+
+/* Upload de arquivo */
+.uploadContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.labelUpload {
+  font-size: 14px;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.uploadArea {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.botaoUpload {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: var(--var-cor-primaria);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  width: fit-content;
+}
+
+.botaoUpload:hover {
+  background-color: #004a8a;
+}
+
+.arquivoSelecionado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--var-cor-terciaria);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--var-cor-cinza-titulos);
+}
+
+.botaoRemover {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.botaoRemover:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+/* Textarea */
+.textareaContainer {
+  margin-top: 15px;
+}
+
+.labelTextarea {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--var-cor-secundaria);
+  border-radius: 6px;
+  background-color: var(--var-cor-terciaria);
+  color: var(--var-cor-cinza-titulos);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--var-cor-primaria);
+}
+
+.textarea::placeholder {
+  color: var(--var-cor-cinza-placeholder);
+}
+
+/* Grupos de radio buttons */
+.grupoRadio {
+  margin-bottom: 20px;
+}
+
+.labelRadio {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Checkbox */
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--var-cor-primaria);
+}
+
+.labelCheckbox {
+  font-size: 14px;
+  color: var(--var-cor-cinza-titulos);
+  cursor: pointer;
+}
+
+/* Input limitado */
+.inputLimitado {
+  margin-top: 15px;
+}
+
+/* Lista de regras */
+.listaRegras {
+  margin: 0;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.listaRegras li {
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #ddd;
+  position: relative;
+  padding-left: 20px;
+}
+
+.listaRegras li::before {
+  content: "•";
+  color: var(--var-cor-rosa);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+/* Botões */
+.botoes {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+  justify-content: center;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .grupoInputs {
+    grid-template-columns: 1fr;
+  }
+  
+  .radioGroup {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .botoes {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .conteudo {
+    padding: 20px 15px;
+  }
+  
+  .titulo {
+    font-size: 32px;
+  }
+  
+  .subtitulo {
+    font-size: 18px;
+  }
+}

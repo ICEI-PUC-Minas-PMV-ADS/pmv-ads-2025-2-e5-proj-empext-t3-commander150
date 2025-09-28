@@ -11,11 +11,11 @@
 
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSessao } from '../../contextos/AuthContexto';
+import { useSessao } from '../../../contextos/AuthContexto';
 import styles from './styles.module.css';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import { alterarSenhaUsuario} from '../../services/authServico';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
+import { alterarSenhaUsuario} from '../../../services/authServico';
 import Swal from "sweetalert2";
 
 
