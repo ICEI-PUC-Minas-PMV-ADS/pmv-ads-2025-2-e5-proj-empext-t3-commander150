@@ -3,32 +3,38 @@
 /**
  * Componente de Input Reutilizável
  *
- * O QUE É E POR QUE EXISTE?
- * Este é o componente padrão de input para a aplicação, desenhado para ser
- * flexível e reutilizável em diversos formulários.
- *
- * RESPONSABILIDADES:
- * 1. Renderizar um campo de input com um rótulo (label) associado.
- * 2. Suportar os tipos 'text', 'email' e 'password'.
- * 3. Para o tipo 'password', incluir a funcionalidade de mostrar/ocultar a senha.
- * 4. Realizar uma validação básica para o tipo 'email'.
+ * SUPORTA:
+ * - Texto, Email, Senha
+ * - Data (dd/MM/yyyy com máscara)
+ * - Hora (HH:mm com máscara)
+ * - Telefone ((DD)XXXXX-XXXX ou (DD)XXXX-XXXX)
+ * - Número inteiro
+ * - Número decimal (com casas configuráveis)
+ * - Dinheiro em Real (R$)
+ * - Multiline (textarea para textos longos)
  */
 
 import { useState } from "react";
-// Importa os estilos do ficheiro CSS Module local.
 import styles from "./style.module.css";
-// Importa os ícones para a funcionalidade de mostrar/ocultar senha.
-// Nota: É necessário ter a biblioteca 'react-icons' instalada: npm install react-icons
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-// Define a "planta baixa" das propriedades que o componente aceita.
+// Definição das propriedades aceitas pelo componente
 interface InputProps {
-  type: "text" | "email" | "password";
+  type:
+    | "text"
+    | "email"
+    | "password"
+    | "data"
+    | "hora"
+    | "telefone"
+    | "numero"
+    | "decimal"
+    | "dinheiro";
   name: string;
   placeholder?: string;
   placeholderColor?: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   minLength?: number;
   required?: boolean;
   label?: string;
@@ -36,6 +42,8 @@ interface InputProps {
   labelColor?: string;
   textColor?: string;
   backgroundColor?: string;
+  casasDecimais?: number; // usado para decimal/dinheiro
+  multiline?: boolean; // se true, usa <textarea> e permite textos longos multilinha
 }
 
 const Input = ({
@@ -51,19 +59,21 @@ const Input = ({
   labelColor,
   textColor,
   backgroundColor,
-
+  casasDecimais = 2,
+  multiline = false,
 }: InputProps) => {
-  // Estado para controlar a visibilidade da senha.
+  // Estado local para alternar a visibilidade da senha
   const [mostrarSenha, setMostrarSenha] = useState(false);
-  // Estado para armazenar a mensagem de erro da validação de email.
+
+  // Estado de mensagem de erro apenas para email
   const [erroEmail, setErroEmail] = useState("");
 
-  // Alterna a visibilidade da senha.
+  // Alternar entre mostrar/ocultar senha
   const handleAlternarSenha = () => {
     setMostrarSenha(!mostrarSenha);
   };
 
-  // Valida o formato do email enquanto o utilizador digita.
+  // Validação simples para emails
   const handleValidacaoEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const emailRegex = /\S+@\S+\.\S+/;
     const valorInput = e.target.value;
@@ -72,51 +82,156 @@ const Input = ({
     } else {
       setErroEmail("");
     }
-    // Propaga a alteração para o componente pai.
+    onChange(e);
+  };
+
+  /**
+   * Aplica as máscaras específicas para cada tipo customizado
+   */
+  const aplicarMascara = (valor: string): string => {
+    if (type === "data") {
+      valor = valor.replace(/\D/g, "");
+      if (valor.length > 8) valor = valor.slice(0, 8);
+      if (valor.length > 4) return valor.replace(/(\d{2})(\d{2})(\d{0,4})/, "$1/$2/$3");
+      if (valor.length > 2) return valor.replace(/(\d{2})(\d{0,2})/, "$1/$2");
+      return valor;
+    }
+
+    if (type === "hora") {
+      valor = valor.replace(/\D/g, "");
+      if (valor.length > 4) valor = valor.slice(0, 4);
+      if (valor.length >= 3) return valor.replace(/(\d{2})(\d{0,2})/, "$1:$2");
+      return valor;
+    }
+
+
+    if (type === "telefone") {
+      valor = valor.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+      if (valor.length <= 10) {
+        return valor.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+      } else {
+        return valor.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+      }
+    }
+
+    if (type === "numero") {
+      return valor.replace(/\D/g, "");
+    }
+
+    if (type === "decimal") {
+      valor = valor.replace(",", ".").replace(/[^0-9.]/g, "");
+      const partes = valor.split(".");
+      if (partes.length > 2) {
+        valor = partes[0] + "." + partes.slice(1).join("");
+      }
+      if (partes[1]) {
+        valor = partes[0] + "." + partes[1].slice(0, casasDecimais);
+      }
+      return valor;
+    }
+
+    if (type === "dinheiro") {
+      valor = valor.replace(/\D/g, "");
+      const numero = (parseInt(valor, 10) / 100).toFixed(casasDecimais);
+      return (
+        "R$ " + // prefixo
+        numero
+          .toString()
+          .replace(".", ",")
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+      );
+    }
+
+
+    return valor;
+  };
+
+  /**
+   * Handler para inputs com máscara (data, telefone, número, decimal, dinheiro)
+   */
+  const handleMudancaComMascara = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const valorOriginal = e.target.value;
+    const valorFormatado = aplicarMascara(valorOriginal);
+    e.target.value = valorFormatado;
     onChange(e);
   };
 
   return (
     <div className={styles.inputGroup}>
-      {/* O rótulo (label) só é renderizado se a prop 'label' for fornecida. */}
-      {label && <label htmlFor={name}
-       className={styles.label}
-       style={{
+      {/* Label opcional */}
+      {label && (
+        <label
+          htmlFor={name}
+          className={styles.label}
+          style={{
             textAlign: labelAlign ?? "left",
-            color: labelColor ?? "var(--cor-texto-principal)"
+            color: labelColor ?? "var(--cor-texto-principal)",
           }}
-       >
-      {label}
-      </label>}
+        >
+          {label}
+        </label>
+      )}
 
       <div className={styles.inputWrapper}>
-        <input
-          id={name}
-          name={name}
-          className={styles.input}
-          // A lógica para alternar o tipo do input entre 'password' e 'text'.
-          type={type === "password" && mostrarSenha ? "text" : type}
-          placeholder={placeholder}
-          value={value}
-          // Usa a função de validação se o tipo for 'email'.
-          onChange={type === "email" ? handleValidacaoEmail : onChange}
-          required={required}
-          minLength={type === "password" && minLength ? minLength : undefined}
-          style={{ 
-            color: textColor ?? "var(--var-cor-cinza-titulos)" ,
-            backgroundColor: backgroundColor ?? "var(--var-cor-azul-fundo-section)",
-          }}
-        />
+        {/* Renderiza textarea se for multiline, caso contrário usa input */}
+        {multiline ? (
+          <textarea
+            id={name}
+            name={name}
+            className={styles.input}
+            placeholder={placeholder}
+            value={value}
+            onChange={
+              ["data", "hora", "telefone", "numero", "decimal", "dinheiro"].includes(type)
+                ? handleMudancaComMascara
+                : onChange
+            }
+            required={required}
+            style={{
+              color: textColor ?? "var(--var-cor-cinza-titulos)",
+              backgroundColor:
+                backgroundColor ?? "var(--var-cor-azul-fundo-section)",
+              minHeight: "80px", // altura mínima para textos longos
+              resize: "vertical", // usuário pode redimensionar verticalmente
+            }}
+          />
+        ) : (
+          <input
+            id={name}
+            name={name}
+            className={styles.input}
+            type={type === "password" && mostrarSenha ? "text" : "text"}
+            placeholder={placeholder}
+            value={value}
+            onChange={
+              type === "email"
+                ? handleValidacaoEmail
+                : ["data", "telefone", "numero", "decimal", "dinheiro"].includes(type)
+                ? handleMudancaComMascara
+                : onChange
+            }
+            required={required}
+            minLength={type === "password" && minLength ? minLength : undefined}
+            style={{
+              color: textColor ?? "var(--var-cor-cinza-titulos)",
+              backgroundColor:
+                backgroundColor ?? "var(--var-cor-azul-fundo-section)",
+            }}
+          />
+        )}
 
-        {/* O ícone de olho só é renderizado se o tipo for 'password'. */}
-        {type === "password" && (
+        {/* Ícone para mostrar/ocultar senha (apenas para password) */}
+        {type === "password" && !multiline && (
           <span className={styles.eyeIcon} onClick={handleAlternarSenha}>
             {mostrarSenha ? <FaEyeSlash /> : <FaEye />}
           </span>
         )}
       </div>
 
-      {/* A mensagem de erro só é renderizada se houver um erro de email. */}
+      {/* Mensagem de erro apenas para email */}
       {erroEmail && <small className={styles.error}>{erroEmail}</small>}
     </div>
   );

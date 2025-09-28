@@ -7,7 +7,7 @@
  * e a consistência visual do projeto.
  */
 
-/* Define as variáveis de cor com base no Figma */
+/* Define as variáveis de cor */
 :root {
   --cor-texto-principal: #181C32;
   --cor-fundo-input: #FFFFFF;
@@ -65,7 +65,7 @@
 
 /* Efeito de foco: muda a cor da borda quando o utilizador clica no input */
 .input:focus {
-  border-color: var(--cor-texto-principal);
+  border-color: var(--var-cor-rosa);
 }
 
 /* Estilo do ícone de olho para mostrar/ocultar a senha */
@@ -86,3 +86,13 @@
   font-size: 12px;
   margin-top: 4px;
 }
+
+
+/* AJuste para campos com máscara */
+.input[data-type="data"],
+.input[data-type="hora"],
+.input[data-tipo="telefone"] {
+  text-align: center;
+  letter-spacing: 1px;
+}
+

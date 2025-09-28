@@ -41,11 +41,12 @@ export default function AppRoutes() {
         <Route element={<Layout />}>
           <Route path="/" element={<App />} />
           {/* <Route path="/jogador/" element={<JogadorTeste />} /> */}
-          <Route path="/jogador/" element={<InscricaoTorneio />} />
+          <Route path="/jogador/" element={<JogadorTeste />} />
           <Route path="/loja/" element={<LojaTeste />} />
           <Route path="/admin/" element={<App />} />
           <Route path="/alterar-senha/" element={<PaginaAlterarSenha />} />
           <Route path="/torneio/" element={<PaginaTorneio />} />
+          <Route path="/inscricao-torneio/" element={<InscricaoTorneio />} />
 
           {/* Adicionar outras rotas protegidas aqui no futuro */}
         </Route>
