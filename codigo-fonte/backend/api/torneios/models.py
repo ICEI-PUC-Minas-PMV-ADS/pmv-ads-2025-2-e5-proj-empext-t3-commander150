@@ -16,15 +16,21 @@ class Torneio(models.Model):
         related_name='torneios_criados',
         help_text="Usuário (loja) que criou o torneio."
     )
-    nome = models.CharField(max_length=255)
+    nome = models.CharField(max_length=255, help_text="Nome do torneio")
+    descricao = models.TextField(blank=True, null=True, help_text="Descrição detalhada do torneio")
     status = models.CharField(max_length=50, default='Aberto', help_text="Ex: Aberto, Em Andamento, Finalizado")
-    pontuacao_vitoria = models.IntegerField(default=3)
-    pontuacao_empate = models.IntegerField(default=1)
-    pontuacao_derrota = models.IntegerField(default=0)
-    pontuacao_bye = models.IntegerField(default=3)
-    quantidade_rodadas = models.IntegerField()
+    regras = models.TextField(help_text="Regras específicas do torneio")
+    banner = models.ImageField(upload_to='torneios/banners/', blank=True, null=True, help_text="Banner do torneio")
+    vagas_limitadas = models.BooleanField(default=True, help_text="Se o torneio tem limite de vagas")
+    qnt_vagas = models.PositiveIntegerField(blank=True, null=True, help_text="Quantidade de vagas disponíveis")
+    incricao_gratuita = models.BooleanField(default=True, help_text="Se a inscrição é gratuita")
+    valor_incricao = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Valor da inscrição em reais")
+    pontuacao_vitoria = models.PositiveIntegerField(default=3, help_text="Pontos por vitória")
+    pontuacao_derrota = models.PositiveIntegerField(default=0, help_text="Pontos por derrota")
+    pontuacao_empate = models.PositiveIntegerField(default=1, help_text="Pontos por empate")
+    pontuacao_bye = models.PositiveIntegerField(default=3, help_text="Pontos por bye")
+    quantidade_rodadas = models.PositiveIntegerField(blank=True, null=True, help_text="Quantidade de rodadas do torneio")
     data_inicio = models.DateTimeField(auto_now_add=True)
-    data_fim = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.nome
