@@ -16,7 +16,7 @@ const InscricaoTorneio: React.FC = () => {
   const [aceiteTermos, setAceiteTermos] = useState(false);
   const corLabelInputs = "#FFFFFF";
 
-  // função de envio do formulário
+  // função de envio do formulário - Adicionar validações conforme necessário
   const enviarFormulario = () => {
     if (!aceiteTermos) {
       alert("É necessário aceitar os termos e condições do torneio.");
@@ -115,13 +115,13 @@ const InscricaoTorneio: React.FC = () => {
               required
             />
             <Input
-              placeholder="(31) 99999-9999"
-              value={telefone}
-              onChange={(e) => setTelefone(e.target.value)}
-              type="text" // TODO: mudar para "tel" e adicionar máscara direto no componente de Input
-              name="telefone"
-              label="Telefone*"
-              labelColor={corLabelInputs}
+                type="telefone"
+                name="telefone"
+                label="Telefone"
+                placeholder="(99) 99999-9999"
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+                labelColor={corLabelInputs}
             />
           </div>
 

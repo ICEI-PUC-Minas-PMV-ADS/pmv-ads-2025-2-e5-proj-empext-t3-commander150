@@ -2,27 +2,65 @@
     background-color: var(--var-cor-azul-fundo-section);
     border: var(--var-borda-section);
     border-radius: 12px;
-    padding: 16px;
+    padding: clamp(16px, 4vw, 24px);
     color: var(--var-cor-branca);
-    width: 320px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .titulo {
-    font-size: 16px;
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
     font-weight: 600;
-    margin-bottom: 12px;
-    color: var(--var-cor-branca);
+    margin-bottom: clamp(8px, 2vw, 12px);
+    color: var(--var-cor-rosa); /* Changed from var(--var-cor-branca) to var(--var-cor-rosa) */
+    word-wrap: break-word;
 }
 
 .lista {
     list-style: disc;
-    padding-left: 20px;
+    padding-left: clamp(16px, 4vw, 20px);
     margin: 0;
     display: grid;
-    gap: 8px;
+    gap: clamp(6px, 1.5vw, 8px);
+    text-align: left; /* Add this line */
 }
 
 .item {
-    font-size: 14px;
+    font-size: clamp(0.875rem, 2vw, 1rem);
     color: var(--var-cor-cinza-titulos);
+    text-align: left; /* Add this line */
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+/* Media Queries for different screen sizes */
+@media (max-width: 768px) {
+    .regras {
+        max-width: 100%;
+        margin: 0 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .regras {
+        padding: 12px;
+        margin: 0 5px;
+    }
+
+    .lista {
+        padding-left: 16px;
+    }
+}
+
+/* Ensure smooth font scaling */
+@media screen and (min-width: 320px) {
+    .titulo {
+        font-size: calc(1.25rem + 0.5vw);
+    }
+
+    .item {
+        font-size: calc(0.875rem + 0.125vw);
+    }
 }

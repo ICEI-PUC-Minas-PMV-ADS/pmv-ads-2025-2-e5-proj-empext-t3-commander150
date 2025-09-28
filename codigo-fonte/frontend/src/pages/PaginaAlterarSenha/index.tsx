@@ -43,7 +43,8 @@ const PaginaAlterarSenha = () => {
             'Prencha todos os campos.',
             'error'
             );
-      return;
+    
+          return;
     }
 
     // Lógica de alteração de senha
@@ -91,6 +92,8 @@ const PaginaAlterarSenha = () => {
       setLoading(false);
     }
   };
+
+  
   return (
     <div className={styles.container}>
       <form className={styles.card} onSubmit={handleSubmit}>

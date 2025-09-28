@@ -1,11 +1,11 @@
 .card {
-  background-color: #0f172a; /* Fundo escuro */
+  background-color: var(--var-cor-azul-fundo-section);
   padding: 1rem;
   border-radius: 0.75rem;
   border: var(--var-borda-section);
   max-width: 300px;
-  color: #fff;
-  font-family: "Inter", sans-serif;
+  color: var(--var-cor-branca);
+  font-family: "Poppins", sans-serif;
 }
 
 .title {
@@ -33,3 +33,26 @@
   padding-left: 1rem;
 }
 
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%;
+    padding: 0.8rem;
+  }
+
+  .title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .tournamentInfo {
+    grid-template-columns: 1fr;
+    padding-left: 0.5rem;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .tournamentName {
+    font-size: 13px;
+    padding-left: 0.5rem;
+  }
+}

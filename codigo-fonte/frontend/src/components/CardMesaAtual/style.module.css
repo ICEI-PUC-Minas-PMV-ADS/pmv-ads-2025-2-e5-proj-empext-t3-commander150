@@ -1,0 +1,101 @@
+.card {
+  background-color: var(--var-cor-azul-fundo-section);
+  padding: 1.2rem;
+  border-radius: 0.75rem;
+  border: var(--var-borda-section);
+  color: var(--var-cor-branca);
+  font-family: "Poppins", sans-serif;
+  max-width: 600px;
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  text-align:left;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--var-cor-cinza-placeholder);
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.duplaBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--var-cor-azul-fundo-section);
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+  border: var(--var-borda-section);
+  margin-bottom: 1rem;
+}
+
+.duplaNomes {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--var-cor-branca);
+}
+
+.duplaTag {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.3rem 0.8rem;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+}
+
+.jogador {
+  background-color: var(--var-cor-rosa);
+  color: var(--var-cor-azul-fundo-section);
+}
+
+.adversaria {
+  background-color: var(--var-cor-azul-fundo-section);
+  border-color: var(--var-cor-rosa);
+  color: var(--var-cor-rosa);
+}
+
+.vs {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%;
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .duplaBox {
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .duplaNomes {
+    font-size: 0.9rem;
+  }
+
+  .duplaTag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .vs {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+  }
+}
