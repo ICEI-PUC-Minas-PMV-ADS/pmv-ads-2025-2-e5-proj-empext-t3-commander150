@@ -1,95 +1,117 @@
-import React from "react";
-import styles from "./styles.module.css";
+import React from 'react';
+import styles from './styles.module.css';
 
-export type Variacao = "up" | "down" | "none";
-
-export interface CardRankingProps {
-    posicao: number;
+interface Player {
+    id: string;
     nome: string;
-    pontos: number;
-    loja?: string;
-    avatarUrl?: string;
-    vitorias?: number;
-    empates?: number;
-    derrotas?: number;
-    variacao?: Variacao;
-    onClick?: () => void;
-    compacto?: boolean;
-    rightSlot?: React.ReactNode;
+    position: number;
+    points: number;
+    avatar?: string;
+    isCurrentUser?: boolean;
 }
 
-const medalhaClasse = (posicao: number) => {
-    if (posicao === 1) return styles.medalhaOuro;
-    if (posicao === 2) return styles.medalhaPrata;
-    if (posicao === 3) return styles.medalhaBronze;
-    return styles.medalhaDefault;
-};
+interface CardRankingProps {
+    players: Player[];
+    title?: string;
+    maxItems?: number;
+    className?: string;
+}
 
-export default function CardRanking({
-    posicao,
-    nome,
-    pontos,
-    loja,
-    avatarUrl,
-    vitorias,
-    empates,
-    derrotas,
-    variacao = "none",
-    onClick,
-    compacto,
-    rightSlot,
-         }: CardRankingProps) {
-    const record = (
-        typeof vitorias === "number" || typeof empates === "number" || typeof derrotas === "number"
-    )
-        ? `${vitorias ?? 0}/${empates ?? 0}/${derrotas ?? 0}`
-        : undefined;
+const CardRanking: React.FC<CardRankingProps> = ({
+                                                     players,
+                                                     title = "Ranking",
+                                                     maxItems = 10,
+                                                     className = ""
+                                                 }) => {
+    const displayedPlayers = players.slice(0, maxItems);
 
+    const getPositionIcon = (position: number) => {
+        switch (position) {
+            case 1:
+                return <span className={`${styles.positionIcon} ${styles.gold}`}>🥇</span>;
+            case 2:
+                return <span className={`${styles.positionIcon} ${styles.silver}`}>🥈</span>;
+            case 3:
+                return <span className={`${styles.positionIcon} ${styles.bronze}`}>🥉</span>;
+            default:
+                return <span className={styles.positionNumber}>#{position}</span>;
+        }
+    };
+
+    const getPositionClass = (position: number) => {
+        switch (position) {
+            case 1:
+                return styles.positionFirst;
+            case 2:
+                return styles.positionSecond;
+            case 3:
+                return styles.positionThird;
+            default:
+                return '';
+        }
+    };
 
     return (
-        <article
-            className={[styles.card, compacto ? styles.compacto : ""].join(" ")}
-            onClick={onClick}
-            role={onClick ? "button" : undefined}
-            tabIndex={onClick ? 0 : -1}
-            aria-label={`Ranking ${nome}, posição ${posicao}`}
-        >
-            <div className={[styles.posicao, medalhaClasse(posicao)].join(" ")}>{posicao}</div>
-
-
-            <div className={styles.avatarWrap}>
-                {avatarUrl ? (
-                    <img src={avatarUrl} alt={`Avatar de ${nome}`} className={styles.avatar} />
-                ) : (
-                    <div className={styles.avatarPlaceholder}>{nome.slice(0, 1).toUpperCase()}</div>
-                )}
+        <div className={`${styles.cardRanking} ${className}`}>
+            <div className={styles.cardRankingHeader}>
+                <h2 className={styles.cardRankingTitle}>{title}</h2>
             </div>
 
+            <div className={styles.cardRankingContent}>
+                {displayedPlayers.map((player, index) => (
+                    <div
+                        key={player.id}
+                        className={`${styles.rankingItem} ${getPositionClass(player.position)} ${
+                            player.isCurrentUser ? styles.currentUser : ''
+                        }`}
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                        <div className={styles.rankingItemLeft}>
+                            <div className={styles.positionContainer}>
+                                {getPositionIcon(player.position)}
+                            </div>
 
-            <div className={styles.info}>
-                <div className={styles.topLine}>
-                    <span className={styles.nome}>{nome}</span>
-                    <span className={styles.pontos}>{pontos} pts</span>
-                </div>
-                <div className={styles.bottomLine}>
-                    {loja && <span className={styles.loja}>{loja}</span>}
-                    {record && <span className={styles.record}>{record} (V/E/D)</span>}
-                    {variacao !== "none" && (
-                        <span
-                            className={[
-                                styles.variacao,
-                                variacao === "up" ? styles.up : styles.down,
-                            ].join(" ")}
-                            aria-label={variacao === "up" ? "Subiu no ranking" : "Caiu no ranking"}
-                        >
-{variacao === "up" ? "▲" : "▼"}
-</span>
-                    )}
-                </div>
+                            <div className={styles.playerInfo}>
+                                <div className={styles.playerAvatarContainer}>
+                                    {player.avatar ? (
+                                        <img
+                                            src={player.avatar}
+                                            alt={player.nome}
+                                            className={styles.playerAvatar}
+                                        />
+                                    ) : (
+                                        <div className={styles.avatarPlaceholder}>
+                                            {player.nome.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className={styles.playerDetails}>
+                                    <span className={styles.playerName}>{player.nome}</span>
+                                    {player.isCurrentUser && (
+                                        <span className={styles.currentUserBadge}>Você</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.rankingItemRight}>
+                            <span className={styles.playerPoints}>{player.points.toLocaleString()}</span>
+                            <span className={styles.pointsLabel}>pts</span>
+                        </div>
+                    </div>
+                ))}
             </div>
 
-
-            {rightSlot && <div className={styles.rightSlot}>{rightSlot}</div>}
-        </article>
+            {players.length > maxItems && (
+                <div className={styles.cardRankingFooter}>
+                    <button className={styles.showMoreButton}>
+                        +{players.length - maxItems} jogadores
+                    </button>
+                </div>
+            )}
+        </div>
     );
-}
+};
+
+export default CardRanking;
