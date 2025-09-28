@@ -1,12 +1,17 @@
 header {
     .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 4px 32px;
+        padding: 2px 32px;
         background-color: var(--var-cor-terciaria);
         box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-        min-height: 70px;
+        min-height: 50px;
+        z-index: 1000;
     }
 
     .navbar-right {
@@ -25,8 +30,33 @@ header {
     }
 
     .logo {
-        height: 60px;
+        height: 40px;
         object-fit: contain;
+    }
+
+    .logo-mobile {
+        display: none;
+    }
+
+    .mobile-menu-toggle {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        gap: 4px;
+    }
+
+    .mobile-menu-toggle span {
+        width: 20px;
+        height: 2px;
+        background-color: #fefefe;
+        border-radius: 1px;
+        transition: all 0.3s ease;
     }
 
     .nav-items {
@@ -121,7 +151,7 @@ header {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
     padding: 16px;
     min-width: 200px;
-    z-index: 1000;
+    z-index: 1001;
     margin-top: 8px;
 }
 
@@ -163,4 +193,168 @@ header {
 .dropdown-item:hover {
     background-color: #f3f4f6;
     color: var(--var-cor-primaria);
+}
+
+/* Mobile Menu Styles */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 50px; /* Altura do header */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--var-cor-terciaria);
+    border-top: 1px solid var(--var-cor-secundaria);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1002;
+    overflow-y: auto;
+}
+
+.mobile-menu-content {
+    padding: 20px;
+}
+
+.mobile-nav-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: none;
+    border: none;
+    color: #fefefe;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.mobile-nav-item:hover {
+    background-color: var(--var-cor-secundaria);
+}
+
+.mobile-user-section {
+    border-top: 1px solid var(--var-cor-secundaria);
+    padding-top: 20px;
+}
+
+.mobile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.mobile-menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mobile-dropdown-item {
+    background: none;
+    border: none;
+    padding: 12px 16px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fefefe;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.mobile-dropdown-item:hover {
+    background-color: var(--var-cor-secundaria);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    header {
+        .navbar {
+            padding: 12px 20px;
+            position: fixed;
+        }
+
+        .logo-desktop {
+            display: none;
+        }
+
+        .logo-mobile {
+            display: block;
+            height: 32px;
+        }
+
+        .mobile-menu-toggle {
+            display: flex;
+        }
+
+        .navbar-right {
+            display: none;
+        }
+    }
+
+    .mobile-menu-overlay {
+        top: 74px; /* Altura do header em tablet */
+    }
+
+    .mobile-menu {
+        top: 74px; /* Altura do header em tablet */
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        .navbar {
+            padding: 8px 16px;
+            min-height: 48px;
+        }
+
+        .logo-mobile {
+            height: 28px;
+        }
+
+        .mobile-menu-toggle {
+            width: 36px;
+            height: 36px;
+        }
+
+        .mobile-menu-toggle span {
+            width: 18px;
+        }
+    }
+
+    .mobile-menu-overlay {
+        top: 48px; /* Altura do header em mobile */
+    }
+
+    .mobile-menu {
+        top: 48px; /* Altura do header em mobile */
+    }
+
+    .mobile-menu-content {
+        padding: 16px;
+    }
 }

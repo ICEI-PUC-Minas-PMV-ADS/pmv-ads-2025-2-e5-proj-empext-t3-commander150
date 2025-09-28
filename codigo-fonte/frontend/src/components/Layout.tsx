@@ -16,6 +16,7 @@
 import { Outlet } from 'react-router-dom';
 // A importação foi corrigida para usar a exportação padrão (default) do ficheiro Navbar.
 import Navbar from './Navbar';
+import './Layout.css';
 
 // O componente Layout já não precisa da prop 'children', pois o <Outlet />
 // assume essa responsabilidade de forma dinâmica.
@@ -25,7 +26,8 @@ const Layout = () => {
       {/* A Navbar será exibida em todas as páginas */}
       <Navbar />
 
-      <main style={{ padding: '20px' }}>
+      {/* Compensa a altura da navbar fixa */}
+      <main className="main-content">
         {/*
           O <Outlet /> funciona como um espaço reservado.
           O react-router-dom irá substituir este Outlet pelo componente

@@ -17,14 +17,14 @@ section {
 }
 
 .titulo {
-  font-size: 64px;
+  font-size: 42px;
   font-weight: 700;
   color: var(--var-cor-rosa);
   text-align: center;
 }
 
 .subtitulo {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 400;
   text-align: center;
   color: var(--var-cor-cinza-titulos);
@@ -41,14 +41,14 @@ section {
 }
 
 .nomeTorneio {
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 600;
   text-align: left;
 
 }
 
 .descricaoTorneio {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 400;
   text-align: left;
   color: var(--var-cor-cinza-titulos);
@@ -102,13 +102,13 @@ section {
 }
 
 .tituloSessao {
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 600;
   text-align: left;
 }
 
 .subtituloSessao {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 400;
   text-align: left;
   color: var(--var-cor-cinza-titulos);
@@ -156,7 +156,7 @@ section {
 
 .regras li {
   margin-bottom: 8px;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 400;
   font-style: regular;
   color: #ddd;

@@ -1,0 +1,24 @@
+/* Layout.css - Estilos para o layout principal */
+
+.main-content {
+  padding: 20px;
+  margin-top: 50px; /* Altura da navbar fixa */
+  min-height: calc(100vh - 50px); /* Altura total menos a navbar */
+  background-color: var(--var-cor-secundaria);
+}
+
+/* Media Queries para ajustar o margin-top baseado na altura da navbar */
+@media (max-width: 768px) {
+  .main-content {
+    margin-top: 74px; /* Altura da navbar em tablet */
+    min-height: calc(100vh - 74px);
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    margin-top: 48px; /* Altura da navbar em mobile */
+    min-height: calc(100vh - 48px);
+    padding: 16px;
+  }
+}
