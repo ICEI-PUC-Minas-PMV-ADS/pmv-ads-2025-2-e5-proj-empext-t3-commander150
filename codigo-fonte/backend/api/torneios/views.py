@@ -44,7 +44,41 @@ class TorneioViewSet(viewsets.ModelViewSet):
             return Torneio.objects.filter(id_loja=self.request.user)
         return Torneio.objects.all()
 
-    def post(self, serializer):
+    @swagger_auto_schema(
+        request_body=TorneioSerializer,
+        responses={
+            201: TorneioSerializer,
+            400: 'Erro de validação'
+        },
+        operation_summary="Criar novo torneio",
+        operation_description="""
+        Cria um novo torneio com os seguintes campos:
+        
+        **Campos obrigatórios:**
+        - nome (string): Nome do torneio
+        - status (string): Status do torneio (ex: Aberto, Em Andamento, Finalizado)
+        - regras (string): Regras específicas do torneio
+        - vagas_limitadas (boolean): Se o torneio tem limite de vagas
+        - incricao_gratuita (boolean): Se a inscrição é gratuita
+        - pontuacao_vitoria (integer): Pontos por vitória
+        - pontuacao_derrota (integer): Pontos por derrota
+        - pontuacao_empate (integer): Pontos por empate
+        - pontuacao_bye (integer): Pontos por bye
+        - data (date): Data do torneio
+        
+        **Campos opcionais:**
+        - descricao (string): Descrição detalhada do torneio
+        - banner (file): Banner do torneio
+        - qnt_vagas (integer): Quantidade de vagas disponíveis
+        - valor_incricao (decimal): Valor da inscrição em reais
+        - quantidade_rodadas (integer): Quantidade de rodadas do torneio
+        
+        **Observações:**
+        - Para usuários tipo LOJA: o campo id_loja é definido automaticamente
+        - Para usuários tipo ADMIN: pode especificar o id_loja manualmente
+        """
+    )
+    def perform_create(self, serializer):
         """
         Ao criar torneio, define a loja automaticamente se for usuário tipo LOJA.
         Admins podem especificar a loja manualmente.
