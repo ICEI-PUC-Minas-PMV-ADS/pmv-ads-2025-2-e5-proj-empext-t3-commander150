@@ -38,8 +38,9 @@
 import { createContext, useState, useEffect, useContext, type ReactNode } from 'react';
 import { AxiosError } from 'axios';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
-import { efetuarLogin, efetuarLogout, verificarSessao} from '../services/authServico';
+import { efetuarLogin, verificarSessao} from '../services/authServico';
 import type { IUsuario, ILoginCredenciais } from '../tipos/tipos';
 
 // Define a "planta baixa" do contexto, especificando quais
@@ -70,6 +71,7 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
   // evitando que a tela "pisque" ou mostre conteúdo indevido enquanto
   // a sessão inicial está sendo verificada.
   const [carregandoSessao, setCarregandoSessao] = useState(true);
+  const navigate = useNavigate();
 
   // forçar reset do usuário
   const resetUsuario = () => setUsuario(null);
@@ -120,10 +122,15 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
   // Função para realizar o logout do usuário.
   const logout = async () => {
     try {
-      await efetuarLogout();
+      // Limpar dados locais do usuário
       setUsuario(null);
+      
+      // Redirecionar para a tela de login usando React Router
+      navigate('/login', { replace: true });
     } catch {
-      Swal.fire('Erro no Logout', 'Não foi possível encerrar a sessão.', 'error');
+      // Em caso de erro, ainda assim limpar os dados locais
+      setUsuario(null);
+      navigate('/login', { replace: true });
     }
   };
 

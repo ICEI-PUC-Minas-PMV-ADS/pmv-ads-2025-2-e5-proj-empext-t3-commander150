@@ -30,6 +30,7 @@ interface RadioProps {
   opcoes: OpcaoRadio[];
   valorSelecionado: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  textColor?: string;
 }
 
 const Radio = ({
@@ -38,10 +39,18 @@ const Radio = ({
   opcoes,
   valorSelecionado,
   onChange,
+  textColor = "#FFFFFF",
 }: RadioProps) => {
   return (
     <div className={styles.radioGroup}>
-      {labelPrincipal && <span className={styles.labelPrincipal}>{labelPrincipal}</span>}
+      {labelPrincipal && (
+        <span 
+          className={styles.labelPrincipal}
+          style={{ color: textColor }}
+        >
+          {labelPrincipal}
+        </span>
+      )}
 
       <div className={styles.opcoesContainer}>
         {opcoes.map((opcao) => (
@@ -66,6 +75,7 @@ const Radio = ({
             <label
               htmlFor={opcao.valor}
               className={styles.labelOpcao}
+              style={{ color: textColor }}
             >
               {opcao.rotulo}
             </label>

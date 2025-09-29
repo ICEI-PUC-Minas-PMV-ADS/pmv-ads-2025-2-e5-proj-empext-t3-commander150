@@ -31,7 +31,7 @@
   font-family: var(--fonte-principal);
   font-weight: 400;
   font-size: 13px;
-  color: var(--cor-texto-principal);
+  color: #FFFFFF;
   margin-bottom: 4px;
 }
 
@@ -49,7 +49,7 @@
   cursor: pointer;
   font-family: var(--fonte-principal);
   font-size: 14px;
-  color: var(--cor-texto-principal);
+  color: #FFFFFF;
   position: relative;
 }
 

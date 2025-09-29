@@ -92,6 +92,8 @@ const PaginaCadastrar = () => {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
+          backgroundColor="#FFFFFF"
+          textColor="#181C32"
         />
         <Input
           type="email"
@@ -101,6 +103,8 @@ const PaginaCadastrar = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          backgroundColor="#FFFFFF"
+          textColor="#181C32"
         />
         <Input
           type="password"
@@ -110,6 +114,8 @@ const PaginaCadastrar = () => {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           required
+          backgroundColor="#FFFFFF"
+          textColor="#181C32"
         />
 
         {/* 3. Substitui o Input de texto pelo componente Radio. */}
@@ -118,6 +124,7 @@ const PaginaCadastrar = () => {
           name="tipo"
           opcoes={opcoesTipoUsuario}
           valorSelecionado={tipo}
+          textColor="var(--cor-texto-principal)"
           onChange={(e) => setTipo(e.target.value)}
         />
 

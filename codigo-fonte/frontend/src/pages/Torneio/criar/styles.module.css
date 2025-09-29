@@ -54,86 +54,120 @@ section {
   margin-bottom: 15px;
 }
 
+/* Quando há apenas um item no grupo, centralizar */
+.grupoInputs:has(.checkboxContainer:only-child) {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
 /* Input com ícone */
 .inputComIcone {
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  width: 100%;
 }
 
-.iconeInput {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--var-cor-cinza-titulos);
-  font-size: 16px;
-  pointer-events: none;
-  margin-top: 12px; /* Ajuste para alinhar com o input */
+.labelInput {
+  font-family: var(--fonte-principal);
+  font-weight: 400;
+  font-size: 13px;
+  color: #FFFFFF;
+  text-align: left;
 }
 
-/* Upload de arquivo */
-.uploadContainer {
+.labelBanner {
+  font-family: var(--fonte-principal);
+  font-weight: 400;
+  font-size: 13px;
+  color: #FFFFFF;
+  text-align: left;
+}
+
+
+/* Input datetime-local */
+.inputDatetime {
+  padding: 12px;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  background-color: var(--var-cor-fundo-input);
+  color: var(--var-cor-texto-principal);
+  font-size: 14px;
+  font-family: var(--fonte-principal);
+  transition: border-color 0.2s ease-in-out;
+  outline: none;
+}
+
+.inputDatetime:focus {
+  border-color: var(--var-cor-rosa);
+}
+
+.inputDatetime::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.inputDatetime::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Seleção de Banner */
+.selecaoBanner {
   display: flex;
   flex-direction: column;
 }
 
-.labelUpload {
+.image.pngBanner {
   font-size: 14px;
   font-weight: 500;
   color: #FFFFFF;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.opcoesBanner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.opcaoBanner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid var(--var-cor-borda-input);
+  border-radius: 8px;
+  background-color: var(--var-cor-fundo-input);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.opcaoBanner:hover {
+  border-color: var(--var-cor-primaria);
+  background-color: rgba(0, 74, 138, 0.1);
+}
+
+.opcaoBannerSelecionada {
+  border-color: var(--var-cor-primaria);
+  background-color: rgba(0, 74, 138, 0.2);
+}
+
+.imagemBanner {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
   margin-bottom: 8px;
 }
 
-.uploadArea {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.botaoUpload {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background-color: var(--var-cor-primaria);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
+.nomeBanner {
+  font-size: 12px;
   font-weight: 500;
-  transition: background-color 0.2s ease;
-  width: fit-content;
-}
-
-.botaoUpload:hover {
-  background-color: #004a8a;
-}
-
-.arquivoSelecionado {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background-color: var(--var-cor-terciaria);
-  border-radius: 6px;
-  font-size: 14px;
-  color: var(--var-cor-cinza-titulos);
-}
-
-.botaoRemover {
-  background: none;
-  border: none;
-  color: #ff6b6b;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
-
-.botaoRemover:hover {
-  background-color: rgba(255, 107, 107, 0.1);
+  color: var(--var-cor-texto-principal);
+  text-align: center;
 }
 
 /* Textarea */
@@ -147,6 +181,7 @@ section {
   font-weight: 500;
   color: #FFFFFF;
   margin-bottom: 8px;
+  text-align: left;
 }
 
 .textarea {
@@ -182,6 +217,7 @@ section {
   font-weight: 500;
   color: #FFFFFF;
   margin-bottom: 10px;
+  text-align: left;
 }
 
 .radioGroup {
@@ -208,6 +244,7 @@ section {
   font-size: 14px;
   color: var(--var-cor-cinza-titulos);
   cursor: pointer;
+  text-align: left;
 }
 
 /* Input limitado */
@@ -245,6 +282,23 @@ section {
   gap: 15px;
   margin-top: 30px;
   justify-content: center;
+}
+
+/* Estilos para erro */
+.erroContainer {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: rgba(255, 107, 107, 0.1);
+  border: 1px solid #ff6b6b;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.erroTexto {
+  color: #ff6b6b;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
 }
 
 /* Responsividade */

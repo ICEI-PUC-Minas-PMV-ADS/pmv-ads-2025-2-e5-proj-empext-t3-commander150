@@ -2,18 +2,19 @@
 
 import { Routes, Route } from "react-router-dom";
 import Layout from "../components/Layout";
-import PaginaLogin from "../pages/PaginaLogin";
+import PaginaLogin from "../pages/auth/login";
 import App from "../App";
 
 // Importa os nossos componentes de lógica de rota
 import { RotaSegura } from "./RotaSegura";
 import JogadorTeste from "../pages/Testes/JogadorTeste";
 import LojaTeste from "../pages/Testes/LojaTeste";
-import PaginaRecuperarSenha from "../pages/PaginaRecuperarSenha";
-import PaginaCadastrar from "../pages/PaginaCadastrar";
-import PaginaAlterarSenha from "../pages/PaginaAlterarSenha";
-import InscricaoTorneio from "../pages/InscricaoTorneio";
-import PaginaTorneio from "../pages/PaginaTorneio";
+import PaginaRecuperarSenha from "../pages/auth/recuperar-senha";
+import PaginaCadastrar from "../pages/auth/cadastrar";
+import PaginaAlterarSenha from "../pages/auth/alterar-senha";
+import InscricaoTorneio from "../pages/Torneio/inscrever";
+import PaginaTorneio from "../pages/Torneio/visualizar";
+import CriarTorneio from "../pages/Torneio/criar";
 
 export default function AppRoutes() {
   return (
@@ -47,6 +48,7 @@ export default function AppRoutes() {
           <Route path="/alterar-senha/" element={<PaginaAlterarSenha />} />
           <Route path="/torneio/" element={<PaginaTorneio />} />
           <Route path="/inscricao-torneio/" element={<InscricaoTorneio />} />
+          <Route path="/criar-evento/" element={<CriarTorneio />} />
 
           {/* Adicionar outras rotas protegidas aqui no futuro */}
         </Route>
