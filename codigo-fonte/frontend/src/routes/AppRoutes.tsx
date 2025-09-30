@@ -27,6 +27,7 @@ export default function AppRoutes() {
       <Route path="/login/" element={<PaginaLogin />} />
       <Route path="/recuperar-senha/" element={<PaginaRecuperarSenha />} />
       <Route path="/cadastrar/" element={<PaginaCadastrar />} />
+      <Route path="/" element={<App />} />
 
 
       {/* --- Grupo 2: Rotas Protegidas com Layout --- */}
@@ -40,8 +41,6 @@ export default function AppRoutes() {
       */}
       <Route element={<RotaSegura />}>
         <Route element={<Layout />}>
-          <Route path="/" element={<App />} />
-          {/* <Route path="/jogador/" element={<JogadorTeste />} /> */}
           <Route path="/jogador/" element={<JogadorTeste />} />
           <Route path="/loja/" element={<LojaTeste />} />
           <Route path="/admin/" element={<App />} />

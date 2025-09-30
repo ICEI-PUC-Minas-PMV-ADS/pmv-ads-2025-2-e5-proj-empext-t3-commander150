@@ -1,0 +1,115 @@
+/* src/App.module.css */
+
+/* Estilo geral da aplicação */
+.app {
+  background: #1e293b;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HERO */
+.hero {
+  width: 100%;
+  height: 575px;
+  background: url("./assets/hero_figma.png") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Gradiente aplicado sobre o hero */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 56.85%,
+      rgba(30, 41, 59, 0) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(30, 41, 59, 0) 12.12%,
+      rgba(30, 41, 59, 0) 43.88%
+    ),
+    linear-gradient(0deg, rgba(19, 17, 29, 0.75), rgba(19, 17, 29, 0.75));
+  border-bottom: 2px solid transparent;
+}
+
+/* Conteúdo dentro do hero */
+.heroConteudo {
+  position: relative;
+  text-align: center;
+  color: #fff;
+  max-width: 900px;
+  z-index: 1;
+}
+
+.titulo {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.subtitulo {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+/* LISTAGEM DE TORNEIOS */
+.listaTorneios {
+  padding: 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tituloSecao {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.gridTorneios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 1024px) {
+  .titulo {
+    font-size: 48px;
+  }
+
+  .subtitulo {
+    font-size: 20px;
+  }
+
+  .listaTorneios {
+    padding: 30px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 420px;
+  }
+
+  .titulo {
+    font-size: 36px;
+  }
+
+  .subtitulo {
+    font-size: 16px;
+  }
+
+  .listaTorneios {
+    padding: 20px;
+  }
+}
