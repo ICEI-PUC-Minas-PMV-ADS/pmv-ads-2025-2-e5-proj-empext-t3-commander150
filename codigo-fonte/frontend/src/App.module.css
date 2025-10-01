@@ -17,6 +17,8 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  padding-top: 80px; /* compensa a altura da navbar */
+
 }
 
 /* Gradiente aplicado sobre o hero */

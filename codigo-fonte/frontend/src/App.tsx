@@ -9,11 +9,13 @@ import b3 from "./assets/b3.png";
 // Importa o CardTorneio já pronto
 import CardTorneio from "./components/CardTorneio";
 
-// Importa ícones do react-icons (se precisar para as tags)
+// Importa ícones do react-icons
 import { FaUsers, FaLock } from "react-icons/fa";
 
+// Importa a Navbar
+import Navbar from "./components/Navbar";
+
 function App() {
-  // Exemplo de dados mockados dos torneios
   const torneios = [
     {
       imagem: b1,
@@ -47,12 +49,12 @@ function App() {
     },
     {
       imagem: b1,
-      titulo: "Goultaminator Junior",
-      data: "18.08.23",
-      hora: "19:00",
+      titulo: "Open Tour Winter Split",
+      data: "09.06.23",
+      hora: "21:00",
       tags: [
         { texto: "2v2", icone: <FaUsers /> },
-        { texto: "Com permissão", icone: <FaLock /> },
+        { texto: "Casual" },
       ],
     },
     {
@@ -79,6 +81,9 @@ function App() {
 
   return (
     <div className={estilos.app}>
+      {/* Navbar sempre visível */}
+      <Navbar />
+
       {/* HERO */}
       <section className={estilos.hero}>
         <div className={estilos.heroConteudo}>
