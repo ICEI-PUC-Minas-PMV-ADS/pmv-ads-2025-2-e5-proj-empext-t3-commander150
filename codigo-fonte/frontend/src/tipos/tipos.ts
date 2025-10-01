@@ -66,13 +66,21 @@ export interface ITorneioAtualizacao {
 export interface ITorneio {
   id: number;
   nome: string;
+  descricao?: string | null;
   status: string;
+  regras?: string | null;
+  banner?: string | null;
+  vagas_limitadas: boolean;
+  qnt_vagas?: number | null;
+  incricao_gratuita: boolean;
+  valor_incricao?: number | null;
   pontuacao_vitoria: number;
-  pontuacao_empate: number;
   pontuacao_derrota: number;
+  pontuacao_empate: number;
   pontuacao_bye: number;
-  quantidade_rodadas: number;
-  data_fim: string;
+  quantidade_rodadas?: number | null;
+  data_inicio: string; // ISO 8601 format
+  data_fim?: string | null; // ISO 8601 format
   id_loja: number;
   data_criacao?: string;
   data_atualizacao?: string;

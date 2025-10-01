@@ -4,6 +4,10 @@ section {
   border: var(--var-borda-section);
 }
 
+li {
+  list-style-type: none;
+}
+
 .container {
   min-height: 100vh;
   color:  var(--var-cor-cinza-titulos);

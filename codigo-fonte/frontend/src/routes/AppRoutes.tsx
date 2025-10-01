@@ -47,7 +47,7 @@ export default function AppRoutes() {
           <Route path="/admin/" element={<App />} />
           <Route path="/alterar-senha/" element={<PaginaAlterarSenha />} />
           <Route path="/torneio/" element={<PaginaTorneio />} />
-          <Route path="/inscricao-torneio/" element={<InscricaoTorneio />} />
+          <Route path="/inscricao-torneio/:id" element={<InscricaoTorneio />} />
           <Route path="/criar-evento/" element={<CriarTorneio />} />
 
           {/* Adicionar outras rotas protegidas aqui no futuro */}
