@@ -1,3 +1,5 @@
+/* src/components/Navbar/style.css */
+
 header {
     .navbar {
         position: fixed;
@@ -195,6 +197,7 @@ header {
     color: var(--var-cor-primaria);
 }
 
+
 /* Mobile Menu Styles */
 .mobile-menu-overlay {
     position: fixed;
@@ -289,6 +292,7 @@ header {
 .mobile-dropdown-item:hover {
     background-color: var(--var-cor-secundaria);
 }
+
 
 /* Media Queries */
 @media (max-width: 768px) {

@@ -203,7 +203,7 @@ const Input = ({
             id={name}
             name={name}
             className={styles.input}
-            type={type === "password" && mostrarSenha ? "text" : "text"}
+            type={type === "password" ? (mostrarSenha ? "text" : "password") : type}
             placeholder={placeholder}
             value={value}
             onChange={
