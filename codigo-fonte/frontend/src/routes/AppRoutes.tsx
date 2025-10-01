@@ -24,10 +24,10 @@ export default function AppRoutes() {
         Estas rotas são renderizadas sem nenhum Layout ou verificação de segurança.
         Isto garante que a página de login não terá a Navbar da aplicação principal.
       */}
+      <Route path="/" element={<App />} />
       <Route path="/login/" element={<PaginaLogin />} />
       <Route path="/recuperar-senha/" element={<PaginaRecuperarSenha />} />
       <Route path="/cadastrar/" element={<PaginaCadastrar />} />
-      <Route path="/" element={<App />} />
 
 
       {/* --- Grupo 2: Rotas Protegidas com Layout --- */}
@@ -49,7 +49,7 @@ export default function AppRoutes() {
           <Route path="/inscricao-torneio/" element={<InscricaoTorneio />} />
           <Route path="/criar-evento/" element={<CriarTorneio />} />
 
-          {/* Adicionar outras rotas protegidas aqui no futuro */}
+
         </Route>
       </Route>
 

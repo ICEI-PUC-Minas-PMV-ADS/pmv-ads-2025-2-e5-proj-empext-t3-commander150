@@ -39,19 +39,20 @@ const PaginaLogin = () => {
   useEffect(() => {
   if (usuario) {
     const redirecionarUsuario = (tipo: string) => {
-      switch (tipo) {
-        case "LOJA":
-          navigate("/loja");
-          break;
-        case "JOGADOR":
-          navigate("/jogador");
-          break;
-        case "ADMIN":
-          navigate("/admin");
-          break;
-        default:
-          navigate("/");
-      }
+        navigate("/");
+      // switch (tipo) {
+      //   case "LOJA":
+      //     navigate("/loja");
+      //     break;
+      //   case "JOGADOR":
+      //     navigate("/jogador");
+      //     break;
+      //   case "ADMIN":
+      //     navigate("/admin");
+      //     break;
+      //   default:
+      //     navigate("/");
+      // }
     };
 
     if (!deOndeVeio || deOndeVeio === "/") {
