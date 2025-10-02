@@ -78,6 +78,12 @@
   margin-bottom: 1rem;
 }
 
+.infoJogadores{
+  font-size: 1rem;
+  color: var(--var-cor-cinza-placeholder);
+  margin-bottom: 1rem;
+}
+
 .playerList {
   list-style: none;
   padding: 0;

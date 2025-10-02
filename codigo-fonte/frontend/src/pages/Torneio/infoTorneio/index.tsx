@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ITorneio } from "../../../tipos/tipos";
-import { buscarTorneioPorId, tratarErroTorneio } from "../../../services/torneioServico";
+import { buscarJogadoresInscritos, buscarTorneioPorId, tratarErroTorneio } from "../../../services/torneioServico";
 import styles from "./styles.module.css";
 import Button from "../../../components/Button";
 import { CardSuperior } from "../../../components/CardSuperior";
@@ -20,7 +20,8 @@ const InformacaoTorneio: React.FC = () => {
   const [salvando, setSalvando] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null);
   const [jogadoresInscritos, setJogadoresInscritos] = useState<string[]>([]);
-  
+  const [carregandoJogadores, setCarregandoJogadores] = useState(true);
+
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
@@ -29,25 +30,22 @@ const InformacaoTorneio: React.FC = () => {
     const carregarTorneio = async () => {
       try {
         setLoading(true);
-        const torneioId = id ? parseInt(id) : 1; // Usa ID da URL ou 1 como fallback
-        const dados = await buscarTorneioPorId(torneioId);
-        setTournament(dados);
-        setRegrasEditadas(dados.regras || "");
-        setStatus(dados.status as Status);
-        
-        // Mock temporário de jogadores sera substituido por dados reais da API
-        // quando a funcionalidade estiver implementada
-        setJogadoresInscritos([
-          "Alexandre Shadows",
-          "Julia Frostmage", 
-          "Marina Stormcaller",
-          "Pedro Flamecaster"
+        setCarregandoJogadores(true);
+        const torneioId = id ? parseInt(id) : 1;
+        const [dadosTorneio, jogadores] = await Promise.all([
+          buscarTorneioPorId(torneioId),
+          buscarJogadoresInscritos(torneioId)
         ]);
+         setTournament(dadosTorneio);
+        setRegrasEditadas(dadosTorneio.regras || "");
+        setStatus(dadosTorneio.status as Status);
+        setJogadoresInscritos(jogadores);
         
       } catch (e) {
         setErro(tratarErroTorneio(e));
       } finally {
         setLoading(false);
+        setCarregandoJogadores(false);
       }
     };
     
@@ -189,17 +187,30 @@ const salvarRegras = async () => {
         <div className={styles.left}>
           <div className={styles.card}>
             <h3 className={styles.cardTitle}>Usuários inscritos</h3>
-            <ul className={styles.playerList}>
-              {jogadoresInscritos.length > 0 ? (
-                jogadoresInscritos.map((player, index) => (
-                  <li key={index} className={styles.playerItem}>
-                    {index + 1}. {player}
-                  </li>
-                ))
-              ) : (
-                <p>Nenhum jogador inscrito.</p>
-              )}
-            </ul>
+            <span className={styles.infoJogadores}>
+                {jogadoresInscritos.length} {jogadoresInscritos.length === 1 ? 'jogador' : 'jogadores'}
+              </span>
+              {carregandoJogadores ? (
+              <div className={styles.infoJogadores}>
+                <p>Carregando lista de jogadores...</p>
+              </div>
+            ) : (
+              <ul className={styles.playerList}>
+                {jogadoresInscritos.length > 0 ? (
+                  jogadoresInscritos.map((player, index) => (
+                    <li key={index} className={styles.playerItem}>
+                      <span className={styles.numeroJogador}>{index + 1}. </span>
+                      <span className={styles.nomeJogador}>{player}</span>
+                    </li>
+                  ))
+                ) : (
+                  <div className={styles.infoJogadores}>
+                    <p>Nenhum jogador inscrito ainda.</p>
+                    <small>Seja o primeiro a se inscrever!</small>
+                  </div>
+                )}
+              </ul>
+            )}
 
             <div className={styles.buttons}>
               <Button 

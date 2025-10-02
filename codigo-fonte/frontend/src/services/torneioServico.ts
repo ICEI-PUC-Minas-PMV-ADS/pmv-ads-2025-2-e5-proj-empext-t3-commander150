@@ -225,6 +225,22 @@ export const inscreverNoTorneio = async (dadosInscricao: {
 };
 
 /**
+ * Busca os jogadores inscritos em um torneio específico.
+ *
+ * @param idTorneio - ID do torneio
+ * @returns Lista de nomes dos jogadores inscritos
+ */
+export const buscarJogadoresInscritos = async (idTorneio: number): Promise<string[]> => {
+  const resposta = await api.get('/torneios/inscricoes/', {
+    params: {
+      id_torneio: idTorneio
+    }
+  });
+  const inscricoes = resposta.data.results || resposta.data;
+  return inscricoes.map((inscricao: any) => inscricao.username);
+};
+
+/**
  * Utilitário para tratar erros de torneio de forma consistente.
  * 
  * @param erro - Erro do Axios
