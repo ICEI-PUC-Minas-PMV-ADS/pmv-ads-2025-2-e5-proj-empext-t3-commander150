@@ -1,0 +1,242 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--var-cor-azul-fundo);
+  padding: 2rem;
+  font-family: "Poppins", sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Cabeçalho */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.titulo {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--var-cor-rosa);
+  margin: 0;
+}
+
+.subtitulo {
+  font-size: 1rem;
+  color: var(--var-cor-cinza-placeholder);
+  margin: 0.25rem 0 0 0;
+}
+
+.rodadaBadge {
+  background-color: var(--var-cor-rosa);
+  color: var(--var-cor-azul-fundo);
+  padding: 0.5rem 1.5rem;
+  border-radius: 1.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Cards Superiores */
+.cardsEsquerda {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.cardsEsquerda > * {
+  flex: 1;
+  max-width: 280px;
+  min-height: 130px;
+}
+
+.cardsDireita {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.cardsDireita > * {
+  flex: 1;
+  width: 100%;
+  min-height: 130px;
+}
+
+/* Grid Principal */
+.gridContainer {
+  display: grid;
+  grid-template-columns: 650px 1fr;
+  gap: 2rem;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.gridContainer:last-child {
+  margin-bottom: 0;
+}
+
+.colunaEsquerda,
+.colunaDireita {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.colunaDireita > * {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Cards Genéricos */
+.partidaCard,
+.resultadoCard {
+  background-color: var(--var-cor-azul-fundo-section);
+  border: var(--var-borda-section);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.cardTitulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--var-cor-branca);
+  margin: 0 0 0.5rem 0;
+}
+
+.statusPartida {
+  font-size: 0.85rem;
+  color: var(--var-cor-cinza-placeholder);
+  margin: 0 0 1.5rem 0;
+}
+
+/* Partida - Times */
+.dupla {
+  background-color: var(--var-cor-azul-fundo);
+  border: var(--var-borda-section);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.duplaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.duplaNomes {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--var-cor-branca);
+}
+
+.duplaTag {
+  background-color: var(--var-cor-rosa);
+  color: var(--var-cor-azul-fundo);
+  padding: 0.3rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.duplaTagAdversario {
+  background-color: transparent;
+  color: var(--var-cor-rosa);
+  border: 1px solid var(--var-cor-rosa);
+  padding: 0.3rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.vs {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--var-cor-branca);
+  margin: 1rem 0;
+}
+
+/* Resultado */
+.instrucao {
+  font-size: 0.85rem;
+  color: var(--var-cor-cinza-placeholder);
+  margin: 0 0 1.5rem 0;
+}
+
+.inputsResultado {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.inputLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--var-cor-branca);
+  margin: 0;
+}
+
+/* Estados */
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 2rem;
+  color: #ff4444;
+}
+
+/* Responsivo - Tablet */
+@media (max-width: 1024px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .cardsSuperiores {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsivo - Mobile */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .titulo {
+    font-size: 1.8rem;
+  }
+
+  .cardsSuperiores {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .gridContainer {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .inputsResultado {
+    grid-template-columns: 1fr;
+  }
+
+  .partidaCard,
+  .resultadoCard {
+    padding: 1.25rem;
+  }
+}
