@@ -1,5 +1,7 @@
 // src/components/CardTorneio/index.tsx
 
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 
 interface TagProps {
@@ -9,16 +11,45 @@ interface TagProps {
 }
 
 interface CardTorneioProps {
+  id: number; // ID do torneio
   imagem: string; // URL da imagem
   titulo: string; // título do torneio
   data: string; // data (ex: 18.08.23)
   hora: string; // hora (ex: 19:00)
   tags?: TagProps[]; // lista de tags
+  loja?: string; // nome da loja
+  status?: string; // status do torneio
+  usuario?: any; // dados do usuário logado
 }
 
-const CardTorneio = ({ imagem, titulo, data, hora, tags = [] }: CardTorneioProps) => {
+const CardTorneio = ({ 
+  id, 
+  imagem, 
+  titulo, 
+  data, 
+  hora, 
+  tags = [], 
+  loja, 
+  status, 
+  usuario 
+}: CardTorneioProps) => {
+  const navigate = useNavigate();
+
+  // Função para lidar com o clique no card
+  const handleClick = () => {
+    if (usuario) {
+      // Se usuário está logado, vai direto para inscrição
+      navigate(`/inscricao-torneio/${id}`);
+    } else {
+      // Se não está logado, vai para login com redirecionamento
+      // Salvar o ID do torneio no localStorage para redirecionar após login
+      localStorage.setItem('redirectAfterLogin', `/inscricao-torneio/${id}`);
+      navigate('/login/');
+    }
+  };
+
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={handleClick} style={{ cursor: 'pointer' }}>
       {/* Imagem com degradê */}
       <div className={styles.imagemWrapper}>
         <img src={imagem} alt={titulo} className={styles.imagem} />

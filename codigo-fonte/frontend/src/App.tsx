@@ -1,4 +1,5 @@
 // src/App.tsx
+import { useState, useEffect } from "react";
 import estilos from "./App.module.css";
 
 // Importar imagens de banner
@@ -10,74 +11,113 @@ import b3 from "./assets/b3.png";
 import CardTorneio from "./components/CardTorneio";
 
 // Importa ícones do react-icons
-import { FaUsers, FaLock } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 
 // Importa a Navbar
 import Navbar from "./components/Navbar";
 
+// Importa serviços e tipos
+import { buscarTorneios, tratarErroTorneio } from "./services/torneioServico";
+import { useSessao } from "./contextos/AuthContexto";
+import type { ITorneio } from "./tipos/tipos";
+import Swal from 'sweetalert2';
+
 function App() {
-  const torneios = [
-    {
-      imagem: b1,
-      titulo: "Open Tour Winter Split",
-      data: "09.06.23",
-      hora: "21:00",
-      tags: [
-        { texto: "2v2", icone: <FaUsers /> },
-        { texto: "Casual" },
-      ],
-    },
-    {
-      imagem: b2,
-      titulo: "Copa Mystical Arcanum",
-      data: "05.05.23",
-      hora: "15:00",
-      tags: [
-        { texto: "2v2", icone: <FaUsers /> },
-        { texto: "Com permissão", icone: <FaLock /> },
-      ],
-    },
-    {
-      imagem: b3,
-      titulo: "Wakfu Championship",
-      data: "04.07.23",
-      hora: "21:00",
-      tags: [
-        { texto: "2v2", icone: <FaUsers /> },
-        { texto: "Casual" },
-      ],
-    },
-    {
-      imagem: b1,
-      titulo: "Open Tour Winter Split",
-      data: "09.06.23",
-      hora: "21:00",
-      tags: [
-        { texto: "2v2", icone: <FaUsers /> },
-        { texto: "Casual" },
-      ],
-    },
-    {
-      imagem: b2,
-      titulo: "Copa Mystical Arcanum",
-      data: "05.05.23",
-      hora: "15:00",
-      tags: [
-        { texto: "2v2", icone: <FaUsers /> },
-        { texto: "Com permissão", icone: <FaLock /> },
-      ],
-    },
-    {
-      imagem: b3,
-      titulo: "Wakfu Championship",
-      data: "04.07.23",
-      hora: "21:00",
-      tags: [
-        { texto: "2v2", icone: <FaUsers /> },
-        { texto: "Casual" },
-      ],
-    },
-  ];
+  // Hook para acessar dados do usuário logado
+  const { usuario } = useSessao();
+  
+  // Estados para gerenciar os torneios
+  const [torneios, setTorneios] = useState<ITorneio[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  // Função para formatar data
+  const formatarData = (data: string) => {
+    return new Date(data).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    });
+  };
+
+  // Função para formatar hora
+  const formatarHora = (data: string) => {
+    return new Date(data).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Função para obter imagem do banner
+  const obterImagemBanner = (banner: string | null) => {
+    if (banner) {
+      // Se há banner da API, usar ele
+      return banner;
+    }
+    // Senão, usar imagens padrão baseadas no ID
+    const imagens = [b1, b2, b3];
+    return imagens[Math.floor(Math.random() * imagens.length)];
+  };
+
+  // Função para obter tags do torneio
+  const obterTagsTorneio = (torneio: ITorneio) => {
+    const tags: Array<{ texto: string; icone?: React.ReactNode }> = [
+      { texto: "2v2", icone: <FaUsers /> }
+    ];
+
+    if (torneio.incricao_gratuita) {
+      tags.push({ texto: "Gratuito" });
+    } else {
+      tags.push({ texto: "Pago" });
+    }
+
+    if (torneio.vagas_limitadas) {
+      tags.push({ texto: "Vagas limitadas" });
+    }
+
+    return tags;
+  };
+
+  // Buscar torneios quando o componente carregar
+  useEffect(() => {
+    const carregarTorneios = async () => {
+      try {
+        setCarregando(true);
+        const resposta = await buscarTorneios(1, 20); // Buscar primeira página com até 20 torneios
+        
+        // Verificar se a resposta tem a estrutura esperada
+        if (resposta && Array.isArray(resposta)) {
+          // API retorna array direto
+          setTorneios(resposta);
+          setErro(null);
+        } else if (resposta && resposta.results && Array.isArray(resposta.results)) {
+          // API retorna formato paginado
+          setTorneios(resposta.results);
+          setErro(null);
+        } else {
+          console.error("Estrutura de resposta inesperada:", resposta);
+          setTorneios([]);
+          setErro("Formato de resposta inesperado da API");
+        }
+      } catch (error) {
+        console.error("Erro ao carregar torneios:", error);
+        const mensagemErro = tratarErroTorneio(error);
+        setErro(mensagemErro);
+        setTorneios([]); // Garantir que torneios seja um array vazio em caso de erro
+        
+        Swal.fire({
+          title: 'Erro ao carregar torneios',
+          text: mensagemErro,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    carregarTorneios();
+  }, []);
 
   return (
     <div className={estilos.app}>
@@ -98,11 +138,38 @@ function App() {
       {/* LISTAGEM DE TORNEIOS */}
       <section className={estilos.listaTorneios}>
         <h2 className={estilos.tituloSecao}>Torneios disponíveis</h2>
-        <div className={estilos.gridTorneios}>
-          {torneios.map((torneio, index) => (
-            <CardTorneio key={index} {...torneio} />
-          ))}
-        </div>
+        
+        {carregando ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <h3>Carregando torneios...</h3>
+          </div>
+        ) : erro ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <h3>Erro ao carregar torneios</h3>
+            <p>{erro}</p>
+          </div>
+        ) : !torneios || torneios.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <h3>Nenhum torneio disponível no momento</h3>
+          </div>
+        ) : (
+          <div className={estilos.gridTorneios}>
+            {torneios && torneios.map((torneio) => (
+              <CardTorneio 
+                key={torneio.id}
+                id={torneio.id}
+                imagem={obterImagemBanner(torneio.banner || null)}
+                titulo={torneio.nome}
+                data={formatarData(torneio.data_inicio)}
+                hora={formatarHora(torneio.data_inicio)}
+                tags={obterTagsTorneio(torneio)}
+                loja={torneio.loja_nome}
+                status={torneio.status}
+                usuario={usuario}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

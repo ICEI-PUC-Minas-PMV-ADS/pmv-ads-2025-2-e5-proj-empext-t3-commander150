@@ -65,6 +65,9 @@ export interface ITorneioAtualizacao {
 // Para resposta da API (retorno)
 export interface ITorneio {
   id: number;
+  loja_nome: string;
+  loja_email: string;
+  loja_tipo: string;
   nome: string;
   descricao?: string | null;
   status: string;

@@ -38,7 +38,7 @@ const PaginaLogin = () => {
   // Redireciona o utilizador assim que o estado 'usuario' é atualizado.
   useEffect(() => {
   if (usuario) {
-    const redirecionarUsuario = (tipo: string) => {
+    const redirecionarUsuario = () => {
         navigate("/");
       // switch (tipo) {
       //   case "LOJA":
@@ -55,8 +55,16 @@ const PaginaLogin = () => {
       // }
     };
 
-    if (!deOndeVeio || deOndeVeio === "/") {
-      redirecionarUsuario(usuario.tipo ?? "JOGADOR");
+    // Verificar se há redirecionamento salvo no localStorage
+    const redirectAfterLogin = localStorage.getItem('redirectAfterLogin');
+    
+    if (redirectAfterLogin) {
+      // Limpar o redirecionamento do localStorage
+      localStorage.removeItem('redirectAfterLogin');
+      // Redirecionar para a página de inscrição
+      navigate(redirectAfterLogin, { replace: true });
+    } else if (!deOndeVeio || deOndeVeio === "/") {
+      redirecionarUsuario();
     } else {
       navigate(deOndeVeio, { replace: true });
     }
