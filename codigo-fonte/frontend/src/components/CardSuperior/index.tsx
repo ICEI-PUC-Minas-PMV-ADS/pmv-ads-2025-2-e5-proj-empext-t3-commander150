@@ -3,15 +3,16 @@ import type { IconType } from "react-icons";
 import styles from "./style.module.css";
 
 type CardProps = {
-  count: number;
+  count: string | number;
   label: string;
   icon: IconType; 
   isActive?: boolean;
+  className?: string; 
 };
 
-export const CardSuperior: React.FC<CardProps> = ({ count, label, icon: Icon, isActive }) => {
+export const CardSuperior: React.FC<CardProps> = ({ count, label, icon: Icon, isActive,  className = "" }) => {
   return (
-    <div className={`${styles.card} ${isActive ? styles.active : styles.inactive}`}>
+    <div className={`${className} ${styles.card} ${isActive ? styles.active : styles.inactive} `}>
       <Icon className={styles.cardIcon} />
       <div className={styles.cardContent}>
         <span className={styles.cardCount}>{count}</span>

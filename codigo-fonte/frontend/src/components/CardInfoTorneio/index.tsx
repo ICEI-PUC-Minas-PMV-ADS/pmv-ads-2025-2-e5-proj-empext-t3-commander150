@@ -11,6 +11,7 @@ interface CardInfoTorneioProps {
   location: string;
   price: string;
   players: number;
+  className?: string;
 }
 
 const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
@@ -21,9 +22,10 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
   location,
   price,
   players,
+  className = ""
 }) => {
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${className}`}>
       <h3 className={styles.title}>{title}</h3>
       <div className={styles.tournamentName}><FiInfo /> {name}</div>
       <div className={styles.tournamentInfo}>
