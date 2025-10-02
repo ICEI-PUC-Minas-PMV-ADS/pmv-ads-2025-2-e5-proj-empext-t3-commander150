@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import estilos from "./styles.module.css";
 
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
-import { buscarTorneioPorId, tratarErroTorneio } from "../../../services/torneioServico";
+import { buscarTorneioPorId, tratarErroTorneio, inscreverNoTorneio } from "../../../services/torneioServico";
+import { useSessao } from "../../../contextos/AuthContexto";
 import type { ITorneio } from "../../../tipos/tipos";
+import Swal from 'sweetalert2';
 
 // Interface temporária para resolver problemas de tipo
 interface ITorneioCompleto extends ITorneio {
@@ -23,12 +25,16 @@ import { FaCalendarAlt, FaClock, FaStore, FaMoneyBillAlt } from "react-icons/fa"
 import { MdOutlinePeople } from "react-icons/md";
 
 const InscricaoTorneio: React.FC = () => {
+  // hook para acessar dados do usuário logado
+  const { usuario } = useSessao();
+  
+  // hook para navegação
+  const navigate = useNavigate();
+  
   // estados locais para capturar os campos do formulário
-  const [nomeCompleto, setNomeCompleto] = useState("");
-  const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
   const [deck, setDeck] = useState("");
   const [aceiteTermos, setAceiteTermos] = useState(false);
+  const [enviando, setEnviando] = useState(false);
   const corLabelInputs = "#FFFFFF";
 
   // estados para dados do torneio
@@ -64,6 +70,11 @@ const InscricaoTorneio: React.FC = () => {
     carregarTorneio();
   }, [id]);
 
+  // scroll para o topo quando o componente carregar
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // funções auxiliares para formatação
   const formatarData = (data: string) => {
     return new Date(data).toLocaleDateString('pt-BR');
@@ -86,22 +97,58 @@ const InscricaoTorneio: React.FC = () => {
     return regras.split('\n').filter(regra => regra.trim() !== '');
   };
 
-  // função de envio do formulário - Adicionar validações conforme necessário
-  const enviarFormulario = () => {
+  // função de envio do formulário
+  const enviarFormulario = async () => {
     if (!aceiteTermos) {
-      alert("É necessário aceitar os termos e condições do torneio.");
+      Swal.fire('Erro', 'É necessário aceitar os termos e condições do torneio.', 'error');
       return;
     }
 
-    // aqui seria chamada a API do back-end
-    console.log({
-      nomeCompleto,
-      email,
-      telefone,
-      deck,
-      aceiteTermos,
-    });
-    alert("Inscrição enviada com sucesso!");
+    if (!torneio || !id) {
+      Swal.fire('Erro', 'Torneio não encontrado.', 'error');
+      return;
+    }
+
+    if (!usuario) {
+      Swal.fire('Erro', 'Usuário não está logado.', 'error');
+      return;
+    }
+
+    try {
+      setEnviando(true);
+      
+      const dadosInscricao = {
+        id_torneio: torneio.id,
+        decklist: deck.trim() || undefined, // só envia se não estiver vazio
+        id_usuario: usuario.id, // ID do usuário logado
+      };
+
+      await inscreverNoTorneio(dadosInscricao);
+      
+      // Sucesso
+      Swal.fire({
+        title: 'Sucesso!',
+        text: `Inscrição no torneio "${torneio.nome}" realizada com sucesso!`,
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        // Redirecionar para a tela inicial após sucesso
+        navigate('/');
+      });
+      
+    } catch (error) {
+      console.error("Erro ao inscrever no torneio:", error);
+      const mensagemErro = tratarErroTorneio(error);
+      
+      Swal.fire({
+        title: 'Erro ao inscrever no torneio',
+        text: mensagemErro,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    } finally {
+      setEnviando(false);
+    }
   };
 
   // renderizar loading
@@ -198,53 +245,20 @@ const InscricaoTorneio: React.FC = () => {
 
         {/* Formulário de inscrição */}
         <section className={estilos.formulario}>
-          <h3 className={estilos.tituloSessao}>Informações Pessoais</h3>
+          <h3 className={estilos.tituloSessao}>Inscrição no Torneio</h3>
           <p className={estilos.subtituloSessao}>
-            Preencha seus dados abaixo para concluir a inscrição no torneio.
+            Preencha as informações abaixo para concluir sua inscrição.
           </p>
 
           <div className={estilos.grupoInputs}>
             <Input
-              placeholder="Seu nome completo"
-              value={nomeCompleto}
-              onChange={(e) => setNomeCompleto(e.target.value)}
-              type="text"
-              name="nome-completo"
-              label="Nome Completo*"
-              labelColor={corLabelInputs}
-              required
-            />
-            <Input
-              placeholder="Informe o link do seu deck na Liga Magic"
+              placeholder="Informe o link do seu deck na Liga Magic (opcional)"
               value={deck}
               onChange={(e) => setDeck(e.target.value)}
               type="text"
               name="link-deck"
-              label="Seu deck"
+              label="Link do Deck"
               labelColor={corLabelInputs}
-
-            />
-          </div>
-
-          <div className={estilos.grupoInputs}>
-            <Input
-              placeholder="exemplo@exemplo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              name="email"
-              label="Email*"
-              labelColor={corLabelInputs}
-              required
-            />
-            <Input
-                type="telefone"
-                name="telefone"
-                label="Telefone"
-                placeholder="(99) 99999-9999"
-                value={telefone}
-                onChange={(e) => setTelefone(e.target.value)}
-                labelColor={corLabelInputs}
             />
           </div>
 
@@ -265,10 +279,13 @@ const InscricaoTorneio: React.FC = () => {
               label="Voltar" 
               onClick={() => window.history.back()}
               backgroundColor="var(--var-cor-terciaria)"
+              disabled={enviando}
             />
-            <Button label="Confirmar Inscrição"  
+            <Button 
+              label={enviando ? "Enviando..." : "Confirmar Inscrição"}  
               onClick={enviarFormulario} 
               backgroundColor="var(--var-cor-primaria)"
+              disabled={enviando}
             />
           </div>
         </section>

@@ -210,6 +210,21 @@ export const buscarTorneiosComFiltros = async (
 };
 
 /**
+ * Inscreve um usuário em um torneio.
+ * 
+ * @param dadosInscricao - Dados da inscrição
+ * @returns Confirmação da inscrição
+ */
+export const inscreverNoTorneio = async (dadosInscricao: {
+  id_torneio: number;
+  decklist?: string;
+  id_usuario?: number;
+}): Promise<{ message: string }> => {
+  const resposta = await api.post('/torneios/inscricoes/', dadosInscricao);
+  return resposta.data;
+};
+
+/**
  * Utilitário para tratar erros de torneio de forma consistente.
  * 
  * @param erro - Erro do Axios

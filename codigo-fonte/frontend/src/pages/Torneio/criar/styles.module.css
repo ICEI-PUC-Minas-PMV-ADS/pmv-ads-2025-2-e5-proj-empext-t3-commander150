@@ -185,7 +185,7 @@ section {
 }
 
 .textarea {
-  width: 100%;
+  width: 96%;
   padding: 12px;
   border: 1px solid var(--var-cor-secundaria);
   border-radius: 6px;
