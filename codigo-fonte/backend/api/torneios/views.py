@@ -147,15 +147,6 @@ class InscricaoViewSet(viewsets.ModelViewSet):
             return InscricaoCreateSerializer if self.request.user.tipo == 'JOGADOR' else InscricaoLojaSerializer
         return InscricaoSerializer
 
-    @swagger_auto_schema(
-        request_body=InscricaoCreateSerializer,
-        responses={
-            201: InscricaoResponseSerializer,
-            400: 'Erro de validação'
-        },
-        operation_summary="Criar inscrição em torneio",
-        operation_description="Permite que jogadores se inscrevam em torneios abertos ou que lojas/admins inscrevam jogadores."
-    )
     def perform_create(self, serializer):
         """
         Define o usuário da inscrição antes de salvar:
@@ -167,6 +158,57 @@ class InscricaoViewSet(viewsets.ModelViewSet):
         else:
             serializer.save()
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'id_torneio': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description='ID do torneio para inscrição',
+                    example=1
+                ),
+                'decklist': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Lista de cartas do deck do jogador (opcional)',
+                    example='4x Lightning Bolt\n4x Counterspell\n...'
+                ),
+                'id_usuario': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description='ID do usuário (apenas para loja/admin)',
+                    example=2
+                ),
+                'status': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Status da inscrição (apenas para loja/admin)',
+                    example='Inscrito'
+                )
+            },
+            required=['id_torneio']
+        ),
+        responses={
+            201: InscricaoResponseSerializer,
+            400: 'Erro de validação',
+            403: 'Permissão negada'
+        },
+        operation_summary="Criar inscrição em torneio",
+        operation_description="""
+        Cria uma nova inscrição em um torneio.
+        
+        **Para JOGADORES:**
+        - Campos obrigatórios: `id_torneio`
+        - Campos opcionais: `decklist`
+        - O `id_usuario` é definido automaticamente como o usuário logado
+        
+        **Para LOJA/ADMIN:**
+        - Campos obrigatórios: `id_torneio`, `id_usuario`
+        - Campos opcionais: `decklist`, `status`
+        
+        **Validações:**
+        - Torneio deve existir e estar com status 'Aberto'
+        - Jogador não pode estar já inscrito no torneio
+        - Usuário especificado deve ser do tipo 'JOGADOR'
+        """
+    )
     def create(self, request, *args, **kwargs):
         """
         Cria uma nova inscrição e retorna resposta padronizada.

@@ -10,6 +10,10 @@ from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador
 
 class TorneioSerializer(serializers.ModelSerializer):
     """Serializer para o modelo Torneio."""
+    # Campos da loja para exibição
+    loja_nome = serializers.CharField(source='id_loja.username', read_only=True)
+    loja_email = serializers.CharField(source='id_loja.email', read_only=True)
+    loja_tipo = serializers.CharField(source='id_loja.tipo', read_only=True)
 
     class Meta:
         model = Torneio
