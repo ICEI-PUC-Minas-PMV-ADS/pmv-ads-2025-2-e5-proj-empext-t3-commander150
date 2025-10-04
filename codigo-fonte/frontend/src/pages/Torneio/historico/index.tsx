@@ -43,6 +43,20 @@ const HistoricoTorneios: React.FC = () => {
         })();
     }, []);
 
+    const tituloPagina = useMemo(() => {
+        if (aba === "inscritos") return "Torneios Inscritos";
+        if (aba === "andamento") return "Torneios em Andamento";
+        return "Histórico de Torneios";
+    }, [aba]);
+
+    const subtituloPagina = useMemo(() => {
+        if (aba === "inscritos")
+            return "Acompanhe seus torneios inscritos e participe das batalhas épicas";
+        if (aba === "andamento")
+            return "Acompanhe seus torneios em andamento e as suas batalhas";
+        return "Reviva os momentos épicos dos seus torneios passados";
+    }, [aba]);
+
     const estatisticas = useMemo(
         () => ({
             torneiosFuturos: inscritos.length,
@@ -85,10 +99,9 @@ const HistoricoTorneios: React.FC = () => {
     return (
         <div className={styles.container}>
             <div className={styles.conteudo}>
-                <h1 className={styles.titulo}>Histórico de Torneios</h1>
-                <p className={styles.subtitulo}>
-                    Reviva os momentos épicos dos seus torneios passados
-                </p>
+                <h1 className={styles.titulo}>{tituloPagina}</h1>
+                <p className={styles.subtitulo}>{subtituloPagina}</p>
+
 
                 <div className={styles.cardsContainer} role="tablist">
                     <button
