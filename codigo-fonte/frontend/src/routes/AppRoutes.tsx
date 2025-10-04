@@ -51,7 +51,6 @@ export default function AppRoutes() {
           <Route path="/criar-evento/" element={<CriarTorneio />} />
           <Route path="/historico/" element={<HistoricoTorneios />} />
 
-
         </Route>
       </Route>
 

@@ -9,7 +9,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+from rest_framework.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, \
+    HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 
 from torneios.permissoes import IsOwnerOrAdmin
@@ -77,25 +78,39 @@ class LogoutView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class ValidarSessaoView(APIView):
     """
-    Endpoint para validar sessão.
+    Endpoint para validar a sessão do utilizador.
 
-    Retorna os dados do usuário autenticado via sessão.
-    O frontend usa este endpoint para verificar se o usuário já está logado
-    quando a aplicação é carregada.
-    A permissão IsAuthenticated já garante que, se esta view for
-    # acessada com sucesso, o request.user é um usuário válido.
+    Este endpoint verifica se o cookie de sessão enviado na requisição
+    corresponde a um utilizador autenticado.
+
+    - Se o utilizador estiver autenticado, retorna os seus dados com status 200.
+    - Se o utilizador não estiver autenticado (sem cookie ou com cookie inválido),
+      retorna uma resposta de sucesso sem conteúdo (status 204), evitando
+      que um erro seja enviado e mal interpretado, como um 403.
     """
-    permission_classes = [IsAuthenticated]
+    print('cheguei na view')
+
+    permission_classes = [AllowAny]
 
     @swagger_auto_schema(
-        responses={200: UsuarioSerializer(many=False)}
+        responses={
+            200: UsuarioSerializer(many=False),
+            204: "Nenhuma sessão ativa."
+        }
     )
     def get(self, request):
         """
-        Retorna os dados serializados do usuário logado (request.user).
+        Verifica o estado de autenticação do utilizador da requisição.
         """
-        serializer = UsuarioSerializer(request.user)
-        return Response(serializer.data, status=HTTP_200_OK)
+        # Verifica se o objeto 'request.user' representa um utilizador autenticado.
+        if request.user.is_authenticated:
+            # Se sim, serializa e retorna os dados do utilizador.
+            serializer = UsuarioSerializer(request.user)
+            return Response(serializer.data, status=HTTP_200_OK)
+        else:
+            # Se não, retorna uma resposta de sucesso, mas sem conteúdo.
+            # Isto informa ao frontend que não há sessão, sem gerar um erro 403, por exemplo.
+            return Response(status=HTTP_204_NO_CONTENT)
 
 
 class RequisitarTrocaSenhaView(APIView):

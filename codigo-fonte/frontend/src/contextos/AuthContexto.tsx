@@ -82,11 +82,24 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
   useEffect(() => {
     const checarSessaoAoCarregar = async () => {
       try {
+        // A função 'verificarSessao' é chamada.
+        // Ela retornará os dados do utilizador (se a resposta for 200 OK)
+        // ou uma resposta vazia (se a resposta for 204 No Content).
         const usuarioLogado = await verificarSessao();
-        setUsuario(usuarioLogado);
-      } catch {
-        // Um erro aqui é um comportamento esperado caso não haja sessão.
-        // Garante que o estado de usuário comece como nulo.
+
+        // Verifica se 'usuarioLogado' contém dados.
+        // Se o backend respondeu com 204, 'usuarioLogado' será 'falsy' (ex: string vazia).
+        // Apenas define o estado do usuarioLogado se dados válidos foram retornados.
+        if (usuarioLogado) {
+          setUsuario(usuarioLogado);
+        } else {
+          // Se não foram retornados dados, significa que não há sessão ativa.
+          setUsuario(null);
+        }
+      } catch (error) {
+        // O bloco 'catch' serve como uma salvaguarda para erros inesperados de rede, 
+        // mas o caso esperado de "sem sessão" já foi tratado no bloco 'try'.
+        Swal.fire('Erro inesperado ao verificar a sessão', `${error}`, 'error');
         setUsuario(null);
       } finally {
         // Finaliza o estado de carregamento inicial, independentemente do resultado.
@@ -130,20 +143,7 @@ export const GerenciadorSessao = ({ children }: GerenciadorSessaoProps) => {
     }
   };
   
-  // const logout = async () => {
-  //   try {
-  //     // Limpar dados locais do usuário
-  //     setUsuario(null);
-      
-  //     // Redirecionar para a tela de login usando React Router
-  //     navigate('/login', { replace: true });
-  //   } catch {
-  //     // Em caso de erro, ainda assim limpar os dados locais
-  //     setUsuario(null);
-  //     navigate('/login', { replace: true });
-  //   }
-  // };
-
+ 
   // Agrupa todos os valores e funções que serão fornecidos pelo contexto.
   const valor = {
     usuario,
