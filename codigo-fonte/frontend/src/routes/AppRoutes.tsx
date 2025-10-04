@@ -15,6 +15,7 @@ import PaginaAlterarSenha from "../pages/auth/alterar-senha";
 import InscricaoTorneio from "../pages/Torneio/inscrever";
 import PaginaTorneio from "../pages/Torneio/visualizar";
 import CriarTorneio from "../pages/Torneio/criar";
+import HistoricoTorneios from "../pages/Torneio/historico";
 
 export default function AppRoutes() {
   return (
@@ -48,6 +49,7 @@ export default function AppRoutes() {
           <Route path="/torneio/" element={<PaginaTorneio />} />
           <Route path="/inscricao-torneio/:id" element={<InscricaoTorneio />} />
           <Route path="/criar-evento/" element={<CriarTorneio />} />
+          <Route path="/historico/" element={<HistoricoTorneios />} />
 
 
         </Route>
