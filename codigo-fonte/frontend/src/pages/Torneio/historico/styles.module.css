@@ -1,3 +1,5 @@
+/* Para as páginas de Histórico de Torneios */
+
 .container {
     min-height: 100vh;
     color: var(--var-cor-cinza-titulos);
@@ -25,50 +27,95 @@
     margin-bottom: 30px;
 }
 
+/* KPIs (CardSuperior) */
 .cardsContainer {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;   /* centraliza o grupo */
+    align-items: flex-start;
+    gap: 2rem;                 /* espaço entre os cards */
+    margin: 0 auto 2rem;       /* centraliza o container dentro da página */
+    width: 100%;
+    max-width: 980px;          /* evita ficar largo demais */
 }
 
-.cardWrapper {
+.kpiBtn {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    text-align: inherit;
     cursor: pointer;
-    transition: transform 0.2s ease;
     position: relative;
+    width: auto;               /* importante p/ centralizar */
 }
 
-.cardWrapper:hover {
-    transform: translateY(-5px);
+.kpiBtn:focus-visible::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 12px;
+    border: 2px solid var(--var-cor-rosa);
+    pointer-events: none;
 }
 
+/* Largura estável do card (não deixa “pular” quando selecionado) */
 .card {
-    border-radius: 8px;
-    padding: 1.5rem;
-    background-color: var(--var-cor-card-background, #2A303C);
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+    width: 280px;              /* fixa o tamanho visual */
+    max-width: 90vw;           /* segurança em telas menores */
 }
 
-.selected .card,
-.selectedCard {
-    border: 2px solid var(--var-cor-dourado, #D4B400);
-    background-color: var(--var-cor-card-background, #2A303C);
+/* Para Seções/Listas */
+.secao {
+    display: grid;
+    gap: 12px;
+    margin-top: 1rem;
 }
 
-/* Tablet */
-@media (max-width: 1024px) {
-    .cardsContainer {
-        grid-template-columns: repeat(2, minmax(200px, 1fr));
-        justify-content: center;
-        gap: 1rem;
+.secaoTitulo {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--var-cor-branca);
+    margin: 0;
+}
+
+.lista {
+    display: grid;
+    gap: 12px;
+}
+
+/* Para o Estado Vazio */
+.vazio {
+    display: grid;
+    place-items: center;
+    text-align: center;
+
+    min-height: 96px;
+    padding: 16px;
+
+    color: var(--var-cor-cinza-titulos);
+    background-color: var(--var-cor-azul-fundo-section);
+    border: var(--var-borda-section);
+    border-radius: 12px;
+
+    margin-top: 4px;
+}
+
+@media (min-width: 1024px) {
+    .vazio {
+        min-height: 110px;
+        padding: 18px;
     }
 }
 
-/* Mobile */
+/* Para responsividade */
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
+    }
+
+    .conteudo {
+        padding: 20px 15px;
     }
 
     .titulo {
@@ -79,18 +126,20 @@
         font-size: 18px;
     }
 
-    .conteudo {
-        padding: 20px 15px;
+    .cardsContainer {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 1rem;
+        width: 100%;
     }
 
-    .cardsContainer {
-        grid-template-columns: minmax(auto, 300px);
-        justify-content: center;
-        gap: 1rem;
+    .kpiBtn {
+        width: auto;
     }
 
     .card {
-        width: 100%;
-        margin: 0 auto;
+        width: 280px;
+        max-width: 90vw;
     }
 }

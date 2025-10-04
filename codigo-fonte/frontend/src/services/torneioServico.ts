@@ -17,7 +17,8 @@ import type {
   ITorneio, 
   ITorneioCriacao, 
   ITorneioAtualizacao, 
-  IListaTorneios 
+  IListaTorneios,
+  IInscricao
 } from '../tipos/tipos';
 import { AxiosError } from "axios";
 
@@ -265,3 +266,40 @@ export const tratarErroTorneio = (erro: unknown): string => {
   return 'Erro inesperado ao processar torneio.';
 };
 
+/** Busca TODAS as inscrições do jogador autenticado (via sessão). */
+export async function buscarInscricoes(): Promise<IInscricao[]> {
+  const { data } = await api.get("/torneios/inscricoes/");
+  return Array.isArray(data) ? data : [];
+}
+
+/** Busca TODOS os torneios.
+export async function buscarTorneios(): Promise<ITorneio[]> {
+  const { data } = await api.get("/torneios/torneios/");
+  return Array.isArray(data) ? data : [];
+}
+*/
+
+/**
+ * Utilitário: agrupa em Inscritos / Em Andamento / Histórico
+ * cruzando as inscrições do jogador com a lista de torneios.
+ */
+export async function buscarAgrupadoPorAba() {
+  const [inscricoes, torneiosResponse] = await Promise.all([
+    buscarInscricoes(),
+    buscarTorneios(),
+  ]);
+
+  const torneios = torneiosResponse.results;
+  const idsInscritos = new Set(inscricoes.map((i) => i.id_torneio));
+  const inscritos = torneios.filter((t) => idsInscritos.has(t.id));
+
+  const andamento = inscritos.filter(
+      (t) => (t.status || "").toLowerCase() === "em andamento"
+  );
+
+  const historico = inscritos.filter(
+      (t) => (t.status || "").toLowerCase() === "finalizado"
+  );
+
+  return { inscritos, andamento, historico };
+}

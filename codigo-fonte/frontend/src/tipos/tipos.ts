@@ -96,3 +96,11 @@ export interface IListaTorneios {
   previous: string | null;
   results: ITorneio[];
 }
+// Para inscrições (inscrição do jogador em um torneio)
+export interface IInscricao {
+  id: number;
+  id_torneio: number;
+  nome_torneio?: string;
+  status?: string;
+  data_inscricao?: string;
+}
