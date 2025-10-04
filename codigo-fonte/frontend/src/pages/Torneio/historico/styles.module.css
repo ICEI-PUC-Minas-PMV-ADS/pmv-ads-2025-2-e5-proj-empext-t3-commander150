@@ -32,9 +32,28 @@
     margin-bottom: 2rem;
 }
 
+.cardWrapper {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    position: relative;
+}
+
+.cardWrapper:hover {
+    transform: translateY(-5px);
+}
+
 .card {
     border-radius: 8px;
     padding: 1.5rem;
+    background-color: var(--var-cor-card-background, #2A303C);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.selected .card,
+.selectedCard {
+    border: 2px solid var(--var-cor-dourado, #D4B400);
+    background-color: var(--var-cor-card-background, #2A303C);
 }
 
 /* Tablet */

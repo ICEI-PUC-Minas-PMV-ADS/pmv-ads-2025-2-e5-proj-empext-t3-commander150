@@ -2,17 +2,23 @@ import React from "react";
 import type { IconType } from "react-icons";
 import styles from "./style.module.css";
 
-type CardProps = {
-  count: string | number;
+interface CardSuperiorProps {
+  icon: IconType;
+  count: number;
   label: string;
-  icon: IconType; 
-  isActive?: boolean;
-  className?: string; 
-};
+  className?: string;
+  selected?: boolean;
+}
 
-export const CardSuperior: React.FC<CardProps> = ({ count, label, icon: Icon, isActive,  className = "" }) => {
+export const CardSuperior: React.FC<CardSuperiorProps> = ({ 
+  icon: Icon, 
+  count, 
+  label, 
+  className,
+  selected 
+}) => {
   return (
-    <div className={`${className} ${styles.card} ${isActive ? styles.active : styles.inactive} `}>
+    <div className={`${styles.card} ${selected ? styles.selected : ''} ${className || ''}`}>
       <Icon className={styles.cardIcon} />
       <div className={styles.cardContent}>
         <span className={styles.cardCount}>{count}</span>

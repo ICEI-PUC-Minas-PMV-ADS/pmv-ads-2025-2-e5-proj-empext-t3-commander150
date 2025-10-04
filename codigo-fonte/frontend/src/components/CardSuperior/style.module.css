@@ -1,3 +1,7 @@
+:root {
+  --var-cor-dourado: #D4B400;
+}
+
 .card {
   display: flex;
   flex-direction: column;
@@ -13,34 +17,15 @@
   font-family: "Poppins", sans-serif;
 }
 
-.card.active {
-  border-color: var(--var-cor-amarela);
-  color: var(--var-cor-amarela);
-
-  .cardCount {
-    font-size: 20px;
-    font-weight: bold;
-  }
-
-  .cardLabel {
-    font-size: 14px;
-  }
+.card.selected {
+  border-color: var(--var-cor-dourado);
+  color: var(--var-cor-dourado);
 }
 
-.card.inactive {
-  border-color: var(--var-cor-rosa);
-  color: var(--var-cor-rosa);
-
-  .cardCount {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--var-cor-cinza-titulos);
-  }
-
-  .cardLabel {
-    font-size: 14px;
-    color: var(--var-cor-cinza-titulos);
-  }
+.card.selected .cardIcon,
+.card.selected .cardCount,
+.card.selected .cardLabel {
+  color: var(--var-cor-dourado);
 }
 
 .cardIcon {
@@ -52,6 +37,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.cardCount {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.cardLabel {
+  font-size: 14px;
 }
 
 @media (max-width: 768px) {
