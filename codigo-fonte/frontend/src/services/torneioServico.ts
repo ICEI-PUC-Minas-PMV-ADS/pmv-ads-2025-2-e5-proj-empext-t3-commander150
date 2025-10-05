@@ -269,8 +269,11 @@ export const tratarErroTorneio = (erro: unknown): string => {
 /** Busca TODAS as inscrições do jogador autenticado (via sessão). */
 export async function buscarInscricoes(): Promise<IInscricao[]> {
   const { data } = await api.get("/torneios/inscricoes/");
-  return Array.isArray(data) ? data : [];
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.results)) return data.results;
+  return [];
 }
+
 
 /** Busca TODOS os torneios.
 export async function buscarTorneios(): Promise<ITorneio[]> {
@@ -286,20 +289,20 @@ export async function buscarTorneios(): Promise<ITorneio[]> {
 export async function buscarAgrupadoPorAba() {
   const [inscricoes, torneiosResponse] = await Promise.all([
     buscarInscricoes(),
-    buscarTorneios(),
+    buscarTorneios(), // <- retorna IListaTorneios
   ]);
 
-  const torneios = torneiosResponse.results;
+  const torneios: ITorneio[] = Array.isArray((torneiosResponse as any)?.results)
+      ? (torneiosResponse as any).results
+      : (Array.isArray(torneiosResponse as any) ? (torneiosResponse as any) : []);
+
+  // Agora é seguro usar .filter()
   const idsInscritos = new Set(inscricoes.map((i) => i.id_torneio));
   const inscritos = torneios.filter((t) => idsInscritos.has(t.id));
 
-  const andamento = inscritos.filter(
-      (t) => (t.status || "").toLowerCase() === "em andamento"
-  );
-
-  const historico = inscritos.filter(
-      (t) => (t.status || "").toLowerCase() === "finalizado"
-  );
+  const norm = (s?: string) => (s ?? "").toString().trim().toLowerCase();
+  const andamento = inscritos.filter((t) => norm(t.status) === "em andamento");
+  const historico  = inscritos.filter((t) => norm(t.status) === "finalizado");
 
   return { inscritos, andamento, historico };
 }

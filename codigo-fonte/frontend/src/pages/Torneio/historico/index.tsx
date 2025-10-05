@@ -3,19 +3,24 @@ import { FiUser, FiStar, FiCalendar } from "react-icons/fi";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
-import { buscarAgrupadoPorAba } from "../../../services/torneioServico";
+import { buscarAgrupadoPorAba /* ou buscarAgrupadoPorAbaAll */ } from "../../../services/torneioServico";
 
 type Aba = "inscritos" | "andamento" | "historico";
 
-// Componente de estado vazio > não consegui fazer funcionar ainda.
+// Estado vazio contextual
 const EmptyState: React.FC<{ aba: Aba }> = ({ aba }) => {
     const messages = {
         inscritos: "Você não está inscrito em nenhum torneio no momento.",
         andamento: "Nenhum torneio em andamento.",
         historico: "Nenhum torneio no histórico.",
     };
-
     return <div className={styles.vazio}>{messages[aba]}</div>;
+};
+
+const IDS = {
+    inscritos: "painel-inscritos",
+    andamento: "painel-andamento",
+    historico: "painel-historico",
 };
 
 const HistoricoTorneios: React.FC = () => {
@@ -32,16 +37,19 @@ const HistoricoTorneios: React.FC = () => {
             setErro(null);
             try {
                 const { inscritos, andamento, historico } = await buscarAgrupadoPorAba();
-                setInscritos(inscritos);
-                setAndamento(andamento);
-                setHistorico(historico);
+                setInscritos(inscritos || []);
+                setAndamento(andamento || []);
+                setHistorico(historico || []);
+                setErro(null);
             } catch (e: any) {
+                console.error("Erro ao buscar torneios:", e);
                 setErro("Não foi possível carregar seus torneios.");
             } finally {
                 setCarregando(false);
             }
         })();
     }, []);
+
 
     const tituloPagina = useMemo(() => {
         if (aba === "inscritos") return "Torneios Inscritos";
@@ -82,10 +90,8 @@ const HistoricoTorneios: React.FC = () => {
                         ? "Concluído"
                         : "Inscrito",
             name: t.nome ?? "Torneio",
-            date: dt ? dt.toLocaleDateString() : "",
-            time: dt
-                ? dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                : "",
+            date: dt ? dt.toLocaleDateString("pt-BR") : "",
+            time: dt ? dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "",
             location: t.loja_nome ?? "",
             price: t.incricao_gratuita
                 ? "Gratuita"
@@ -96,20 +102,24 @@ const HistoricoTorneios: React.FC = () => {
         };
     };
 
+    // Se houve erro, mas temos dados carregados (ex.: uma das chamadas falhou),
+    // priorize mostrar os dados e deixe o erro como aviso (poderíamos exibir um toast).
+    const deveMostrarErro = !!erro && (inscritos.length + andamento.length + historico.length === 0);
+
     return (
         <div className={styles.container}>
             <div className={styles.conteudo}>
                 <h1 className={styles.titulo}>{tituloPagina}</h1>
                 <p className={styles.subtitulo}>{subtituloPagina}</p>
 
-
-                <div className={styles.cardsContainer} role="tablist">
+                <div className={styles.cardsContainer} role="tablist" aria-label="Seleção de categorias de torneio">
                     <button
                         type="button"
                         className={styles.kpiBtn}
                         role="tab"
-                        onClick={() => setAba("inscritos")}
                         aria-selected={aba === "inscritos"}
+                        aria-controls={IDS.inscritos}
+                        onClick={() => setAba("inscritos")}
                     >
                         <CardSuperior
                             icon={FiUser}
@@ -124,8 +134,9 @@ const HistoricoTorneios: React.FC = () => {
                         type="button"
                         className={styles.kpiBtn}
                         role="tab"
-                        onClick={() => setAba("andamento")}
                         aria-selected={aba === "andamento"}
+                        aria-controls={IDS.andamento}
+                        onClick={() => setAba("andamento")}
                     >
                         <CardSuperior
                             icon={FiStar}
@@ -140,8 +151,9 @@ const HistoricoTorneios: React.FC = () => {
                         type="button"
                         className={styles.kpiBtn}
                         role="tab"
-                        onClick={() => setAba("historico")}
                         aria-selected={aba === "historico"}
+                        aria-controls={IDS.historico}
+                        onClick={() => setAba("historico")}
                     >
                         <CardSuperior
                             icon={FiCalendar}
@@ -154,19 +166,23 @@ const HistoricoTorneios: React.FC = () => {
                 </div>
 
                 {/* Lista dinâmica abaixo dos cards */}
-                <section className={styles.secao} aria-live="polite">
+                <section
+                    id={aba === "inscritos" ? IDS.inscritos : aba === "andamento" ? IDS.andamento : IDS.historico}
+                    className={styles.secao}
+                    aria-live="polite"
+                    role="tabpanel"
+                >
                     <h2 className={styles.secaoTitulo}>
-                        {aba === "inscritos"
-                            ? "Torneios Inscritos"
-                            : aba === "andamento"
-                                ? "Em Andamento"
-                                : "Histórico"}
+                        {aba === "inscritos" ? "Torneios Inscritos" : aba === "andamento" ? "Em Andamento" : "Histórico"}
                     </h2>
 
                     {carregando && <div className={styles.vazio}>Carregando…</div>}
-                    {!carregando && erro && <div className={styles.vazio}>{erro}</div>}
 
-                    {!carregando && !erro && (
+                    {!carregando && deveMostrarErro && (
+                        <div className={styles.vazio}>{erro}</div>
+                    )}
+
+                    {!carregando && !deveMostrarErro && (
                         listaAtiva.length === 0 ? (
                             <EmptyState aba={aba} />
                         ) : (
