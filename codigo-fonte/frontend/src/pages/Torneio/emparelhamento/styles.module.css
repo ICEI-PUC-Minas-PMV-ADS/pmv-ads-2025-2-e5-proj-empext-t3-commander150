@@ -1,0 +1,161 @@
+.container {
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+  margin: 3rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  font-size: 3rem;
+  color: var(--var-cor-rosa);
+}
+
+.badge {
+  background-color: var(--var-cor-rosa);
+  color: var(--var-cor-azul-fundo-section);
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.subtext {
+  margin-bottom: 4rem;
+  font-size: 0.9rem;
+  color: var(--var-cor-cinza-titulos);
+}
+
+.rankingItem {
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: var(--var-borda-section);
+  color: var(--var-cor-cinza-placeholder);
+  margin-bottom: 1rem;
+}
+
+.mesasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+  padding: 3rem;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.cardMesa {
+  background-color: var(--var-cor-azul-fundo-section);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 3rem;
+  margin-top: 3rem;
+  border: var(--var-borda-section);
+  width: 96%;
+}
+
+.cardMesa h2 {
+    padding-left: 3rem;
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+    color: var(--var-cor-cinza-titulos);
+}
+
+.cardSobressalentes{
+  background-color: var(--var-cor-azul-fundo-section);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 3rem;
+  border: var(--var-borda-section);
+  width: 96%;
+}
+
+.cardSobressalentes h2 {
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+    color: var(--var-cor-cinza-titulos);
+}
+
+.CardRanking {
+  width: 96% !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    margin: 1rem;
+    margin-right: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    margin-left: 2rem;
+  }
+
+  .subtext {
+    margin-bottom: 2rem;
+    font-size: 0.8rem;
+  }
+
+  .rankingItem {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .mesasGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .buttons {
+    gap: 1rem;
+  }
+
+  .cardMesa {
+    width: 93%;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cardMesa h2 {
+    padding-left: 0;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .cardSobressalentes {
+    width: 93%;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cardSobressalentes h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .CardRanking {
+    width: 94% !important;
+  }
+}
