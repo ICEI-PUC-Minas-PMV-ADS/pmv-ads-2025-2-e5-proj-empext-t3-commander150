@@ -99,6 +99,7 @@ const HistoricoTorneios: React.FC = () => {
                     ? `R$ ${String(t.valor_incricao).replace(".", ",")}`
                     : "—",
             players: 0,
+            tournamentId: t.id 
         };
     };
 

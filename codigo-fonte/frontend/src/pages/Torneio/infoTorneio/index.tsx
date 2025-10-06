@@ -111,23 +111,26 @@ const salvarRegras = async () => {
     if (!tournament) return;
     
     try {
-      const url = window.location.href;
+      const baseUrl = window.location.origin;
+      const urlInscricao = `${baseUrl}/inscricao-torneio/${tournament.id}`;
       
       if (navigator.share) {
         await navigator.share({
           title: tournament.nome,
-          text: `Confira o torneio ${tournament.nome}`,
-          url: url,
+          text: `Participe do torneio ${tournament.nome}!`,
+          url: urlInscricao,
         });
       } else {
-        await navigator.clipboard.writeText(url);
-        setMensagemSucesso("Link copiado para a área de transferência!");
+        await navigator.clipboard.writeText(urlInscricao);
+        setMensagemSucesso("Link de inscrição copiado para a área de transferência!");
         setTimeout(() => setMensagemSucesso(null), 3000);
       }
     } catch (error) {
       console.error("Erro ao compartilhar:", error);
-      await navigator.clipboard.writeText(window.location.href);
-      setMensagemSucesso("Link copiado para a área de transferência!");
+      const baseUrl = window.location.origin;
+      const urlInscricao = `${baseUrl}/inscricao-torneio/${tournament.id}`;
+      await navigator.clipboard.writeText(urlInscricao);
+      setMensagemSucesso("Link de inscrição copiado para a área de transferência!");
       setTimeout(() => setMensagemSucesso(null), 3000);
     }
   };

@@ -4,7 +4,7 @@ import styles from "./style.module.css";
 
 interface CardSuperiorProps {
   icon: IconType;
-  count: number;
+  count: number | string;
   label: string;
   className?: string;
   selected?: boolean;

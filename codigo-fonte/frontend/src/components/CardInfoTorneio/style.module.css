@@ -6,7 +6,19 @@
   max-width: 300px;
   color: var(--var-cor-branca);
   font-family: "Poppins", sans-serif;
+  transition: all 0.2s ease-in-out;
 }
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--var-cor-rosa);
+}
+
 
 .title {
   text-align: center;
@@ -32,6 +44,8 @@
   text-align: left;
   padding-left: 1rem;
 }
+
+
 
 @media (max-width: 768px) {
   .card {
