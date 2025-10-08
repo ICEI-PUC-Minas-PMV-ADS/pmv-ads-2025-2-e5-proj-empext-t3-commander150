@@ -3,13 +3,16 @@ import { FiUser, FiStar, FiCalendar } from "react-icons/fi";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
-import {buscarAgrupadoPorAba,buscarAgrupadoPorAbaLoja} from "../../../services/torneioServico";
+import {
+    buscarAgrupadoPorAba,       // JOGADOR
+    buscarAgrupadoPorAbaLoja    // LOJA (sem idLoja, backend já filtra)
+} from "../../../services/torneioServico";
 import { useSessao } from "../../../contextos/AuthContexto";
 
 type Aba = "inscritos" | "andamento" | "historico";
 type PapelUsuario = "JOGADOR" | "LOJA";
 
-// aqui é o estado vazio contextual
+// Estado vazio contextual
 const EmptyState: React.FC<{ aba: Aba; papel: PapelUsuario }> = ({ aba, papel }) => {
     const msgsJogador = {
         inscritos: "Você não está inscrito em nenhum torneio no momento.",
@@ -28,14 +31,8 @@ const EmptyState: React.FC<{ aba: Aba; papel: PapelUsuario }> = ({ aba, papel })
 const HistoricoTorneios: React.FC = () => {
     const { usuario } = useSessao();
 
-    // aqui é o papel do usuário (padrão JOGADOR se não for informado)
+    // Papel do usuário (padrão JOGADOR se não informado)
     const papel: PapelUsuario = usuario?.tipo === "LOJA" ? "LOJA" : "JOGADOR";
-
-    // aqui tenta-se extrair id da loja de formas comuns; se não existir no usuário, fica null
-    const idLoja: number | null =
-        (usuario as any)?.id_loja ??
-        (usuario as any)?.loja?.id ??
-        null;
 
     const [aba, setAba] = useState<Aba>("inscritos");
 
@@ -44,7 +41,7 @@ const HistoricoTorneios: React.FC = () => {
     // Compartilhado
     const [andamento, setAndamento] = useState<any[]>([]);
     const [historico, setHistorico] = useState<any[]>([]);
-    // LOJA > primeira aba “Seus Torneios”
+    // LOJA (primeira aba “Seus Torneios”)
     const [seus, setSeus] = useState<any[]>([]);
 
     const [carregando, setCarregando] = useState(false);
@@ -56,15 +53,11 @@ const HistoricoTorneios: React.FC = () => {
             setErro(null);
             try {
                 if (papel === "LOJA") {
-                    if (!idLoja) {
-                        console.debug("[Historico] LOJA sem idLoja no usuário. Mostrando vazio.");
-                        setSeus([]); setAndamento([]); setHistorico([]);
-                    } else {
-                        const { seus, andamento, historico } = await buscarAgrupadoPorAbaLoja(idLoja);
-                        setSeus(seus || []);
-                        setAndamento(andamento || []);
-                        setHistorico(historico || []);
-                    }
+                    // Backend já filtra pelos torneios da loja logada
+                    const { seus, andamento, historico } = await buscarAgrupadoPorAbaLoja();
+                    setSeus(seus || []);
+                    setAndamento(andamento || []);
+                    setHistorico(historico || []);
                 } else {
                     const { inscritos, andamento, historico } = await buscarAgrupadoPorAba();
                     setInscritos(inscritos || []);
@@ -80,9 +73,9 @@ const HistoricoTorneios: React.FC = () => {
                 setCarregando(false);
             }
         })();
-    }, [papel, idLoja]);
+    }, [papel]);
 
-    // aqui são as labels dos KPIs, que variam conforme o tipo de usuário
+    // Labels dos KPIs variam conforme o tipo de usuário
     const kpiLabelInscritos = papel === "LOJA" ? "Seus Torneios" : "Torneios Inscritos";
 
     const kpis = useMemo(() => {
@@ -90,6 +83,7 @@ const HistoricoTorneios: React.FC = () => {
         return { k1, k2: andamento.length, k3: historico.length };
     }, [papel, seus, inscritos, andamento, historico]);
 
+    // Título e subtítulo da página
     const tituloPagina = useMemo(() => {
         if (papel === "LOJA") {
             if (aba === "inscritos") return "Seus Torneios";
@@ -114,7 +108,7 @@ const HistoricoTorneios: React.FC = () => {
         return "Reviva os momentos épicos dos seus torneios passados";
     }, [papel, aba]);
 
-    // abaixo, a lista ativa (torneios a renderizar)
+    // Lista ativa (torneios a renderizar)
     const listaAtiva = useMemo(() => {
         if (papel === "LOJA") {
             if (aba === "inscritos") return seus;
@@ -164,7 +158,7 @@ const HistoricoTorneios: React.FC = () => {
                 <h1 className={styles.titulo}>{tituloPagina}</h1>
                 <p className={styles.subtitulo}>{subtituloPagina}</p>
 
-                {/* KPIs (são os cards superiores) */}
+                {/* KPIs (cards superiores) */}
                 <div className={styles.cardsContainer} role="tablist" aria-label="Seleção de categorias de torneio">
                     <button
                         type="button"
@@ -218,7 +212,7 @@ const HistoricoTorneios: React.FC = () => {
                     </button>
                 </div>
 
-                {/* lista dinâmica abaixo dos cards */}
+                {/* Lista dinâmica abaixo dos cards */}
                 <section
                     id={
                         aba === "inscritos"

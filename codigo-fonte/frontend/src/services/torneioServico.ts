@@ -21,6 +21,7 @@ import type {
   IInscricao
 } from '../tipos/tipos';
 import { AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 
 /**
  * Busca todos os torneios com paginação.
@@ -306,14 +307,14 @@ export async function buscarAgrupadoPorAba() {
   return { inscritos, andamento, historico };
 }
 
-/** Helper DRF: varre todas as páginas usando `next` */
-async function fetchAllPaginated<T>(path: string, params?: Record<string, any>): Promise<T[]> {
+/** Helper DRF: varre todas as páginas usando `next` (paginado ou array simples) */
+async function fetchAllPaginated<T>(path: string): Promise<T[]> {
   let url: string | null = path;
   let acc: T[] = [];
-  let opts: any = { params };
+  let opts: any = undefined;
 
   while (url) {
-    const resp = await api.get(url, opts);
+    const resp: AxiosResponse<any> = await api.get(url, opts);
     const payload = resp.data;
 
     if (Array.isArray(payload)) {
@@ -325,45 +326,33 @@ async function fetchAllPaginated<T>(path: string, params?: Record<string, any>):
     acc = acc.concat(results);
 
     url = payload?.next ?? null;
-    // Depois da 1ª página o DRF já carrega query na própria `next`
+    // após a primeira página o `next` já embute os params
     opts = undefined;
   }
 
   return acc;
 }
 
-/** Tenta buscar torneios da loja via query param; se o backend não suportar, volta a buscar tudo e filtrar localmente. */
-export async function buscarTodosTorneiosDaLoja(idLoja: number): Promise<ITorneio[]> {
-  try {
-    // 1) tenta com filtro por query param (seu backend já tinha isso em buscarTorneiosPorLoja)
-    const viaFiltro = await fetchAllPaginated<ITorneio>("/torneios/torneios/", { id_loja: idLoja });
-    if (viaFiltro.length > 0) return viaFiltro;
-
-    // 2) fallback: busca tudo e filtra por id_loja / loja.id
-    const todos = await fetchAllPaginated<ITorneio>("/torneios/torneios/");
-    return todos.filter((t: any) => t?.id_loja === idLoja || t?.loja?.id === idLoja);
-  } catch {
-    // 3) último fallback seguro (sem quebrar a tela)
-    const todos = await fetchAllPaginated<ITorneio>("/torneios/torneios/");
-    return todos.filter((t: any) => t?.id_loja === idLoja || t?.loja?.id === idLoja);
-  }
+/** (LOJA) Busca TODOS os torneios visíveis para a loja autenticada.
+ *  O backend já restringe por loja logada em get_queryset, então não precisamos de ?id_loja=
+ */
+export async function buscarTodosTorneiosDaLoja(): Promise<ITorneio[]> {
+  return fetchAllPaginated<ITorneio>("/torneios/torneios/");
 }
 
-/** Agrupa para LOJA: “Seus Torneios” (abertos), “Em Andamento”, “Histórico” (finalizados) */
-export async function buscarAgrupadoPorAbaLoja(idLoja: number) {
-  if (!idLoja) return { seus: [], andamento: [], historico: [] };
-
-  const torneios = await buscarTodosTorneiosDaLoja(idLoja);
+/** (LOJA) Agrupa: “Seus Torneios” (abertos), “Em Andamento”, “Histórico” (finalizados) */
+export async function buscarAgrupadoPorAbaLoja() {
+  const torneios = await buscarTodosTorneiosDaLoja();
   const norm = (s?: string) => (s ?? "").toString().trim().toLowerCase();
 
-  // Aceita variações comuns do backend
-  const isAberto      = (s?: string) => ["aberto", "em aberto", "open"].includes(norm(s));
-  const isAndamento   = (s?: string) => ["em andamento", "andamento", "running"].includes(norm(s));
-  const isFinalizado  = (s?: string) => ["finalizado", "encerrado", "closed"].includes(norm(s));
+  // tolera pequenas variações de texto vindas do backend
+  const isAberto     = (s?: string) => ["aberto", "em aberto", "open"].includes(norm(s));
+  const isAndamento  = (s?: string) => ["em andamento", "andamento", "running"].includes(norm(s));
+  const isFinalizado = (s?: string) => ["finalizado", "encerrado", "closed"].includes(norm(s));
 
-  const seus       = torneios.filter(t => isAberto(t.status));
-  const andamento  = torneios.filter(t => isAndamento(t.status));
-  const historico  = torneios.filter(t => isFinalizado(t.status));
+  const seus      = torneios.filter(t => isAberto(t.status));
+  const andamento = torneios.filter(t => isAndamento(t.status));
+  const historico = torneios.filter(t => isFinalizado(t.status));
 
   return { seus, andamento, historico };
 }
