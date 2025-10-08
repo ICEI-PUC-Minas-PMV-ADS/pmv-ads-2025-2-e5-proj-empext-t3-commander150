@@ -241,6 +241,15 @@ export const buscarJogadoresInscritos = async (idTorneio: number): Promise<strin
   const inscricoes = resposta.data.results || resposta.data;
   return inscricoes.map((inscricao: any) => inscricao.username);
 };
+export async function contarInscritosTorneio(idTorneio: number): Promise<number> {
+  try {
+    const lista = await buscarJogadoresInscritos(idTorneio);
+    return Array.isArray(lista) ? lista.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
 
 /**
  * Utilitário para tratar erros de torneio de forma consistente.

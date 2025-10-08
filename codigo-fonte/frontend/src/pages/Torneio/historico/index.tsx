@@ -1,12 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { FiUser, FiStar, FiCalendar } from "react-icons/fi";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
-import {
-    buscarAgrupadoPorAba,       // JOGADOR
-    buscarAgrupadoPorAbaLoja    // LOJA (sem idLoja, backend já filtra)
-} from "../../../services/torneioServico";
+import { buscarAgrupadoPorAba, buscarAgrupadoPorAbaLoja, contarInscritosTorneio } from "../../../services/torneioServico";
 import { useSessao } from "../../../contextos/AuthContexto";
 
 type Aba = "inscritos" | "andamento" | "historico";
@@ -36,37 +33,49 @@ const HistoricoTorneios: React.FC = () => {
 
     const [aba, setAba] = useState<Aba>("inscritos");
 
-    // JOGADOR
+    // Estados dos torneios
     const [inscritos, setInscritos] = useState<any[]>([]);
-    // Compartilhado
     const [andamento, setAndamento] = useState<any[]>([]);
     const [historico, setHistorico] = useState<any[]>([]);
-    // LOJA (primeira aba “Seus Torneios”)
     const [seus, setSeus] = useState<any[]>([]);
+    const [contadores, setContadores] = useState<Record<number, number>>({});
 
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState<string | null>(null);
 
+    // Helper para obter lista atual - useCallback para evitar re-render
+    const getListaAtual = useCallback(() => {
+        if (papel === "LOJA") {
+            return aba === "inscritos" ? seus :
+                aba === "andamento" ? andamento :
+                    historico;
+        }
+        return aba === "inscritos" ? inscritos :
+            aba === "andamento" ? andamento :
+                historico;
+    }, [papel, aba, seus, inscritos, andamento, historico]);
+
+    // Buscar dados principais - APENAS UMA VEZ por mudança de papel
     useEffect(() => {
         (async () => {
             setCarregando(true);
             setErro(null);
+            setContadores({}); // Reset contadores ao recarregar
+
             try {
+                let resultado;
                 if (papel === "LOJA") {
-                    // Backend já filtra pelos torneios da loja logada
-                    const { seus, andamento, historico } = await buscarAgrupadoPorAbaLoja();
-                    setSeus(seus || []);
-                    setAndamento(andamento || []);
-                    setHistorico(historico || []);
+                    resultado = await buscarAgrupadoPorAbaLoja();
+                    setSeus(resultado.seus || []);
+                    setAndamento(resultado.andamento || []);
+                    setHistorico(resultado.historico || []);
                 } else {
-                    const { inscritos, andamento, historico } = await buscarAgrupadoPorAba();
-                    setInscritos(inscritos || []);
-                    setAndamento(andamento || []);
-                    setHistorico(historico || []);
+                    resultado = await buscarAgrupadoPorAba();
+                    setInscritos(resultado.inscritos || []);
+                    setAndamento(resultado.andamento || []);
+                    setHistorico(resultado.historico || []);
                 }
-                setErro(null);
             } catch (e: any) {
-                // eslint-disable-next-line no-console
                 console.error("Erro ao carregar torneios:", e);
                 setErro("Não foi possível carregar seus torneios.");
             } finally {
@@ -75,15 +84,54 @@ const HistoricoTorneios: React.FC = () => {
         })();
     }, [papel]);
 
-    // Labels dos KPIs variam conforme o tipo de usuário
-    const kpiLabelInscritos = papel === "LOJA" ? "Seus Torneios" : "Torneios Inscritos";
+    // Carregar contadores de inscritos - OTIMIZADO
+    useEffect(() => {
+        const carregarContadores = async () => {
+            const listaAtual = getListaAtual();
+            if (listaAtual.length === 0) return;
 
+            const idsParaCarregar = listaAtual
+                .filter(t => contadores[t.id] === undefined)
+                .map(t => t.id);
+
+            if (idsParaCarregar.length === 0) return;
+
+            const promises = idsParaCarregar.map(async (id) => {
+                try {
+                    const qtd = await contarInscritosTorneio(id);
+                    return { id, qtd };
+                } catch (error) {
+                    return { id, qtd: 0 };
+                }
+            });
+
+            try {
+                const resultados = await Promise.all(promises);
+                setContadores(prev => {
+                    const novosContadores = { ...prev };
+                    resultados.forEach(({ id, qtd }) => {
+                        novosContadores[id] = qtd;
+                    });
+                    return novosContadores;
+                });
+            } catch (error) {
+                console.error("Erro ao carregar contadores:", error);
+            }
+        };
+
+        // Só carrega contadores quando não está carregando e há torneios
+        if (!carregando) {
+            carregarContadores();
+        }
+    }, [carregando, getListaAtual]); // Dependências mínimas
+
+    // KPIs - useMemo para evitar recálculos desnecessários
+    const kpiLabelInscritos = papel === "LOJA" ? "Seus Torneios" : "Torneios Inscritos";
     const kpis = useMemo(() => {
         const k1 = papel === "LOJA" ? seus.length : inscritos.length;
         return { k1, k2: andamento.length, k3: historico.length };
     }, [papel, seus, inscritos, andamento, historico]);
 
-    // Título e subtítulo da página
     const tituloPagina = useMemo(() => {
         if (papel === "LOJA") {
             if (aba === "inscritos") return "Seus Torneios";
@@ -108,41 +156,38 @@ const HistoricoTorneios: React.FC = () => {
         return "Reviva os momentos épicos dos seus torneios passados";
     }, [papel, aba]);
 
-    // Lista ativa (torneios a renderizar)
-    const listaAtiva = useMemo(() => {
-        if (papel === "LOJA") {
-            if (aba === "inscritos") return seus;
-            if (aba === "andamento") return andamento;
-            return historico;
-        }
-        if (aba === "inscritos") return inscritos;
-        if (aba === "andamento") return andamento;
-        return historico;
-    }, [papel, aba, seus, inscritos, andamento, historico]);
+    // Helper functions para mapeamento
+    const getStatusTorneio = useCallback((status: string, papelUsuario: PapelUsuario) => {
+        const statusLower = status?.toLowerCase() || "";
+        if (statusLower.includes("andamento")) return "Em andamento";
+        if (statusLower.includes("finalizado")) return "Concluído";
+        return papelUsuario === "LOJA" ? "Aberto" : "Inscrito";
+    }, []);
 
-    const mapToCardInfo = (t: any) => {
+    const formatarPreco = useCallback((gratuita: boolean, valor: number) => {
+        if (gratuita) return "Gratuita";
+        if (valor) return `R$ ${String(valor).replace(".", ",")}`;
+        return "—";
+    }, []);
+
+    // Lista ativa - useMemo para evitar recálculos
+    const listaAtiva = useMemo(() => getListaAtual(), [getListaAtual]);
+
+    // Mapper para CardInfoTorneio - useCallback para evitar re-render
+    const mapToCardInfo = useCallback((t: any) => {
         const dt = t.data_inicio ? new Date(t.data_inicio) : null;
+        const qtdInscritos = contadores[t.id] !== undefined ? contadores[t.id] : 0;
+
         return {
-            title:
-                t.status === "Em Andamento"
-                    ? "Em andamento"
-                    : t.status === "Finalizado"
-                        ? "Concluído"
-                        : papel === "LOJA"
-                            ? "Aberto"
-                            : "Inscrito",
+            title: getStatusTorneio(t.status, papel),
             name: t.nome ?? "Torneio",
             date: dt ? dt.toLocaleDateString("pt-BR") : "",
             time: dt ? dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "",
             location: t.loja_nome ?? "",
-            price: t.incricao_gratuita
-                ? "Gratuita"
-                : t.valor_incricao
-                    ? `R$ ${String(t.valor_incricao).replace(".", ",")}`
-                    : "—",
-            players: 0,
+            price: formatarPreco(t.incricao_gratuita, t.valor_incricao),
+            players: qtdInscritos,
         };
-    };
+    }, [contadores, getStatusTorneio, papel, formatarPreco]);
 
     const IDS = {
         inscritos: "painel-inscritos",
@@ -158,7 +203,7 @@ const HistoricoTorneios: React.FC = () => {
                 <h1 className={styles.titulo}>{tituloPagina}</h1>
                 <p className={styles.subtitulo}>{subtituloPagina}</p>
 
-                {/* KPIs (cards superiores) */}
+                {/* KPIs */}
                 <div className={styles.cardsContainer} role="tablist" aria-label="Seleção de categorias de torneio">
                     <button
                         type="button"
@@ -212,15 +257,9 @@ const HistoricoTorneios: React.FC = () => {
                     </button>
                 </div>
 
-                {/* Lista dinâmica abaixo dos cards */}
+                {/* Lista dinâmica */}
                 <section
-                    id={
-                        aba === "inscritos"
-                            ? IDS.inscritos
-                            : aba === "andamento"
-                                ? IDS.andamento
-                                : IDS.historico
-                    }
+                    id={IDS[aba]}
                     className={styles.secao}
                     aria-live="polite"
                     role="tabpanel"
@@ -249,7 +288,10 @@ const HistoricoTorneios: React.FC = () => {
                         ) : (
                             <div className={styles.lista}>
                                 {listaAtiva.map((t: any) => (
-                                    <CardInfoTorneio key={t.id} {...mapToCardInfo(t)} />
+                                    <CardInfoTorneio
+                                        key={t.id}
+                                        {...mapToCardInfo(t)}
+                                    />
                                 ))}
                             </div>
                         )
