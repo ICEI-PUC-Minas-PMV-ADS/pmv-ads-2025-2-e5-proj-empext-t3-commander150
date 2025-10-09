@@ -32,23 +32,26 @@ const InformacaoTorneio: React.FC = () => {
         setLoading(true);
         setCarregandoJogadores(true);
         const torneioId = id ? parseInt(id) : 1;
+        console.log('InformacaoTorneio - Buscando torneio ID:', torneioId);
         const [dadosTorneio, jogadores] = await Promise.all([
           buscarTorneioPorId(torneioId),
           buscarJogadoresInscritos(torneioId)
         ]);
+        console.log('InformacaoTorneio - Torneio encontrado:', dadosTorneio);
          setTournament(dadosTorneio);
         setRegrasEditadas(dadosTorneio.regras || "");
         setStatus(dadosTorneio.status as Status);
         setJogadoresInscritos(jogadores);
-        
+
       } catch (e) {
+        console.error('InformacaoTorneio - Erro ao carregar torneio:', e);
         setErro(tratarErroTorneio(e));
       } finally {
         setLoading(false);
         setCarregandoJogadores(false);
       }
     };
-    
+
     carregarTorneio();
   }, [id]);
 

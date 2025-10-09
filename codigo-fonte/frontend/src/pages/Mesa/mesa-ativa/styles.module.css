@@ -159,6 +159,105 @@
   margin: 1rem 0;
 }
 
+/* Intervalo */
+.intervaloCard {
+  background-color: var(--var-cor-azul-fundo-section);
+  border: var(--var-borda-section);
+  border-radius: 1rem;
+  padding: 2rem;
+  min-height: 350px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.intervaloTitulo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--var-cor-rosa);
+  margin: 0;
+}
+
+.intervaloTexto {
+  font-size: 1rem;
+  color: var(--var-cor-cinza-placeholder);
+  margin: 0;
+  max-width: 400px;
+}
+
+/* Resultado no Intervalo */
+.resultadoIntervalo {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 1rem;
+}
+
+.resultadoTitulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--var-cor-branca);
+  margin-bottom: 1.5rem;
+}
+
+.duplaResultado {
+  background-color: var(--var-cor-azul-fundo);
+  border: var(--var-borda-section);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.duplaResultadoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.duplaResultadoNomes {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--var-cor-branca);
+  display: block;
+  text-align: left;
+}
+
+.pontuacaoResultado {
+  font-size: 0.9rem;
+  color: var(--var-cor-cinza-placeholder);
+}
+
+.vencedorTag {
+  background-color: var(--var-cor-rosa);
+  color: var(--var-cor-azul-fundo);
+  padding: 0.3rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.vsResultado {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--var-cor-branca);
+  margin: 0.5rem 0;
+}
+
+.empateTag {
+  background-color: var(--var-cor-cinza-placeholder);
+  color: var(--var-cor-azul-fundo);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  text-align: center;
+}
+
 /* Resultado */
 .instrucao {
   font-size: 0.85rem;
@@ -187,6 +286,13 @@
 }
 
 /* Estados */
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 2rem;
+  color: var(--var-cor-branca);
+}
+
 .error {
   text-align: center;
   font-size: 1.2rem;
@@ -238,5 +344,29 @@
   .partidaCard,
   .resultadoCard {
     padding: 1.25rem;
+  }
+
+  .intervaloCard {
+    padding: 1.5rem 1rem;
+  }
+
+  .intervaloTitulo {
+    font-size: 1.5rem;
+  }
+
+  .intervaloTexto {
+    font-size: 0.9rem;
+  }
+
+  .resultadoTitulo {
+    font-size: 1rem;
+  }
+
+  .duplaResultadoNomes {
+    font-size: 0.9rem;
+  }
+
+  .pontuacaoResultado {
+    font-size: 0.85rem;
   }
 }

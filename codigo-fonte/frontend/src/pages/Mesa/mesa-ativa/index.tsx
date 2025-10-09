@@ -10,8 +10,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// import { buscarMinhaMesaNaRodada, reportarResultadoMesa } from '../../../services/mesaServico';
-import type { IMesaAtiva } from '../../../tipos/tipos';
+import { buscarMinhaMesaNaRodada, reportarResultadoMesa } from '../../../services/mesaServico';
+import { buscarTorneioPorId } from '../../../services/torneioServico';
+import type { IMesaAtiva, ITorneio } from '../../../tipos/tipos';
 import styles from './styles.module.css';
 import Swal from 'sweetalert2';
 import Button from '../../../components/Button';
@@ -28,44 +29,26 @@ const PaginaMesaAtiva = () => {
   const { rodadaId } = useParams<{ rodadaId: string }>();
   const navigate = useNavigate();
 
-  // Dados mockados para visualização
-  const dadosMockados: IMesaAtiva = {
-    id: 1,
-    numero_mesa: 3,
-    id_torneio: 1,
-    nome_torneio: 'Copa Mystical Arcanum',
-    numero_rodada: 2,
-    status_rodada: 'Em Andamento',
-    pontuacao_time_1: 0,
-    pontuacao_time_2: 0,
-    time_vencedor: null,
-    time_1: [
-      { id: 1, username: 'Alexandre Shadows', email: 'alex@email.com' },
-      { id: 2, username: 'Marina Stormcaller', email: 'marina@email.com' }
-    ],
-    time_2: [
-      { id: 3, username: 'Pedro Flamecaster', email: 'pedro@email.com' },
-      { id: 4, username: 'Julia Frostmage', email: 'julia@email.com' }
-    ],
-    meu_time: 1
-  };
-
-  const [mesa, setMesa] = useState<IMesaAtiva | null>(dadosMockados);
+  const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
+  const [torneio, setTorneio] = useState<ITorneio | null>(null);
+  const [loading, setLoading] = useState(true);
   const [reportandoResultado, setReportandoResultado] = useState(false);
 
   // Estados para o formulário de resultado
   const [vitoriasSuaDupla, setVitoriasSuaDupla] = useState('');
   const [vitoriasOponentes, setVitoriasOponentes] = useState('');
 
-  // Dados mockados adicionais
-  const regrasPartida = [
-    'Formato Commander padrão',
-    'Time limit: 50 minutos por partida',
-    'Decks devem ter exatamente 100 cartas',
-    'Banlist oficial da Wizards',
-    'Vida inicial: 40 pontos por jogador',
-    'Comportamento respeitoso e obrigatório'
-  ];
+  // Processar regras do torneio
+  const regrasPartida = torneio?.regras
+    ? torneio.regras.split('\n').filter(regra => regra.trim() !== '')
+    : [
+        'Formato Commander padrão',
+        'Time limit: 50 minutos por partida',
+        'Decks devem ter exatamente 100 cartas',
+        'Banlist oficial da Wizards',
+        'Vida inicial: 40 pontos por jogador',
+        'Comportamento respeitoso e obrigatório'
+      ];
 
   const rankingJogadores = [
     { id: '1', nome: 'Alexandre Shadows', position: 1, points: 12 },
@@ -74,6 +57,25 @@ const PaginaMesaAtiva = () => {
     { id: '4', nome: 'Pedro Flamecaster', position: 4, points: 6 },
   ];
 
+  // Formatar data do torneio
+  const formatarData = (dataISO?: string) => {
+    if (!dataISO) return 'N/A';
+    const data = new Date(dataISO);
+    return data.toLocaleDateString('pt-BR');
+  };
+
+  const formatarHora = (dataISO?: string) => {
+    if (!dataISO) return 'N/A';
+    const data = new Date(dataISO);
+    return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatarPreco = (valor?: number | null, gratuito?: boolean) => {
+    if (gratuito) return 'Gratuito';
+    if (!valor) return 'R$ 0,00';
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  };
+
   useEffect(() => {
     if (!rodadaId) {
       Swal.fire('Erro', 'ID da rodada não fornecido', 'error');
@@ -81,24 +83,39 @@ const PaginaMesaAtiva = () => {
       return;
     }
 
-    // COMENTADO: Requisição à API
-    // const carregarMesa = async () => {
-    //   try {
-    //     setLoading(true);
-    //     const mesaData = await buscarMinhaMesaNaRodada(parseInt(rodadaId));
-    //     setMesa(mesaData);
-    //     setVitoriasSuaDupla(mesaData.pontuacao_time_1.toString());
-    //     setVitoriasOponentes(mesaData.pontuacao_time_2.toString());
-    //   } catch (error) {
-    //     console.error('Erro ao carregar mesa:', error);
-    //     Swal.fire('Erro', 'Não foi possível carregar a mesa. Você pode não estar inscrito nesta rodada.', 'error');
-    //     navigate('/');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
+    const carregarMesa = async () => {
+      try {
+        setLoading(true);
+        const mesaData = await buscarMinhaMesaNaRodada(parseInt(rodadaId));
+        setMesa(mesaData);
 
-    // carregarMesa();
+        // Define os valores iniciais baseados nos dados da API
+        if (mesaData.meu_time === 1) {
+          setVitoriasSuaDupla(mesaData.pontuacao_time_1.toString());
+          setVitoriasOponentes(mesaData.pontuacao_time_2.toString());
+        } else {
+          setVitoriasSuaDupla(mesaData.pontuacao_time_2.toString());
+          setVitoriasOponentes(mesaData.pontuacao_time_1.toString());
+        }
+
+        // Buscar detalhes do torneio
+        try {
+          const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
+          setTorneio(torneioData);
+        } catch (error) {
+          console.error('Erro ao carregar torneio:', error);
+          // Não bloqueia a exibição da mesa se falhar ao buscar o torneio
+        }
+      } catch (error) {
+        console.error('Erro ao carregar mesa:', error);
+        Swal.fire('Erro', 'Não foi possível carregar a mesa. Você pode não estar inscrito nesta rodada.', 'error');
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarMesa();
   }, [rodadaId, navigate]);
 
   const handleReportarResultado = async () => {
@@ -109,50 +126,62 @@ const PaginaMesaAtiva = () => {
       return;
     }
 
-    const pontuacaoTime1 = parseInt(vitoriasSuaDupla);
-    const pontuacaoTime2 = parseInt(vitoriasOponentes);
+    // Ajusta as pontuações baseado no time do jogador
+    let pontuacaoTime1: number;
+    let pontuacaoTime2: number;
+
+    if (mesa.meu_time === 1) {
+      pontuacaoTime1 = parseInt(vitoriasSuaDupla);
+      pontuacaoTime2 = parseInt(vitoriasOponentes);
+    } else {
+      pontuacaoTime1 = parseInt(vitoriasOponentes);
+      pontuacaoTime2 = parseInt(vitoriasSuaDupla);
+    }
 
     // Determina o vencedor baseado nas pontuações
     let timeVencedor: number;
     if (pontuacaoTime1 > pontuacaoTime2) {
-      timeVencedor = mesa.meu_time || 1;
+      timeVencedor = 1;
     } else if (pontuacaoTime2 > pontuacaoTime1) {
-      timeVencedor = mesa.meu_time === 1 ? 2 : 1;
+      timeVencedor = 2;
     } else {
       timeVencedor = 0; // Empate
     }
 
-    // COMENTADO: Requisição à API
-    // try {
-    //   setReportandoResultado(true);
-    //   const mesaAtualizada = await reportarResultadoMesa(
-    //     mesa.id,
-    //     pontuacaoTime1,
-    //     pontuacaoTime2,
-    //     timeVencedor
-    //   );
-    //   setMesa(mesaAtualizada);
-    //   Swal.fire('Sucesso', 'Resultado reportado com sucesso!', 'success');
-    // } catch (error) {
-    //   console.error('Erro ao reportar resultado:', error);
-    //   Swal.fire('Erro', 'Não foi possível reportar o resultado. Verifique se a rodada está em andamento.', 'error');
-    // } finally {
-    //   setReportandoResultado(false);
-    // }
+    try {
+      setReportandoResultado(true);
+      await reportarResultadoMesa(
+        mesa.id,
+        pontuacaoTime1,
+        pontuacaoTime2,
+        timeVencedor
+      );
 
-    // Mock: Apenas simula o resultado
-    setReportandoResultado(true);
-    setTimeout(() => {
+      // Atualiza apenas as pontuações localmente, mantendo os dados dos times
       setMesa({
         ...mesa,
         pontuacao_time_1: pontuacaoTime1,
         pontuacao_time_2: pontuacaoTime2,
-        time_vencedor: timeVencedor
+        time_vencedor: timeVencedor,
+        status_rodada: 'Finalizada' // Assume que a rodada foi finalizada
       });
+
+      await Swal.fire('Sucesso', 'Resultado reportado com sucesso!', 'success');
+    } catch (error) {
+      console.error('Erro ao reportar resultado:', error);
+      Swal.fire('Erro', 'Não foi possível reportar o resultado. Verifique se a rodada está em andamento.', 'error');
+    } finally {
       setReportandoResultado(false);
-      Swal.fire('Sucesso', 'Resultado reportado com sucesso! (Mock)', 'success');
-    }, 500);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Carregando mesa...</div>
+      </div>
+    );
+  }
 
   if (!mesa) {
     return (
@@ -165,12 +194,109 @@ const PaginaMesaAtiva = () => {
   const meuTime = mesa.meu_time === 1 ? mesa.time_1 : mesa.time_2;
   const timeAdversario = mesa.meu_time === 1 ? mesa.time_2 : mesa.time_1;
 
+  // Verificação de segurança
+  if (!meuTime || !timeAdversario) {
+    console.error('Times não encontrados na mesa:', mesa);
+    return (
+      <div className={styles.container}>
+        <div className={styles.error}>Erro ao carregar dados da mesa</div>
+      </div>
+    );
+  }
+
+  // Verificar se recebeu um bye (mesa 0)
+  if (mesa.numero_mesa === 0) {
+    return (
+      <div className={styles.container}>
+        {/* Cabeçalho */}
+        <div className={styles.header}>
+          <div>
+            <h1 className={styles.titulo}>Você recebeu um bye!</h1>
+            <p className={styles.subtitulo}>{mesa.nome_torneio}</p>
+          </div>
+          <div className={styles.rodadaBadge}>
+            Rodada {mesa.numero_rodada}
+          </div>
+        </div>
+
+        {/* Layout em Grid */}
+        <div className={styles.gridContainer}>
+          {/* Cards Superiores Esquerda */}
+          <div className={styles.cardsEsquerda}>
+            <CardSuperior
+              count="BYE"
+              label="Sua Mesa"
+              icon={BsGrid3X3Gap}
+              selected={false}
+            />
+            <CardSuperior
+              count={mesa.numero_rodada}
+              secondaryCount={torneio?.quantidade_rodadas || undefined}
+              label="Rodada"
+              icon={GiPodium}
+              selected={false}
+            />
+          </div>
+
+          {/* Cards Superiores Direita */}
+          <div className={styles.cardsDireita}>
+            <CardSuperior
+              count={torneio?.valor_incricao || 0}
+              label="Premiação"
+              icon={FaDollarSign}
+              selected={false}
+            />
+          </div>
+        </div>
+
+        {/* Layout em Grid - Conteúdo Principal */}
+        <div className={styles.gridContainer}>
+          {/* Coluna Esquerda */}
+          <div className={styles.colunaEsquerda}>
+            <div className={styles.intervaloCard}>
+              <h2 className={styles.intervaloTitulo}>Você recebeu um bye!</h2>
+              <p className={styles.intervaloTexto}>
+                Aproveite para tomar uma água enquanto aguarda a próxima rodada.
+              </p>
+            </div>
+          </div>
+
+          {/* Coluna Direita */}
+          <div className={styles.colunaDireita}>
+            {/* Informações do Torneio */}
+            <CardInfoTorneio
+              title="Informações do Torneio"
+              name={mesa.nome_torneio}
+              date={formatarData(torneio?.data_inicio)}
+              time={formatarHora(torneio?.data_inicio)}
+              location={torneio?.loja_nome || 'Loja não especificada'}
+              price={formatarPreco(torneio?.valor_incricao, torneio?.incricao_gratuita)}
+              players={torneio?.qnt_vagas || 0}
+            />
+
+            {/* Regras da Partida */}
+            <RegrasPartida regras={regrasPartida} />
+
+            {/* Ranking */}
+            <CardRanking
+              players={rankingJogadores}
+              title="Ranking"
+              maxItems={4}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       {/* Cabeçalho */}
       <div className={styles.header}>
         <div>
-          <h1 className={styles.titulo}>Mesa Ativa</h1>
+          <h1 className={styles.titulo}>
+            {mesa.status_rodada.toLowerCase() === 'finalizada' ? 'Intervalo' : 'Mesa Ativa'}
+          </h1>
           <p className={styles.subtitulo}>{mesa.nome_torneio}</p>
         </div>
         <div className={styles.rodadaBadge}>
@@ -186,23 +312,24 @@ const PaginaMesaAtiva = () => {
             count={mesa.numero_mesa}
             label="Sua Mesa"
             icon={BsGrid3X3Gap}
-            isActive={false}
+            selected={false}
           />
           <CardSuperior
             count={mesa.numero_rodada}
-            label="Rodadas"
+            secondaryCount={torneio?.quantidade_rodadas || undefined}
+            label="Rodada"
             icon={GiPodium}
-            isActive={false}
+            selected={false}
           />
         </div>
 
         {/* Cards Superiores Direita */}
         <div className={styles.cardsDireita}>
           <CardSuperior
-            count={160}
+            count={torneio?.valor_incricao || 0}
             label="Premiação"
             icon={FaDollarSign}
-            isActive={false}
+            selected={false}
           />
         </div>
       </div>
@@ -211,73 +338,126 @@ const PaginaMesaAtiva = () => {
       <div className={styles.gridContainer}>
         {/* Coluna Esquerda */}
         <div className={styles.colunaEsquerda}>
-          {/* Sua Partida */}
-          <div className={styles.partidaCard}>
-            <h2 className={styles.cardTitulo}>Sua Partida - Mesa {mesa.numero_mesa}</h2>
-            <p className={styles.statusPartida}>Partida em andamento</p>
+          {mesa.status_rodada.toLowerCase() === 'finalizada' ? (
+            /* Mensagem de Intervalo */
+            <div className={styles.intervaloCard}>
+              <h2 className={styles.intervaloTitulo}>Estamos no Intervalo</h2>
+              <p className={styles.intervaloTexto}>
+                A rodada {mesa.numero_rodada} foi finalizada. Aguarde o início da próxima rodada.
+              </p>
 
-            <div className={styles.dupla}>
-              <div className={styles.duplaHeader}>
-                <span className={styles.duplaNomes}>
-                  {meuTime.map(j => j.username).join(' & ')}
-                </span>
-                <span className={styles.duplaTag}>Sua Dupla</span>
+              {/* Resultado da Partida */}
+              <div className={styles.resultadoIntervalo}>
+                <h3 className={styles.resultadoTitulo}>Resultado da Partida</h3>
+
+                <div className={styles.duplaResultado}>
+                  <div className={styles.duplaResultadoHeader}>
+                    <span className={styles.pontuacaoResultado}>
+                      Pontuação: {mesa.meu_time === 1 ? mesa.pontuacao_time_1 : mesa.pontuacao_time_2}
+                    </span>
+                    {mesa.time_vencedor === mesa.meu_time && (
+                      <span className={styles.vencedorTag}>Vencedor</span>
+                    )}
+                  </div>
+                  <span className={styles.duplaResultadoNomes}>
+                    {meuTime.map(j => j.username).join(' & ')}
+                  </span>
+                </div>
+
+                <div className={styles.vsResultado}>VS</div>
+
+                <div className={styles.duplaResultado}>
+                  <div className={styles.duplaResultadoHeader}>
+                    <span className={styles.pontuacaoResultado}>
+                      Pontuação: {mesa.meu_time === 1 ? mesa.pontuacao_time_2 : mesa.pontuacao_time_1}
+                    </span>
+                    {mesa.time_vencedor && mesa.time_vencedor !== mesa.meu_time && (
+                      <span className={styles.vencedorTag}>Vencedor</span>
+                    )}
+                  </div>
+                  <span className={styles.duplaResultadoNomes}>
+                    {timeAdversario.map(j => j.username).join(' & ')}
+                  </span>
+                </div>
+
+                {mesa.time_vencedor === 0 && (
+                  <div className={styles.empateTag}>Partida Empatada</div>
+                )}
               </div>
             </div>
+          ) : (
+            <>
+              {/* Sua Partida */}
+              <div className={styles.partidaCard}>
+                <h2 className={styles.cardTitulo}>Sua Partida - Mesa {mesa.numero_mesa}</h2>
+                <p className={styles.statusPartida}>Partida em andamento</p>
 
-            <div className={styles.vs}>VS</div>
+                <div className={styles.dupla}>
+                  <div className={styles.duplaHeader}>
+                    <span className={styles.duplaNomes}>
+                      {meuTime.map(j => j.username).join(' & ')}
+                    </span>
+                    <span className={styles.duplaTag}>Sua Dupla</span>
+                  </div>
+                </div>
 
-            <div className={styles.dupla}>
-              <div className={styles.duplaHeader}>
-                <span className={styles.duplaNomes}>
-                  {timeAdversario.map(j => j.username).join(' & ')}
-                </span>
-                <span className={styles.duplaTagAdversario}>Dupla Adversária</span>
+                <div className={styles.vs}>VS</div>
+
+                <div className={styles.dupla}>
+                  <div className={styles.duplaHeader}>
+                    <span className={styles.duplaNomes}>
+                      {timeAdversario.map(j => j.username).join(' & ')}
+                    </span>
+                    <span className={styles.duplaTagAdversario}>Dupla Adversária</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Informar Resultado */}
-          <div className={styles.resultadoCard}>
-            <h2 className={styles.cardTitulo}>Informar Resultado da Rodada</h2>
-            <p className={styles.instrucao}>
-              Informe a quantas vitórias e empates sua dupla teve ao final da partida
-            </p>
+              {/* Informar Resultado */}
+              <div className={styles.resultadoCard}>
+                <h2 className={styles.cardTitulo}>Informar Resultado da Rodada</h2>
+                <p className={styles.instrucao}>
+                  Informe a quantas vitórias e empates sua dupla teve ao final da partida
+                </p>
 
-            <div className={styles.inputsResultado}>
-              <div className={styles.inputGroup}>
-                <p className={styles.inputLabel}>Sua Dupla</p>
-                <Input
-                  type="numero"
-                  name="vitorias_sua_dupla"
-                  label="Vitórias"
-                  value={vitoriasSuaDupla}
-                  onChange={(e) => setVitoriasSuaDupla(e.target.value)}
-                  backgroundColor="var(--var-cor-azul-fundo-section)"
-                  textColor="var(--var-cor-branca)"
+                <div className={styles.inputsResultado}>
+                  <div className={styles.inputGroup}>
+                    <p className={styles.inputLabel}>Sua Dupla</p>
+                    <Input
+                      type="numero"
+                      name="vitorias_sua_dupla"
+                      label="Vitórias"
+                      value={vitoriasSuaDupla}
+                      onChange={(e) => setVitoriasSuaDupla(e.target.value)}
+                      backgroundColor="var(--var-cor-azul-fundo-section)"
+                      textColor="var(--var-cor-branca)"
+                      labelColor="var(--var-cor-branca)"
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <p className={styles.inputLabel}>Dupla Adversária</p>
+                    <Input
+                      type="numero"
+                      name="vitorias_oponentes"
+                      label="Vitórias"
+                      value={vitoriasOponentes}
+                      onChange={(e) => setVitoriasOponentes(e.target.value)}
+                      backgroundColor="var(--var-cor-azul-fundo-section)"
+                      textColor="var(--var-cor-branca)"
+                      labelColor="var(--var-cor-branca)"
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  label="Confirmar Resultado"
+                  type="button"
+                  onClick={handleReportarResultado}
+                  disabled={reportandoResultado}
                 />
               </div>
-              <div className={styles.inputGroup}>
-                <p className={styles.inputLabel}>Dupla Adversária</p>
-                <Input
-                  type="numero"
-                  name="vitorias_oponentes"
-                  label="Vitórias"
-                  value={vitoriasOponentes}
-                  onChange={(e) => setVitoriasOponentes(e.target.value)}
-                  backgroundColor="var(--var-cor-azul-fundo-section)"
-                  textColor="var(--var-cor-branca)"
-                />
-              </div>
-            </div>
-
-            <Button
-              label="Confirmar Resultado"
-              type="button"
-              onClick={handleReportarResultado}
-              disabled={reportandoResultado}
-            />
-          </div>
+            </>
+          )}
         </div>
 
         {/* Coluna Direita */}
@@ -286,11 +466,11 @@ const PaginaMesaAtiva = () => {
           <CardInfoTorneio
             title="Informações do Torneio"
             name={mesa.nome_torneio}
-            date="05/05/2023"
-            time="14:00"
-            location="Loja Cards & Dragons"
-            price="R$ 25,00"
-            players={12}
+            date={formatarData(torneio?.data_inicio)}
+            time={formatarHora(torneio?.data_inicio)}
+            location={torneio?.loja_nome || 'Loja não especificada'}
+            price={formatarPreco(torneio?.valor_incricao, torneio?.incricao_gratuita)}
+            players={torneio?.qnt_vagas || 0}
           />
 
           {/* Regras da Partida */}
