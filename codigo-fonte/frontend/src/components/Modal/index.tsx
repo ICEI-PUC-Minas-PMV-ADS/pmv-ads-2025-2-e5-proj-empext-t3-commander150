@@ -1,34 +1,86 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
+import Swal from "sweetalert2";
 import styles from "./modal.module.css";
 
 interface ResultadoPartidaModalProps {
   isOpen: boolean;
   onClose: () => void;
+  mesaId: number;
   numeroMesa: number;
   dupla1: string;
   dupla2: string;
   status: string;
+  pontuacaoInicial1: number;
+  pontuacaoInicial2: number;
+  onConfirmarResultado?: (mesaId: number, pontuacaoTime1: number, pontuacaoTime2: number) => Promise<boolean>;
 }
 
 const Modal: React.FC<ResultadoPartidaModalProps> = ({
   isOpen,
   onClose,
+  mesaId,
   numeroMesa,
   dupla1,
   dupla2,
   status,
+  pontuacaoInicial1,
+  pontuacaoInicial2,
+  onConfirmarResultado,
 }) => {
   const [vitoriasDupla1, setVitoriasDupla1] = useState("");
   const [vitoriasDupla2, setVitoriasDupla2] = useState("");
+  const [confirmando, setConfirmando] = useState(false);
 
-  const handleConfirmar = () => {
-    // Lógica para confirmar o resultado
-    console.log("Resultado confirmado:", {
-      vitoriasDupla1,
-      vitoriasDupla2,
-    });
-    onClose();
+  // Atualizar valores quando o modal abrir
+  useEffect(() => {
+    if (isOpen) {
+      setVitoriasDupla1(pontuacaoInicial1.toString());
+      setVitoriasDupla2(pontuacaoInicial2.toString());
+    }
+  }, [isOpen, pontuacaoInicial1, pontuacaoInicial2]);
+
+  const handleConfirmar = async () => {
+    // Validar campos
+    if (!vitoriasDupla1 || !vitoriasDupla2) {
+      await Swal.fire('Atenção', 'Preencha todas as pontuações', 'warning');
+      return;
+    }
+
+    const pontuacao1 = parseInt(vitoriasDupla1);
+    const pontuacao2 = parseInt(vitoriasDupla2);
+
+    if (isNaN(pontuacao1) || isNaN(pontuacao2)) {
+      await Swal.fire('Atenção', 'Pontuações devem ser números válidos', 'warning');
+      return;
+    }
+
+    if (pontuacao1 < 0 || pontuacao2 < 0) {
+      await Swal.fire('Atenção', 'Pontuações não podem ser negativas', 'warning');
+      return;
+    }
+
+    try {
+      setConfirmando(true);
+
+      if (onConfirmarResultado) {
+        await onConfirmarResultado(mesaId, pontuacao1, pontuacao2);
+        await Swal.fire('Sucesso', 'Resultado confirmado com sucesso!', 'success');
+        onClose();
+      } else {
+        console.log("Resultado confirmado:", {
+          mesaId,
+          vitoriasDupla1: pontuacao1,
+          vitoriasDupla2: pontuacao2,
+        });
+        onClose();
+      }
+    } catch (error) {
+      console.error('Erro ao confirmar resultado:', error);
+      await Swal.fire('Erro', 'Não foi possível confirmar o resultado. Tente novamente.', 'error');
+    } finally {
+      setConfirmando(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -72,6 +124,7 @@ const Modal: React.FC<ResultadoPartidaModalProps> = ({
                 placeholder="Qnt. de vitórias da dupla 1"
                 value={vitoriasDupla1}
                 onChange={(e) => setVitoriasDupla1(e.target.value)}
+                disabled={confirmando}
               />
             </div>
 
@@ -83,12 +136,17 @@ const Modal: React.FC<ResultadoPartidaModalProps> = ({
                 placeholder="Qnt. de vitórias da dupla 2"
                 value={vitoriasDupla2}
                 onChange={(e) => setVitoriasDupla2(e.target.value)}
+                disabled={confirmando}
               />
             </div>
           </div>
 
-          <button className={styles.confirmarButton} onClick={handleConfirmar}>
-            Confirmar Resultado
+          <button
+            className={styles.confirmarButton}
+            onClick={handleConfirmar}
+            disabled={confirmando}
+          >
+            {confirmando ? 'Confirmando...' : 'Confirmar Resultado'}
           </button>
         </div>
       </div>

@@ -8,20 +8,24 @@ interface CardSuperiorProps {
   label: string;
   className?: string;
   selected?: boolean;
+  secondaryCount?: number;
 }
 
-export const CardSuperior: React.FC<CardSuperiorProps> = ({ 
-  icon: Icon, 
-  count, 
-  label, 
+export const CardSuperior: React.FC<CardSuperiorProps> = ({
+  icon: Icon,
+  count,
+  label,
   className,
-  selected 
+  selected,
+  secondaryCount
 }) => {
   return (
     <div className={`${styles.card} ${selected ? styles.selected : ''} ${className || ''}`}>
       <Icon className={styles.cardIcon} />
       <div className={styles.cardContent}>
-        <span className={styles.cardCount}>{count}</span>
+        <span className={styles.cardCount}>
+          {count}{secondaryCount ? ` de ${secondaryCount}` : ''}
+        </span>
         <span className={styles.cardLabel}>{label}</span>
       </div>
     </div>
