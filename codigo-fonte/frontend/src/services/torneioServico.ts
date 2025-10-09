@@ -21,6 +21,7 @@ import type {
   IInscricao
 } from '../tipos/tipos';
 import { AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 
 /**
  * Busca todos os torneios com paginação.
@@ -240,6 +241,15 @@ export const buscarJogadoresInscritos = async (idTorneio: number): Promise<strin
   const inscricoes = resposta.data.results || resposta.data;
   return inscricoes.map((inscricao: any) => inscricao.username);
 };
+export async function contarInscritosTorneio(idTorneio: number): Promise<number> {
+  try {
+    const lista = await buscarJogadoresInscritos(idTorneio);
+    return Array.isArray(lista) ? lista.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
 
 /**
  * Utilitário para tratar erros de torneio de forma consistente.
@@ -296,7 +306,6 @@ export async function buscarAgrupadoPorAba() {
       ? (torneiosResponse as any).results
       : (Array.isArray(torneiosResponse as any) ? (torneiosResponse as any) : []);
 
-  // Agora é seguro usar .filter()
   const idsInscritos = new Set(inscricoes.map((i) => i.id_torneio));
   const inscritos = torneios.filter((t) => idsInscritos.has(t.id));
 
@@ -305,4 +314,54 @@ export async function buscarAgrupadoPorAba() {
   const historico  = inscritos.filter((t) => norm(t.status) === "finalizado");
 
   return { inscritos, andamento, historico };
+}
+
+/** Helper DRF: varre todas as páginas usando `next` (paginado ou array simples) */
+async function fetchAllPaginated<T>(path: string): Promise<T[]> {
+  let url: string | null = path;
+  let acc: T[] = [];
+  let opts: any = undefined;
+
+  while (url) {
+    const resp: AxiosResponse<any> = await api.get(url, opts);
+    const payload = resp.data;
+
+    if (Array.isArray(payload)) {
+      acc = acc.concat(payload as T[]);
+      break;
+    }
+
+    const results: T[] = Array.isArray(payload?.results) ? payload.results : [];
+    acc = acc.concat(results);
+
+    url = payload?.next ?? null;
+    // após a primeira página o `next` já embute os params
+    opts = undefined;
+  }
+
+  return acc;
+}
+
+/** (LOJA) Busca TODOS os torneios visíveis para a loja autenticada.
+ *  O backend já restringe por loja logada em get_queryset, então não precisamos de ?id_loja=
+ */
+export async function buscarTodosTorneiosDaLoja(): Promise<ITorneio[]> {
+  return fetchAllPaginated<ITorneio>("/torneios/torneios/");
+}
+
+/** (LOJA) Agrupa: “Seus Torneios” (abertos), “Em Andamento”, “Histórico” (finalizados) */
+export async function buscarAgrupadoPorAbaLoja() {
+  const torneios = await buscarTodosTorneiosDaLoja();
+  const norm = (s?: string) => (s ?? "").toString().trim().toLowerCase();
+
+  // tolera pequenas variações de texto vindas do backend
+  const isAberto     = (s?: string) => ["aberto", "em aberto", "open"].includes(norm(s));
+  const isAndamento  = (s?: string) => ["em andamento", "andamento", "running"].includes(norm(s));
+  const isFinalizado = (s?: string) => ["finalizado", "encerrado", "closed"].includes(norm(s));
+
+  const seus      = torneios.filter(t => isAberto(t.status));
+  const andamento = torneios.filter(t => isAndamento(t.status));
+  const historico = torneios.filter(t => isFinalizado(t.status));
+
+  return { seus, andamento, historico };
 }

@@ -1,4 +1,7 @@
 /* Para as páginas de Histórico de Torneios */
+section{
+    border: 0px !important;
+}
 
 .container {
     min-height: 100vh;
