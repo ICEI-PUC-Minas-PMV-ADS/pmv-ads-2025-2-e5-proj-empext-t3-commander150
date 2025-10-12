@@ -69,6 +69,8 @@ class InscricaoCreateSerializer(serializers.ModelSerializer):
         Validações específicas para torneio:
         - Torneio deve existir e estar aberto
         - Jogador não pode estar já inscrito
+        - Data de início não pode ser posterior ao momento atual
+        - Respeita limite de vagas quando aplicável
         """
         if not value:
             raise serializers.ValidationError("Torneio é obrigatório.")
@@ -84,6 +86,21 @@ class InscricaoCreateSerializer(serializers.ModelSerializer):
             id_torneio=value
         ).exists():
             raise serializers.ValidationError("Você já está inscrito neste torneio.")
+        
+        # Bloqueia inscrição se a data de início for posterior ao momento atual
+        agora = timezone.now()
+        if value.data_inicio and value.data_inicio > agora:
+            raise serializers.ValidationError(
+                "Não é possível se inscrever: a data de início do torneio ainda não chegou."
+            )
+        
+        # Verifica limite de vagas quando aplicável
+        if value.vagas_limitadas and value.qnt_vagas is not None:
+            total_inscritos = Inscricao.objects.filter(id_torneio=value).count()
+            if total_inscritos >= value.qnt_vagas:
+                raise serializers.ValidationError(
+                    f"Limite de vagas atingido. Este torneio aceita apenas {value.qnt_vagas} jogadores."
+                )
         
         return value
 
@@ -143,6 +160,23 @@ class InscricaoLojaSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Não é possível alterar inscrição durante uma rodada ativa."
                 )
+        
+        # Validações adicionais para criação de novas inscrições
+        if not self.instance and torneio:
+            # Bloqueia inscrição se a data de início for posterior ao momento atual
+            agora = timezone.now()
+            if torneio.data_inicio and torneio.data_inicio > agora:
+                raise serializers.ValidationError(
+                    "Não é possível inscrever jogadores: a data de início do torneio ainda não chegou."
+                )
+            
+            # Verifica limite de vagas quando aplicável
+            if torneio.vagas_limitadas and torneio.qnt_vagas is not None:
+                total_inscritos = Inscricao.objects.filter(id_torneio=torneio).count()
+                if total_inscritos >= torneio.qnt_vagas:
+                    raise serializers.ValidationError(
+                        f"Limite de vagas atingido. Este torneio aceita apenas {torneio.qnt_vagas} jogadores."
+                    )
         
         return data
 

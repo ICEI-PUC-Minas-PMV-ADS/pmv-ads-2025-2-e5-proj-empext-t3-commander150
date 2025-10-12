@@ -49,7 +49,7 @@ EMAIL_HOST_USER = env('EMAIL_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD', default='')
 
 # Configuração do CORS e CSRF
-CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
+CORS_ALLOW_ALL_ORIGINS = True  # Permite todas as origens
 CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False

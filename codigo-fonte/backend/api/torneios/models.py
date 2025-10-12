@@ -30,7 +30,7 @@ class Torneio(models.Model):
     pontuacao_empate = models.PositiveIntegerField(default=1, help_text="Pontos por empate")
     pontuacao_bye = models.PositiveIntegerField(default=3, help_text="Pontos por bye")
     quantidade_rodadas = models.PositiveIntegerField(blank=True, null=True, help_text="Quantidade de rodadas do torneio")
-    data_inicio = models.DateTimeField(auto_now_add=True)
+    data_inicio = models.DateTimeField(help_text="Data e hora de início do torneio")
 
     def __str__(self):
         return self.nome
