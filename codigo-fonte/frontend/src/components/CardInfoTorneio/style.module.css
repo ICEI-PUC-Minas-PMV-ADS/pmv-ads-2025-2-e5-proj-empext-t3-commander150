@@ -52,11 +52,6 @@
   gap: 8px;
 }
 
-.btnDanger {
-  background-color: var(--var-cor-erro);
-  color: var(--var-cor-branca);
-}
-
 .btnPrimary {
   background-color: var(--var-cor-primaria);
   color: var(--var-cor-branca);
