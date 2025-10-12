@@ -12,13 +12,15 @@ export interface IUsuarioCadastro {
   tipo: 'JOGADOR' | 'LOJA' | 'ADMIN';
 }
 
-// Para resposta (retorno da API)
+// Interface para usuário
 export interface IUsuario {
   id: number;
   email: string;
   username: string;
   tipo: 'JOGADOR' | 'LOJA' | 'ADMIN';
   status: string;
+  perfil?: string;  // Optional property for legacy support
+  role?: string;    // Optional property for legacy support
 }
 
 // Define a estrutura das credenciais necessárias para o login.

@@ -4,14 +4,17 @@ import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
 import Button from "../../../components/Button";
-import {buscarAgrupadoPorAba, buscarAgrupadoPorAbaLoja, desinscreverDoTorneio,} from "../../../services/torneioServico";
-
+import { buscarAgrupadoPorAba, buscarAgrupadoPorAbaLoja, desinscreverDoTorneio } from "../../../services/torneioServico";
 import { useSessao } from "../../../contextos/AuthContexto";
 
 type Aba = "inscritos" | "andamento" | "historico";
 
-const EmptyState: React.FC<{ aba: Aba }> = ({ aba }) => {
-    const messages = {
+const EmptyState: React.FC<{ aba: Aba; isLoja: boolean }> = ({ aba, isLoja }) => {
+    const messages = isLoja ? {
+        inscritos: "Você ainda não tem torneios abertos.",
+        andamento: "Nenhum torneio em andamento.",
+        historico: "Nenhum torneio finalizado no histórico.",
+    } : {
         inscritos: "Você não está inscrito em nenhum torneio no momento.",
         andamento: "Nenhum torneio em andamento.",
         historico: "Nenhum torneio no histórico.",
@@ -20,38 +23,41 @@ const EmptyState: React.FC<{ aba: Aba }> = ({ aba }) => {
 };
 
 const HistoricoTorneios: React.FC = () => {
-
     const { usuario } = useSessao?.() ?? ({} as any);
-    const tipoBruto =
-        (usuario?.tipo ?? usuario?.perfil ?? usuario?.role ?? "").toString();
+    const tipoBruto = (usuario?.tipo ?? usuario?.perfil ?? usuario?.role ?? "").toString();
     const isLoja = tipoBruto.toUpperCase() === "LOJA";
 
-    // Estado de página
+    // Estado de página > estados separados para LOJA e JOGADOR
     const [aba, setAba] = useState<Aba>("inscritos");
-    const [inscritos, setInscritos] = useState<any[]>([]);
+    const [seusTorneios, setSeusTorneios] = useState<any[]>([]); // Apenas para LOJA - torneios abertos
+    const [inscritos, setInscritos] = useState<any[]>([]); // Apenas para JOGADOR - torneios inscritos
     const [andamento, setAndamento] = useState<any[]>([]);
     const [historico, setHistorico] = useState<any[]>([]);
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState<string | null>(null);
     const [loadingAcao, setLoadingAcao] = useState<Record<number, boolean>>({});
 
-    // Carregamento inicial conforme o tipo (JOGADOR ou LOJA)
     const carregar = useCallback(async () => {
         setCarregando(true);
         setErro(null);
         try {
             if (isLoja) {
-                const { seus, andamento, historico } = await buscarAgrupadoPorAbaLoja();
-                setInscritos(seus || []);
-                setAndamento(andamento || []);
-                setHistorico(historico || []);
+                // LOJA: busca torneios da loja (seus = abertos, andamento, historico)
+                const resultado = await buscarAgrupadoPorAbaLoja();
+                setSeusTorneios(resultado.seus || []);
+                setAndamento(resultado.andamento || []);
+                setHistorico(resultado.historico || []);
+                setInscritos([]); // Limpa estado de inscritos para LOJA
             } else {
-                const { inscritos, andamento, historico } = await buscarAgrupadoPorAba();
-                setInscritos(inscritos || []);
-                setAndamento(andamento || []);
-                setHistorico(historico || []);
+                // JOGADOR: busca torneios do jogador (inscritos, andamento, historico)
+                const resultado = await buscarAgrupadoPorAba();
+                setInscritos(resultado.inscritos || []);
+                setAndamento(resultado.andamento || []);
+                setHistorico(resultado.historico || []);
+                setSeusTorneios([]); // Limpa estado de seus torneios para JOGADOR
             }
         } catch (e: any) {
+            console.error("Erro ao carregar torneios:", e);
             setErro("Não foi possível carregar seus torneios.");
         } finally {
             setCarregando(false);
@@ -61,7 +67,6 @@ const HistoricoTorneios: React.FC = () => {
     useEffect(() => {
         carregar();
     }, [carregar]);
-
 
     // Cabeçalho dinâmico
     const tituloPagina = useMemo(() => {
@@ -78,38 +83,42 @@ const HistoricoTorneios: React.FC = () => {
     const subtituloPagina = useMemo(() => {
         if (isLoja) {
             if (aba === "inscritos") return "Acompanhe seus torneios e crie batalhas épicas!";
-            if (aba === "andamento")
-                return "Acompanhe seus torneios em andamento e as suas batalhas";
+            if (aba === "andamento") return "Acompanhe seus torneios em andamento e as suas batalhas";
             return "Reviva os momentos épicos dos seus torneios passados";
         }
-        if (aba === "inscritos")
-            return "Acompanhe seus torneios inscritos e participe das batalhas épicas";
-        if (aba === "andamento")
-            return "Acompanhe seus torneios em andamento e as suas batalhas";
+        if (aba === "inscritos") return "Acompanhe seus torneios inscritos e participe das batalhas épicas";
+        if (aba === "andamento") return "Acompanhe seus torneios em andamento e as suas batalhas";
         return "Reviva os momentos épicos dos seus torneios passados";
     }, [aba, isLoja]);
 
     // KPIs
-    const estatisticas = useMemo(
-        () => ({
-            torneiosFuturos: inscritos.length,
-            torneiosEmAndamento: andamento.length,
-            torneiosHistorico: historico.length,
-        }),
-        [inscritos, andamento, historico]
-    );
+    const estatisticas = useMemo(() => ({
+        torneiosFuturos: isLoja ? seusTorneios.length : inscritos.length,
+        torneiosEmAndamento: andamento.length,
+        torneiosHistorico: historico.length,
+    }), [isLoja, seusTorneios, inscritos, andamento, historico]);
 
+    // LISTA ATIVA
     const listaAtiva = useMemo(() => {
-        if (aba === "inscritos") return inscritos;
-        if (aba === "andamento") return andamento;
-        return historico;
-    }, [aba, inscritos, andamento, historico]);
+        if (isLoja) {
+            // LOJA: "inscritos" mostra torneios abertos (seus), "andamento" e "historico" normais
+            if (aba === "inscritos") return seusTorneios;
+            if (aba === "andamento") return andamento;
+            return historico;
+        } else {
+            // JOGADOR: "inscritos" mostra torneios inscritos, "andamento" e "historico" normais
+            if (aba === "inscritos") return inscritos;
+            if (aba === "andamento") return andamento;
+            return historico;
+        }
+    }, [aba, isLoja, seusTorneios, inscritos, andamento, historico]);
 
     // Ação: desinscrever (apenas JOGADOR na aba "inscritos")
     const onUnsubscribe = useCallback(async (torneioId: number) => {
         setLoadingAcao((p) => ({ ...p, [torneioId]: true }));
         try {
             await desinscreverDoTorneio(torneioId);
+            // Remove apenas do estado de inscritos (JOGADOR)
             setInscritos((prev) => prev.filter((t) => Number(t.id) !== Number(torneioId)));
         } catch (e: any) {
             console.error("desinscrever(): erro", e?.response?.data || e);
@@ -119,7 +128,7 @@ const HistoricoTorneios: React.FC = () => {
         }
     }, []);
 
-    // Aqui mapeia torneio -> props do CardInfoTorneio
+    // aqui mapeia torneio -> props do CardInfoTorneio
     const mapToCardInfo = (t: any) => {
         const dt = t.data_inicio ? new Date(t.data_inicio) : null;
         return {
@@ -132,8 +141,8 @@ const HistoricoTorneios: React.FC = () => {
                             ? "Aberto"
                             : "Inscrito",
             name: t.nome ?? "Torneio",
-            date: dt ? dt.toLocaleDateString() : "",
-            time: dt ? dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "",
+            date: dt ? dt.toLocaleDateString("pt-BR") : "",
+            time: dt ? dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "",
             location: t.loja_nome ?? "loja",
             price: t.incricao_gratuita
                 ? "Gratuita"
@@ -145,7 +154,7 @@ const HistoricoTorneios: React.FC = () => {
         };
     };
 
-    // Slot de ação que injeta o Button do projeto
+    // aqui um slot de ação que injeta o Button do projeto - APENAS PARA JOGADOR NA ABA INSCRITOS
     const renderActionFor = (t: any) => {
         if (isLoja) return null;
         if (aba !== "inscritos") return null;
@@ -153,15 +162,10 @@ const HistoricoTorneios: React.FC = () => {
         return (
             <Button
                 label={loadingAcao[tid] ? "Desinscrevendo..." : "Desinscrever-se"}
-                onClick={(e: any) => {
-                    e.stopPropagation();
+                onClick={() => {
                     onUnsubscribe(tid);
                 }}
                 disabled={!!loadingAcao[tid]}
-                backgroundColor="var(--var-cor-primaria)"
-                textColor="var(--var-cor-branca)"
-                borderColor="var(--var-cor-rosa)"
-                hoverColor="var(--var-cor-rosa)"
                 className={styles.btnDesinscrever}
             />
         );
@@ -239,7 +243,7 @@ const HistoricoTorneios: React.FC = () => {
 
                     {!carregando && !erro && (
                         listaAtiva.length === 0 ? (
-                            <EmptyState aba={aba} />
+                            <EmptyState aba={aba} isLoja={isLoja} />
                         ) : (
                             <div className={styles.lista}>
                                 {listaAtiva.map((t: any) => (

@@ -19,7 +19,6 @@ import type {
   ITorneioAtualizacao, 
   IListaTorneios,
   IInscricao,
-  IUsuario
 } from '../tipos/tipos';
 import { AxiosError } from "axios";
 import type { AxiosResponse } from "axios";
