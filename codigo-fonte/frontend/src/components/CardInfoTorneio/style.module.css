@@ -45,6 +45,28 @@
   padding-left: 1rem;
 }
 
+.acoes {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btnDanger {
+  background-color: var(--var-cor-erro);
+  color: var(--var-cor-branca);
+}
+
+.btnPrimary {
+  background-color: var(--var-cor-primaria);
+  color: var(--var-cor-branca);
+}
+
+.btnSecondary {
+  background-color: var(--var-cor-secundaria);
+  color: var(--var-cor-branca);
+}
+
 
 
 @media (max-width: 768px) {
