@@ -104,3 +104,55 @@ export interface IInscricao {
   status?: string;
   data_inscricao?: string;
 }
+
+// ===== TIPOS PARA MESA =====
+
+// Jogador em um time
+export interface IJogadorMesa {
+  id: number;
+  id_usuario: number;
+  username: string;
+  email: string;
+  time: number;
+}
+
+// Mesa ativa do jogador (resposta da API)
+export interface IMesaAtiva {
+  id: number;
+  numero_mesa: number;
+  id_torneio: number;
+  nome_torneio: string;
+  numero_rodada: number;
+  status_rodada: string;
+  pontuacao_time_1: number;
+  pontuacao_time_2: number;
+  time_vencedor: number | null; // 0=Empate, 1=Time 1, 2=Time 2, null=Não definido
+  time_1: IJogadorMesa[];
+  time_2: IJogadorMesa[];
+  meu_time?: number; // Adicionado pela view para indicar em qual time o jogador está
+}
+
+// ===== TIPOS PARA RODADA =====
+
+// Rodada de torneio
+export interface IRodada {
+  id: number;
+  numero_rodada: number;
+  id_torneio: number;
+  status: string; // "Aguardando", "Em andamento", "Finalizada"
+  data_inicio?: string | null;
+  data_fim?: string | null;
+}
+
+// Mesa de uma rodada (visão administrativa)
+export interface IMesaRodada {
+  id: number;
+  numero_mesa: number;
+  id_rodada: number;
+  numero_rodada: number;
+  nome_torneio: string;
+  pontuacao_time_1: number;
+  pontuacao_time_2: number;
+  time_vencedor: number | null; // 0=Empate, 1=Time 1, 2=Time 2, null=Não definido
+  jogadores: IJogadorMesa[];
+}

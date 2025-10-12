@@ -222,6 +222,23 @@ class InscricaoViewSet(viewsets.ModelViewSet):
     # Removidas implementações de put e delete pois a validação de rodada ativa
     # já está implementada no serializer InscricaoSerializer
 
+    @action(detail=True, methods=['post'])
+    def desinscrever(self, request, pk=None):
+        """Desinscreve um jogador do torneio (marca inscrição como inativa)"""
+        inscricao = self.get_object()
+        
+        # Verificar se o torneio não está em andamento
+        if inscricao.id_torneio.status.lower() == 'em andamento':
+            return Response(
+                {"detail": "Não é possível desinscrever-se de um torneio em andamento."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        inscricao.ativo = False
+        inscricao.save(update_fields=['ativo'])
+        
+        return Response({"message": "Desinscrição realizada com sucesso"})
+
 
 class RodadaViewSet(viewsets.ModelViewSet):
     """

@@ -1,66 +1,62 @@
-.regras {
-    background-color: var(--var-cor-azul-fundo-section);
-    border: var(--var-borda-section);
-    border-radius: 12px;
-    padding: clamp(16px, 4vw, 24px);
-    color: var(--var-cor-branca);
-    width: 100%;
-    max-width: 320px;
-    margin: 0 auto;
-    box-sizing: border-box;
+.card {
+  background-color: var(--var-cor-azul-fundo-section);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: var(--var-borda-section);
+  max-width: 300px;
+  color: var(--var-cor-branca);
+  font-family: "Poppins", sans-serif;
 }
 
-.titulo {
-    font-size: clamp(1.25rem, 3vw, 1.75rem);
-    font-weight: 600;
-    margin-bottom: clamp(8px, 2vw, 12px);
-    color: var(--var-cor-rosa); /* Changed from var(--var-cor-branca) to var(--var-cor-rosa) */
-    word-wrap: break-word;
+.title {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--var-cor-rosa);
+  margin-bottom: 1.2rem;
 }
 
-.lista {
-    list-style: disc;
-    padding-left: clamp(16px, 4vw, 20px);
-    margin: 0;
-    display: grid;
-    gap: clamp(6px, 1.5vw, 8px);
-    text-align: left; /* Add this line */
+.rulesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 1rem;
 }
 
-.item {
-    font-size: clamp(0.875rem, 2vw, 1rem);
-    color: var(--var-cor-cinza-titulos);
-    text-align: left; /* Add this line */
-    line-height: 1.4;
-    word-wrap: break-word;
+.ruleItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
 }
 
-/* Media Queries for different screen sizes */
+.icon {
+  color: var(--var-cor-rosa);
+  flex-shrink: 0;
+  margin-top: 2px;
+  min-width: 16px;
+  min-height: 16px;
+}
+
 @media (max-width: 768px) {
-    .regras {
-        max-width: 100%;
-        margin: 0 10px;
-    }
-}
+  .card {
+    max-width: 100%;
+    padding: 0.8rem;
+  }
 
-@media (max-width: 480px) {
-    .regras {
-        padding: 12px;
-        margin: 0 5px;
-    }
+  .title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
 
-    .lista {
-        padding-left: 16px;
-    }
-}
+  .rulesContainer {
+    gap: 8px;
+    padding-left: 0.5rem;
+  }
 
-/* Ensure smooth font scaling */
-@media screen and (min-width: 320px) {
-    .titulo {
-        font-size: calc(1.25rem + 0.5vw);
-    }
-
-    .item {
-        font-size: calc(0.875rem + 0.125vw);
-    }
+  .ruleItem {
+    font-size: 13px;
+  }
 }

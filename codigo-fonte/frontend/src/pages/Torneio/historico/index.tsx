@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { FiUser, FiStar, FiCalendar } from "react-icons/fi";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
-import { buscarAgrupadoPorAba /* ou buscarAgrupadoPorAbaAll */ } from "../../../services/torneioServico";
+import Button from "../../../components/Button";
+import {buscarAgrupadoPorAba, buscarAgrupadoPorAbaLoja, desinscreverDoTorneio,} from "../../../services/torneioServico";
+
+import { useSessao } from "../../../contextos/AuthContexto";
 
 type Aba = "inscritos" | "andamento" | "historico";
 
-// Estado vazio contextual
 const EmptyState: React.FC<{ aba: Aba }> = ({ aba }) => {
     const messages = {
         inscritos: "Você não está inscrito em nenhum torneio no momento.",
@@ -17,54 +19,77 @@ const EmptyState: React.FC<{ aba: Aba }> = ({ aba }) => {
     return <div className={styles.vazio}>{messages[aba]}</div>;
 };
 
-const IDS = {
-    inscritos: "painel-inscritos",
-    andamento: "painel-andamento",
-    historico: "painel-historico",
-};
-
 const HistoricoTorneios: React.FC = () => {
+
+    const { usuario } = useSessao?.() ?? ({} as any);
+    const tipoBruto =
+        (usuario?.tipo ?? usuario?.perfil ?? usuario?.role ?? "").toString();
+    const isLoja = tipoBruto.toUpperCase() === "LOJA";
+
+    // Estado de página
     const [aba, setAba] = useState<Aba>("inscritos");
     const [inscritos, setInscritos] = useState<any[]>([]);
     const [andamento, setAndamento] = useState<any[]>([]);
     const [historico, setHistorico] = useState<any[]>([]);
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState<string | null>(null);
+    const [loadingAcao, setLoadingAcao] = useState<Record<number, boolean>>({});
 
-    useEffect(() => {
-        (async () => {
-            setCarregando(true);
-            setErro(null);
-            try {
+    // Carregamento inicial conforme o tipo (JOGADOR ou LOJA)
+    const carregar = useCallback(async () => {
+        setCarregando(true);
+        setErro(null);
+        try {
+            if (isLoja) {
+                const { seus, andamento, historico } = await buscarAgrupadoPorAbaLoja();
+                setInscritos(seus || []);
+                setAndamento(andamento || []);
+                setHistorico(historico || []);
+            } else {
                 const { inscritos, andamento, historico } = await buscarAgrupadoPorAba();
                 setInscritos(inscritos || []);
                 setAndamento(andamento || []);
                 setHistorico(historico || []);
-                setErro(null);
-            } catch (e: any) {
-                console.error("Erro ao buscar torneios:", e);
-                setErro("Não foi possível carregar seus torneios.");
-            } finally {
-                setCarregando(false);
             }
-        })();
-    }, []);
+        } catch (e: any) {
+            setErro("Não foi possível carregar seus torneios.");
+        } finally {
+            setCarregando(false);
+        }
+    }, [isLoja]);
+
+    useEffect(() => {
+        carregar();
+    }, [carregar]);
 
 
+    // Cabeçalho dinâmico
     const tituloPagina = useMemo(() => {
+        if (isLoja) {
+            if (aba === "inscritos") return "Seus Torneios";
+            if (aba === "andamento") return "Torneios em Andamento";
+            return "Histórico";
+        }
         if (aba === "inscritos") return "Torneios Inscritos";
         if (aba === "andamento") return "Torneios em Andamento";
         return "Histórico de Torneios";
-    }, [aba]);
+    }, [aba, isLoja]);
 
     const subtituloPagina = useMemo(() => {
+        if (isLoja) {
+            if (aba === "inscritos") return "Acompanhe seus torneios e crie batalhas épicas!";
+            if (aba === "andamento")
+                return "Acompanhe seus torneios em andamento e as suas batalhas";
+            return "Reviva os momentos épicos dos seus torneios passados";
+        }
         if (aba === "inscritos")
             return "Acompanhe seus torneios inscritos e participe das batalhas épicas";
         if (aba === "andamento")
             return "Acompanhe seus torneios em andamento e as suas batalhas";
         return "Reviva os momentos épicos dos seus torneios passados";
-    }, [aba]);
+    }, [aba, isLoja]);
 
+    // KPIs
     const estatisticas = useMemo(
         () => ({
             torneiosFuturos: inscritos.length,
@@ -80,6 +105,21 @@ const HistoricoTorneios: React.FC = () => {
         return historico;
     }, [aba, inscritos, andamento, historico]);
 
+    // Ação: desinscrever (apenas JOGADOR na aba "inscritos")
+    const onUnsubscribe = useCallback(async (torneioId: number) => {
+        setLoadingAcao((p) => ({ ...p, [torneioId]: true }));
+        try {
+            await desinscreverDoTorneio(torneioId);
+            setInscritos((prev) => prev.filter((t) => Number(t.id) !== Number(torneioId)));
+        } catch (e: any) {
+            console.error("desinscrever(): erro", e?.response?.data || e);
+            setErro("Não foi possível desinscrever-se do torneio.");
+        } finally {
+            setLoadingAcao((p) => ({ ...p, [torneioId]: false }));
+        }
+    }, []);
+
+    // Aqui mapeia torneio -> props do CardInfoTorneio
     const mapToCardInfo = (t: any) => {
         const dt = t.data_inicio ? new Date(t.data_inicio) : null;
         return {
@@ -88,23 +128,44 @@ const HistoricoTorneios: React.FC = () => {
                     ? "Em andamento"
                     : t.status === "Finalizado"
                         ? "Concluído"
-                        : "Inscrito",
+                        : isLoja
+                            ? "Aberto"
+                            : "Inscrito",
             name: t.nome ?? "Torneio",
-            date: dt ? dt.toLocaleDateString("pt-BR") : "",
-            time: dt ? dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "",
-            location: t.loja_nome ?? "",
+            date: dt ? dt.toLocaleDateString() : "",
+            time: dt ? dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "",
+            location: t.loja_nome ?? "loja",
             price: t.incricao_gratuita
                 ? "Gratuita"
                 : t.valor_incricao
                     ? `R$ ${String(t.valor_incricao).replace(".", ",")}`
                     : "—",
-            players: 0,
+            players: Number(t.qnt_inscritos ?? t.inscritos ?? 0),
+            tournamentId: t.id,
         };
     };
 
-    // Se houve erro, mas temos dados carregados (ex.: uma das chamadas falhou),
-    // priorize mostrar os dados e deixe o erro como aviso (poderíamos exibir um toast).
-    const deveMostrarErro = !!erro && (inscritos.length + andamento.length + historico.length === 0);
+    // Slot de ação que injeta o Button do projeto
+    const renderActionFor = (t: any) => {
+        if (isLoja) return null;
+        if (aba !== "inscritos") return null;
+        const tid = Number(t.id);
+        return (
+            <Button
+                label={loadingAcao[tid] ? "Desinscrevendo..." : "Desinscrever-se"}
+                onClick={(e: any) => {
+                    e.stopPropagation();
+                    onUnsubscribe(tid);
+                }}
+                disabled={!!loadingAcao[tid]}
+                backgroundColor="var(--var-cor-primaria)"
+                textColor="var(--var-cor-branca)"
+                borderColor="var(--var-cor-rosa)"
+                hoverColor="var(--var-cor-rosa)"
+                className={styles.btnDesinscrever}
+            />
+        );
+    };
 
     return (
         <div className={styles.container}>
@@ -112,19 +173,18 @@ const HistoricoTorneios: React.FC = () => {
                 <h1 className={styles.titulo}>{tituloPagina}</h1>
                 <p className={styles.subtitulo}>{subtituloPagina}</p>
 
-                <div className={styles.cardsContainer} role="tablist" aria-label="Seleção de categorias de torneio">
+                <div className={styles.cardsContainer} role="tablist">
                     <button
                         type="button"
                         className={styles.kpiBtn}
                         role="tab"
-                        aria-selected={aba === "inscritos"}
-                        aria-controls={IDS.inscritos}
                         onClick={() => setAba("inscritos")}
+                        aria-selected={aba === "inscritos"}
                     >
                         <CardSuperior
                             icon={FiUser}
                             count={estatisticas.torneiosFuturos}
-                            label="Torneios Inscritos"
+                            label={isLoja ? "Seus Torneios" : "Torneios Inscritos"}
                             className={styles.card}
                             selected={aba === "inscritos"}
                         />
@@ -134,9 +194,8 @@ const HistoricoTorneios: React.FC = () => {
                         type="button"
                         className={styles.kpiBtn}
                         role="tab"
-                        aria-selected={aba === "andamento"}
-                        aria-controls={IDS.andamento}
                         onClick={() => setAba("andamento")}
+                        aria-selected={aba === "andamento"}
                     >
                         <CardSuperior
                             icon={FiStar}
@@ -151,9 +210,8 @@ const HistoricoTorneios: React.FC = () => {
                         type="button"
                         className={styles.kpiBtn}
                         role="tab"
-                        aria-selected={aba === "historico"}
-                        aria-controls={IDS.historico}
                         onClick={() => setAba("historico")}
+                        aria-selected={aba === "historico"}
                     >
                         <CardSuperior
                             icon={FiCalendar}
@@ -165,30 +223,31 @@ const HistoricoTorneios: React.FC = () => {
                     </button>
                 </div>
 
-                {/* Lista dinâmica abaixo dos cards */}
-                <section
-                    id={aba === "inscritos" ? IDS.inscritos : aba === "andamento" ? IDS.andamento : IDS.historico}
-                    className={styles.secao}
-                    aria-live="polite"
-                    role="tabpanel"
-                >
+                <section className={styles.secao} aria-live="polite">
                     <h2 className={styles.secaoTitulo}>
-                        {aba === "inscritos" ? "Torneios Inscritos" : aba === "andamento" ? "Em Andamento" : "Histórico"}
+                        {aba === "inscritos"
+                            ? isLoja
+                                ? "Seus Torneios"
+                                : "Torneios Inscritos"
+                            : aba === "andamento"
+                                ? "Em Andamento"
+                                : "Histórico"}
                     </h2>
 
                     {carregando && <div className={styles.vazio}>Carregando…</div>}
+                    {!carregando && erro && <div className={styles.vazio}>{erro}</div>}
 
-                    {!carregando && deveMostrarErro && (
-                        <div className={styles.vazio}>{erro}</div>
-                    )}
-
-                    {!carregando && !deveMostrarErro && (
+                    {!carregando && !erro && (
                         listaAtiva.length === 0 ? (
                             <EmptyState aba={aba} />
                         ) : (
                             <div className={styles.lista}>
                                 {listaAtiva.map((t: any) => (
-                                    <CardInfoTorneio key={t.id} {...mapToCardInfo(t)} />
+                                    <CardInfoTorneio
+                                        key={t.id}
+                                        {...mapToCardInfo(t)}
+                                        action={renderActionFor(t)}
+                                    />
                                 ))}
                             </div>
                         )

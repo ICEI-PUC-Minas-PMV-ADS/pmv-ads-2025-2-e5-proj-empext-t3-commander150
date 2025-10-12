@@ -7,11 +7,11 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 
 ### ETAPA 2  
 
-| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Assertivas |
-|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|------------|
+| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Assertivas Teste Unitário |
+|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|---------------------------|
 | Autenticação  | Realizar Login       | CT-001-S | Credenciais válidas                   | Email válido, senha válida                          | Sucesso         | Cria uma sessão e retorna os dados do usuário |
 | Autenticação  | Realizar Login       | CT-001-I | Credenciais inválidas                 | Email válido, senha inválida                        | Insucesso       | Retorna código e mensagem de erro |
-| Autenticação  | Recuperar senha      | CT-002-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
+| Autenticação  | Recuperar senha      | CT-002-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email | 
 | Autenticação  | Recuperar senha      | CT-002-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Retorna código e mensagem de erro |
 | Permissão     | Controlar Acesso     | CT-003-S | Acesso aos próprios dados             | SessionID atrelado ao dono dos dados                | Sucesso         | Retorna os dados requisitados |
 | Permissão     | Controlar Acesso     | CT-003-I | Acesso a dados que pertencem a outro usuário                    | SessionID não atrelado ao dono dos dados                                  | Insucesso       | Retorna código e mensagem de erro |
@@ -39,10 +39,10 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Pontuação     | Ajustar sistema      | CT-014-I | Ajuste inválido                       | Critérios fora do padrão                            | Insucesso       | Mensagem de erro |
 | Autenticação  | Recuperar senha      | CT-015-S | Recuperação com token válido          | Token válido                                        | Sucesso         | Nova senha enviada para email |
 | Autenticação  | Recuperar senha      | CT-015-I | Recuperação com token inválido        | Token inválido                                      | Insucesso       | Retorna código e mensagem de erro |
-| Autenticação  | Alterar senha        | CT-016-S | Alteração de senha com senha atual válida          | Senha atual válida                     | Sucesso         | Altera a senha |
-| Autenticação  | Alterar senha        | CT-016-I | Alteração de senha com senha atual inválida        | Senha atual inválida                                | Insucesso       | Retorna código e mensagem de erro |
-| Autenticação  | Alterar senha        | CT-017-I | Alteração de senha com nova senha igual a senha atual        | Nova senha igual a senha atual                                | Insucesso       | Retorna código e mensagem de erro |
-| Permissão     | Controlar Acesso     | CT-018-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Retorna os dados requisitados |
+| Autenticação  | Alterar senha        | CT-016-S | Alteração de senha com senha atual válida          | Senha atual válida                     | Sucesso         | Altera a senha | 
+| Autenticação  | Alterar senha        | CT-016-I | Alteração de senha com senha atual inválida        | Senha atual inválida                                | Insucesso       | Retorna código e mensagem de erro | 
+| Autenticação  | Alterar senha        | CT-017-I | Alteração de senha com nova senha igual a senha atual        | Nova senha igual a senha atual                                | Insucesso       | Retorna código e mensagem de erro | 
+| Permissão     | Controlar Acesso     | CT-018-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Retorna os dados requisitados | 
 | Autenticação  | Cadastro             | CT-019-S | Cadastro com email e usuário válidos  | Email e username válidos                            | Sucesso         | Cadastra o usuário no sistema |
 | Autenticação  | Cadastro             | CT-019-I | Cadastro com email e/ou usuário inválidos       | Email e/ou username inválidos                                      | Insucesso       | Retorna código e mensagem de erro |
 | Rodada  | Detalhes rodada      | CT-020-S | Capturar detalhes da rodada        | ID rodada existente                                      | Sucesso       | Retorna detalhes da rodada |
@@ -59,7 +59,33 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Torneio  | Loja edita resultado     | CT-025-I | Eviar ID de rodada inexistente    | ID de rodada inexistente      | Insucesso       | Retorna 404 e mensagem de erro |
 
 ### ETAPA 3
-Criar casos de teste da etapa 3
+| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Teste por Pares |
+|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|----------------------------|
+| Autenticação  | Realizar Login       | CT-001-S | Credenciais válidas                   | Email válido, senha válida                          | Sucesso  | Redireciona o usuário para a tela inicial ou tela requisitada antes da autenticação |
+| Autenticação  | Realizar Login       | CT-001-I | Credenciais inválidas                 | Email válido, senha inválida                        | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Recuperar senha      | CT-002-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
+| Autenticação  | Recuperar senha      | CT-002-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-003-S | Acesso aos próprios dados             | SessionID atrelado ao dono dos dados                | Sucesso         | Usuário tem acesso aos próprios dados da rotina acessada na tela|
+| Permissão     | Controlar Acesso     | CT-003-I | Acesso a dados que pertencem a outro usuário                    | SessionID não atrelado ao dono dos dados    | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Recuperar senha      | CT-004-S | Recuperação com token válido          | Token válido                                        | Sucesso         | Nova senha enviada para email | Nova senha enviada para email |
+| Autenticação  | Recuperar senha      | CT-004-I | Recuperação com token inválido        | Token inválido                                      | Insucesso       | Retorna código e mensagem de erro | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Alterar senha        | CT-005-S | Alteração de senha com senha atual válida          | Senha atual válida                     | Sucesso         | Altera a senha | Usuário consegue alterar a senha |
+| Autenticação  | Alterar senha        | CT-005-I | Alteração de senha com senha atual inválida        | Senha atual inválida                                | Insucesso       |Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Alterar senha        | CT-006-I | Alteração de senha com nova senha igual a senha atual        | Nova senha igual a senha atual                                | Insucesso       |  Alerta de falha aparece na tela com a mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-006-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Acessa aos dados de todos os usuários pela interface administrativa |
+| Autenticação  | Cadastro             | CT-007-S | Cadastro com email e usuário válidos  | Email e username válidos                            | Sucesso         | Cadastra o usuário no sistema
+| Autenticação  | Cadastro             | CT-007-I | Cadastro com email e/ou usuário inválidos       | Email e/ou username inválidos                                      | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Torneio  | Buscar Torneio            | CT-008-S   | Torneio existente             | ID de torneio válido                                   | Sucesso     | Exibe ao abrir a tela Informação do Torneio nome, status, regras e lista de jogadores |
+| Torneio  | Buscar Torneio          | CT-008-I   | Torneio inexistente     | ID de torneio inexistente                              | Insucesso       | Exibe mensagem “Erro ao buscar torneio.” |
+| Torneio  | Editar Regras           | CT-009-S   | Atualização bem-sucedida | Texto válido de regras                                 | Sucesso    | Regras atualizadas e mensagem de sucesso exibida |
+| Torneio  | Editar Regras           | CT-009-I   | Falha ao salvar regras   | Texto de regras + erro 500                             | Insucesso  | Exibe mensagem “Erro ao salvar regras.” E não atualiza as regras salvas. |
+| Torneio  | Listar Jogadores                   | CT-010-S   | Jogadores inscritos   | Lista retornada pela API  | Sucesso         | Exibe nomes dos jogadores inscritos no torneio |
+| Torneio  | Listar Jogadores                   | CT-010-I   | Jogadores inscritos   | Lista retornada pela API  | Insucesso         | Exibe a mensagem  “Nenhum jogador inscrito ainda”|
+| Torneio | Exibir Detalhes da Mesa          | CT-011-S   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Sucesso         | Exibe corretamente número da mesa e jogadores |
+| Torneio | Exibir Detalhes da Mesa          | CT-011-I   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Insucesso         | Exibe a mesnagem "Nenhuma mesa emparelhada para esta rodada." |
+
+
+
 
 ### ETAPA 4
 Criar casos de teste da etapa 4
@@ -981,34 +1007,403 @@ Colocar evidências de teste da etapa 4
 ## Parte 2 - Testes por pares
 A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade deve ser testada por um colega e os testes devem ser evidenciados. O colega "Tester" deve utilizar o caso de teste criado pelo desenvolvedor responsável pela funcionalidade (desenvolveu a funcionalidade e criou o caso de testes descrito no plano de testes) e caso perceba a necessidade de outros casos de teste, deve acrescentá-los na sessão "Plano de Testes".
 
-### ETAPA 2
+### ETAPA 3
 
-### Exemplo
+<!-- Testes Lucas -->
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-001 (Exemplo)<br>Exemplo Autenticação com credenciais válidas</th>
+    <th colspan="6" width="1000">CT-001-S <br>Autenticação com credenciais válidas</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O sistema deve redirecionar o usuário para a página inicial do aplicativo após o Autenticação bem-sucedido.</td>
+    <td colspan="5">O usuário deve conseguir se autenticar na aplicação, sendo redirecionado para a tela inical ou tela requisitada antes da autenticação.</td>
   </tr>
-    <tr>
-      <td><strong>Responsável pela funcionalidade</strong></td>
-    <td width="430">José da Silva </td>
-      <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Maria Oliveira </td>
-     <td width="100"><strong>Data do teste</strong></td>
-    <td width="150">08/05/2024</td>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
   </tr>
-    <tr>
+  <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O sistema está permitindo o Autenticação corretamente.</td>
+    <td colspan="5">O usuário foi autenticado e redirecionado com sucesso.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><video src="https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2024-1-e5-proj-time-sheet/assets/82043220/2e3c1722-7adc-4bd4-8b4c-3abe9ddc1b48"/></td>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-001-I <br>Autenticação com credenciais inválidas</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve conseguir se autenticar na aplicação, recebendo um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-002-S <br>Recuperação de senha com email válido</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve receber um token de validação em seu email.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu seu token de validação por email.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-002-I <br>Recuperação de senha com email inválido</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve receber o token por email, recebendo um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-003-S <br>Acesso aos própios dados</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve conseguir acessar os dados que pertencem a ele, como torneios inscritos, dados históricos, etc.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário conseguiu acessar os seus próprios dados</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/imgng"/></td>
+  </tr>
+   <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-003-I <br>Acesso aos dados de outro usuário</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve ter acesso aos dados de outro usuário, visualizando e gerenciando somente os próprios dados em todas as telas que acessar.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário só visualizou e gerenciou seus próprios dados.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-015-S <br>Recuperação de senha com token válido</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve receber a nova senha em seu email.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu sua nova senha por email.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-015-I <br>Recuperação de senha com token inválido</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve receber a nova senha em seu email, recebendo um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-016-S <br>Alteração de senha com senha atual válida</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve conseguir alterar sua senha.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário conseguiu realizar a alteração da senha.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="imgimg.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-016-I <br>Alteração de senha com senha atual inválida</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve conseguir alterar sua senha, recebendo um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-017-I <br>Alteração de senha com nova senha igual a senha atual</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve conseguir alterar sua senha, recebendo um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-018-S <br>Acesso aos dados de outro usuário sendo administrador do sistema (ADMIN)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve ter acesso aos dados de todos os usuários pela interface administrativa (acessar URL http://localhost:8000/admin/ e logar com o superusuário).</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário acessou com sucesso os dados de outros usuários.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-019-S <br>Cadastro com email e username válidos</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve conseguir se cadastrar na aplicação.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário se cadastrou com sucesso.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-019-I <br>Cadastro com email e username inválidos</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve conseguir se cadastrar na aplicação, recebendo um alerta com uma mensagem de erro </td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Lucas Campos de Abreu </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário recebeu um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
   </tr>
 </table>
 
