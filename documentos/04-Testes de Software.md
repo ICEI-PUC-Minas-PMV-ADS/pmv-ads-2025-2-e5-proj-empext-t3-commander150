@@ -107,7 +107,12 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Torneio | Carregar Dados, Histórico | CT-047-I | Carregamento falha, JOGADOR | JOGADOR logado com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." |
 | Torneio | Navegação Abas, Histórico | CT-048-S | Alternância entre abas LOJA | LOJA logada clica entre abas | Sucesso | Conteúdo da aba é atualizado corretamente |
 | Torneio | Navegação Abas, Histórico | CT-049-S | Alternância entre abas JOGADOR | JOGADOR logado clica entre abas | Sucesso | Conteúdo da aba é atualizado corretamente |
-
+| Torneio | Visualizar torneio e rodadas | CT-050-S | Logado com a loja responsável pelo torneio | Loja logada clica nos detalhes do torneio | Sucesso | Conteúdo do torneio e rodadas é renderizado |
+| Torneio | Visualizar torneio e rodadas | CT-050-I | Logado com a loja não responsável pelo torneio | Loja logada acessa url do torneio | Insucesso | Mensagem torneio não encontrado |
+| Torneio | Confirmar resultado | CT-051-S | Loja confirma resultado | Loja abre modal e confirma resultado | Sucesso | Mensagem de sucesso e altera status da mesa para finalizado |
+| Torneio | Visualizar mesa | CT-052-S | Jogador vizualiza mesa ativa | Jogador clica no torneio | Sucesso | Renderiza mesa ativa do torneio clicado |
+| Torneio | Visualizar mesa | CT-052-I | Jogador vizualiza mesa ativa | Jogador acessa mesa inexistente pela url | Insucesso | Mensagem mesa não encontrada |
+| Torneio | Visualizar mesa | CT-053-S | Jogador confirma resultado | Jogador informa o resultado e confirma | Sucesso | Mensagem sucesso e altera a renderização para visualização |
 
 
 
