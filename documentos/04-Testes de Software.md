@@ -59,8 +59,8 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Torneio  | Loja edita resultado     | CT-025-I | Eviar ID de rodada inexistente    | ID de rodada inexistente      | Insucesso       | Retorna 404 e mensagem de erro |
 
 ### ETAPA 3
-| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Teste por Pares |
-|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|----------------------------|
+| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Assertivas Teste por Pares | Desenvolvedor
+|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|----------------------------|----------------------------|
 | Autenticação  | Realizar Login       | CT-026-S | Credenciais válidas                   | Email válido, senha válida                          | Sucesso  | Redireciona o usuário para a tela inicial ou tela requisitada antes da autenticação |
 | Autenticação  | Realizar Login       | CT-026-I | Credenciais inválidas                 | Email válido, senha inválida                        | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
 | Autenticação  | Recuperar senha      | CT-027-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
