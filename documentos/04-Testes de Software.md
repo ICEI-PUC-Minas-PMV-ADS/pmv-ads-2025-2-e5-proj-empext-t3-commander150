@@ -75,14 +75,14 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Permissão     | Controlar Acesso     | CT-031-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Acessa aos dados de todos os usuários pela interface administrativa | Lucas |
 | Autenticação  | Cadastro             | CT-032-S | Cadastro com email e usuário válidos  | Email e username válidos                            | Sucesso         | Cadastra o usuário no sistema |  Lucas |
 | Autenticação  | Cadastro             | CT-032-I | Cadastro com email e/ou usuário inválidos       | Email e/ou username inválidos                                      | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro | Lucas |
-| Torneio  | Buscar Torneio            | CT-033-S   | Torneio existente             | ID de torneio válido                                   | Sucesso     | Exibe ao abrir a tela Informação do Torneio nome, status, regras e lista de jogadores |
-| Torneio  | Buscar Torneio          | CT-033-I   | Torneio inexistente     | ID de torneio inexistente                              | Insucesso       | Exibe mensagem “Erro ao buscar torneio.” |
-| Torneio  | Editar Regras           | CT-034-S   | Atualização bem-sucedida | Texto válido de regras                                 | Sucesso    | Regras atualizadas e mensagem de sucesso exibida |
-| Torneio  | Editar Regras           | CT-034-I   | Falha ao salvar regras   | Texto de regras + erro 500                             | Insucesso  | Exibe mensagem “Erro ao salvar regras.” E não atualiza as regras salvas. |
-| Torneio  | Listar Jogadores                   | CT-035-S   | Jogadores inscritos   | Lista retornada pela API  | Sucesso         | Exibe nomes dos jogadores inscritos no torneio |
-| Torneio  | Listar Jogadores                   | CT-035-I   | Jogadores inscritos   | Lista retornada pela API  | Insucesso         | Exibe a mensagem  “Nenhum jogador inscrito ainda”|
-| Torneio | Exibir Detalhes da Mesa          | CT-036-S   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Sucesso         | Exibe corretamente número da mesa e jogadores |
-| Torneio | Exibir Detalhes da Mesa          | CT-036-I   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Insucesso         | Exibe a mesnagem "Nenhuma mesa emparelhada para esta rodada." |
+| Torneio  | Buscar Torneio            | CT-033-S   | Torneio existente             | ID de torneio válido                                   | Sucesso     | Exibe ao abrir a tela Informação do Torneio nome, status, regras e lista de jogadores | Gabriela |
+| Torneio  | Buscar Torneio          | CT-033-I   | Torneio inexistente     | ID de torneio inexistente                              | Insucesso       | Exibe mensagem “Erro ao buscar torneio.” | Gabriela |
+| Torneio  | Editar Regras           | CT-034-S   | Atualização bem-sucedida | Texto válido de regras                                 | Sucesso    | Regras atualizadas e mensagem de sucesso exibida | Gabriela |
+| Torneio  | Editar Regras           | CT-034-I   | Falha ao salvar regras   | Texto de regras + erro 500                             | Insucesso  | Exibe mensagem “Erro ao salvar regras.” E não atualiza as regras salvas. | Gabriela |
+| Torneio  | Listar Jogadores                   | CT-035-S   | Jogadores inscritos   | Lista retornada pela API  | Sucesso         | Exibe nomes dos jogadores inscritos no torneio | Gabriela |
+| Torneio  | Listar Jogadores                   | CT-035-I   | Jogadores inscritos   | Lista retornada pela API  | Insucesso         | Exibe a mensagem  “Nenhum jogador inscrito ainda”| Gabriela |
+| Torneio | Exibir Detalhes da Mesa          | CT-036-S   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Sucesso         | Exibe corretamente número da mesa e jogadores | Gabriela |
+| Torneio | Exibir Detalhes da Mesa          | CT-036-I   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Insucesso         | Exibe a mesnagem "Nenhuma mesa emparelhada para esta rodada." | Gabriela |
 | Torneio | Carregar Dados | CT-037-S | Carregamento bem-sucedido, LOJA | LOJA logada com torneios existentes | Sucesso | Exibe lista de torneios organizada por status | Will |  |
 | Torneio | Carregar Dados | CT-037-I | Carregamento falha, LOJA | LOJA logada com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." | Will |  |
 | Torneio | Visualizar Histórico | CT-038-S | LOJA visualiza Seus Torneios com torneios abertos | LOJA logada, com torneios no status "Aberto" | Sucesso | Exibe lista de torneios abertos da loja com status "Aberto" | Will |  |
@@ -1895,6 +1895,174 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <tr>
     <td width="170"><strong>Comentário</strong></td>
     <td colspan="5">O usuário recebeu um alerta com uma mensagem de erro.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-041-S<br>Visualizar torneio e rodadas</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Conteúdo do torneio e as rodadas são renderizadas</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-041-I<br>Loja tenta acessar torneio que não a pertence pela URL</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Renderiza mensagem de erro com torneio não encontrado</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-042-S<br>Loja confirma resultado da mesa</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Mensagem de sucesso e altera status da mesa para finalizado</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-043-S<br>Jogador visualiza sua mesa ativa durante o torneio</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Ao clicar no torneio em andamento é redirecionado para a mesa ativa</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-043-I<br>Jogador tenta acessar outra mesa pela url</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Renderiza mensagem de mesa não encontrada</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-044-S<br>Jogador registra o resultado da sua mesa</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Mensagem de sucesso e altera a tela para Intervalo</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
