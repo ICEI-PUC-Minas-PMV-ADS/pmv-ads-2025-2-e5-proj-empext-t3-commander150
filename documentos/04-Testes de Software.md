@@ -82,20 +82,20 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Torneio  | Listar Jogadores                   | CT-035-S   | Jogadores inscritos   | Lista retornada pela API  | Sucesso         | Exibe nomes dos jogadores inscritos no torneio | Gabriela |
 | Torneio  | Listar Jogadores                   | CT-035-I   | Jogadores inscritos   | Lista retornada pela API  | Insucesso         | Exibe a mensagem  “Nenhum jogador inscrito ainda”| Gabriela |
 | Torneio | Exibir Detalhes da Mesa          | CT-036-S   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Sucesso         | Exibe corretamente número da mesa e jogadores | Gabriela |
-| Torneio | Exibir Detalhes da Mesa          | CT-036-I   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Insucesso         | Exibe a mesnagem "Nenhuma mesa emparelhada para esta rodada." | Gabriela |
-| Torneio | Carregar Dados | CT-037-S | Carregamento bem-sucedido, LOJA | LOJA logada com torneios existentes | Sucesso | Exibe lista de torneios organizada por status | Will |  |
-| Torneio | Carregar Dados | CT-037-I | Carregamento falha, LOJA | LOJA logada com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." | Will |  |
-| Torneio | Visualizar Histórico | CT-038-S | LOJA visualiza Seus Torneios com torneios abertos | LOJA logada, com torneios no status "Aberto" | Sucesso | Exibe lista de torneios abertos da loja com status "Aberto" | Will |  |
-| Torneio | Visualizar Histórico | CT-038-I | LOJA visualiza Seus Torneios sem torneios abertos | LOJA logada, sem torneios no status "Aberto" | Insucesso | Exibe mensagem "Você ainda não tem torneios abertos." | Will |  |
-| Torneio | Visualizar Histórico | CT-039-S | JOGADOR visualiza Torneios Inscritos | JOGADOR logado, inscrito em torneios abertos | Sucesso | Exibe lista de torneios inscritos com status "Inscrito" | Will |  |
-| Torneio | Visualizar Histórico | CT-039-I | JOGADOR visualiza Torneios Inscritos | JOGADOR logado, não inscrito em torneios | Insucesso | Exibe mensagem "Você não está inscrito em nenhum torneio no momento." | Will |  |
-| Torneio | Desinscrever-se de Torneio| CT-040-S | JOGADOR desinscreve-se de torneio com sucesso | JOGADOR logado, acessa Torneios Inscritos, clica "Desinscrever-se" | Sucesso | Remove torneio da lista | Will |  |
-| Torneio | Desinscrever-se de Torneio| CT-040-I | JOGADOR falha ao desinscrever-se | JOGADOR logado, tenta desinscrever com erro de API | Insucesso | Exibe mensagem "Não foi possível desinscrever-se do torneio." | Will |  |
+| Torneio | Exibir Detalhes da Mesa          | CT-036-I   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Insucesso         | Exibe a mensagem "Nenhuma mesa emparelhada para esta rodada." | Gabriela |
+| Torneio | Carregar Dados | CT-037-S | Carregamento bem-sucedido, LOJA | LOJA logada com torneios existentes | Sucesso | Exibe lista de torneios organizada por status | Willams       |  |
+| Torneio | Carregar Dados | CT-037-I | Carregamento falha, LOJA | LOJA logada com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." | Willams       |  |
+| Torneio | Visualizar Histórico | CT-038-S-1 | LOJA visualiza Seus Torneios sem torneios abertos | LOJA logada, sem torneios no status "Aberto" | Sucesso | Exibe mensagem "Você ainda não tem torneios abertos." | Willams |  |
+| Torneio | Visualizar Histórico | CT-038-S-2 | LOJA visualiza Seus Torneios com torneios abertos | LOJA logada, com torneios no status "Aberto" | Sucesso | Exibe lista de torneios abertos da loja com status "Aberto" | Willams |  |
+| Torneio | Visualizar Histórico | CT-039-S | JOGADOR visualiza Torneios Inscritos | JOGADOR logado, inscrito em torneios abertos | Sucesso | Exibe lista de torneios inscritos com status "Inscrito" | Willams |  |
+| Torneio | Visualizar Histórico | CT-039-I | JOGADOR não visualiza Torneios Inscritos | JOGADOR logado, não inscrito em torneios | Insucesso | Exibe mensagem "Você não está inscrito em nenhum torneio no momento." | Willams |  |
+| Torneio | Desinscrever-se de Torneio| CT-040-S | JOGADOR desinscreve-se de torneio com sucesso | JOGADOR logado, acessa Torneios Inscritos, clica "Desinscrever-se" | Sucesso | Remove torneio da lista | Willams |  |
+| Torneio | Desinscrever-se de Torneio| CT-040-I | JOGADOR falha ao desinscrever-se | JOGADOR logado, tenta desinscrever com erro de API | Insucesso | Exibe mensagem "Não foi possível desinscrever-se do torneio." | Willams |  |
 | Torneio | Visualizar torneio e rodadas | CT-041-S | Logado com a loja responsável pelo torneio | Loja logada clica nos detalhes do torneio | Sucesso | Conteúdo do torneio e rodadas é renderizado | Guilherme
 | Torneio | Visualizar torneio e rodadas | CT-041-I | Logado com a loja não responsável pelo torneio | Loja logada acessa url do torneio | Insucesso | Mensagem torneio não encontrado | Guilherme
 | Torneio | Confirmar resultado | CT-042-S | Loja confirma resultado | Loja abre modal e confirma resultado | Sucesso | Mensagem de sucesso e altera status da mesa para finalizado | Guilherme
-| Torneio | Visualizar mesa | CT-043-S | Jogador vizualiza mesa ativa | Jogador clica no torneio | Sucesso | Renderiza mesa ativa do torneio clicado | Guilherme
-| Torneio | Visualizar mesa | CT-043-I | Jogador vizualiza mesa ativa | Jogador acessa mesa inexistente pela url | Insucesso | Mensagem mesa não encontrada | Guilherme
+| Torneio | Visualizar mesa | CT-043-S | Jogador visualiza mesa ativa | Jogador clica no torneio | Sucesso | Renderiza mesa ativa do torneio clicado | Guilherme
+| Torneio | Visualizar mesa | CT-043-I | Jogador visualiza mesa ativa | Jogador acessa mesa inexistente pela url | Insucesso | Mensagem mesa não encontrada | Guilherme
 | Torneio | Visualizar mesa | CT-044-S | Jogador confirma resultado | Jogador informa o resultado e confirma | Sucesso | Mensagem sucesso e altera a renderização para visualização | Guilherme
 | Loja          | Gerenciar torneios   | CT-045-S | Criação válida de torneio             | Dados válidos                                       | Sucesso         | Torneio criado | Rafael
 | Loja          | Gerenciar torneios   | CT-045-I | Criação inválida de torneio           | Nome vazio                                          | Insucesso       | Sistema rejeita criação | Rafael
@@ -1903,6 +1903,235 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><br><img src="img/img.png"/></td>
   </tr>
 </table>
+
+<!--Testes Will-->
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-037-S<br>Carregamento de dados (de Torneios)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Uma lista de torneios criados pelo usuário LOJA é exibida</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">DD/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Carregamento bem-sucedido para o usuário LOJA.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-037-I<br>Carregamento de dados (de Torneios) não é completado</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Uma mensagem é exibida para o usuário LOJA: "Não foi possível carregar os seus torneios."</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">DD/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Mensagem de não possibilidade de carregamento de dados quando há um erro de API / de carregamento de dados.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-038-S-1<br>Visualizar histórico vazio de Torneios (abertos)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário LOJA tem uma mensagem exibida: "Você ainda não tem torneios abertos."</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">DD/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário LOJA sem torneios abertos vê apenas a mensagem que ainda não tem torneios abertos em 'Seus Torneios'</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-038-S-2<br>Visualizar histórico de Torneios (abertos)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5"> Uma lista de torneios criados pela LOJA com status "Aberto" é listada</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">DD/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O usuário LOJA visualizou os torneios abertos em Seus Torneios</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-039-S<br>Visualizar histórico de Torneios (inscritos)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5"> O usuário JOGADOR, logado com sucesso, visualiza uma lista de torneios em que está inscrito</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">DD/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">JOGADOR visualizou os torneios nos quais está inscrito</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-039-I<br>JOGADOR tenta visualizar Torneios (não inscritos)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário JOGADOR, logado com sucesso, tenta visualizar os torneios inscritos, mas não se inscreveu efetivamente em um torneio aberto e recebe a mensagem "Você não está inscrito em nenhum torneio no momento."</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">DD/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O JOGADOR não estava inscrito em torneios abertos, nenhuma lista de torneios foi exibida.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-040-S<br>JOGADOR desinscreve-se de um torneio (inscrito)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário JOGADOR, logado com sucesso, inscrito em um torneio (aberto) desinscreve-se de um torneio ao clicar no botão "Desincrever-se" e o torneio sai da lista de torneios inscritos.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">DD/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O torneio saiu da lista de torneios inscritos do JOGADOR</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-040-I<br>JOGADOR tenta desinscreve-se de um torneio (inscrito)</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O JOGADOR recebe a mensagem "Não foi possível desinscrever-se do torneio."</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Willams Andrade Lima</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">DD/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+
+<!--Testes Guilherme-->
 
 <table>
   <tr>
