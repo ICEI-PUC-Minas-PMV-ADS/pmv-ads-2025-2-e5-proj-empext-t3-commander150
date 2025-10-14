@@ -59,42 +59,44 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Torneio  | Loja edita resultado     | CT-025-I | Eviar ID de rodada inexistente    | ID de rodada inexistente      | Insucesso       | Retorna 404 e mensagem de erro |
 
 ### ETAPA 3
-| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Assertivas Teste por Pares | Desenvolvedor
-|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|----------------------------|----------------------------|
+| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Assertivas Teste por Pares | Desenvolvedor | Testador | 
+|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|----------------------------|----------------------------|----------------------------|
 | Autenticação  | Realizar Login       | CT-026-S | Credenciais válidas                   | Email válido, senha válida                          | Sucesso  | Redireciona o usuário para a tela inicial ou tela requisitada antes da autenticação |
-| Autenticação  | Realizar Login       | CT-027-I | Credenciais inválidas                 | Email válido, senha inválida                        | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Autenticação  | Recuperar senha      | CT-028-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
-| Autenticação  | Recuperar senha      | CT-029-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Permissão     | Controlar Acesso     | CT-030-S | Acesso aos próprios dados             | SessionID atrelado ao dono dos dados                | Sucesso         | Usuário tem acesso aos próprios dados da rotina acessada na tela |
-| Permissão     | Controlar Acesso     | CT-031-I | Acesso a dados que pertencem a outro usuário | SessionID não atrelado ao dono dos dados    | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Autenticação  | Recuperar senha      | CT-032-S | Recuperação com token válido          | Token válido                                        | Sucesso         | Nova senha enviada para email |
-| Autenticação  | Recuperar senha      | CT-033-I | Recuperação com token inválido        | Token inválido                                      | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Autenticação  | Alterar senha        | CT-034-S | Alteração de senha com senha atual válida | Senha atual válida                     | Sucesso         | Usuário consegue alterar a senha |
-| Autenticação  | Alterar senha        | CT-035-I | Alteração de senha com senha atual inválida | Senha atual inválida                                | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Autenticação  | Alterar senha        | CT-036-I | Alteração de senha com nova senha igual à senha atual | Nova senha igual à senha atual        | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Permissão     | Controlar Acesso     | CT-037-S | Acesso a dados que pertencem a outro usuário sendo Admin | ID de usuário com tipo ADMIN           | Sucesso         | Acessa aos dados de todos os usuários pela interface administrativa |
-| Autenticação  | Cadastro             | CT-038-S | Cadastro com email e usuário válidos  | Email e username válidos                            | Sucesso         | Cadastra o usuário no sistema |
-| Autenticação  | Cadastro             | CT-039-I | Cadastro com email e/ou usuário inválidos | Email e/ou username inválidos                       | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Torneio       | Buscar Torneio       | CT-040-S | Torneio existente                     | ID de torneio válido                                | Sucesso         | Exibe ao abrir a tela Informação do Torneio: nome, status, regras e lista de jogadores |
-| Torneio       | Buscar Torneio       | CT-041-I | Torneio inexistente                   | ID de torneio inexistente                           | Insucesso       | Exibe mensagem “Erro ao buscar torneio.” |
-| Torneio       | Editar Regras        | CT-042-S | Atualização bem-sucedida              | Texto válido de regras                              | Sucesso         | Regras atualizadas e mensagem de sucesso exibida |
-| Torneio       | Editar Regras        | CT-043-I | Falha ao salvar regras                | Texto de regras + erro 500                          | Insucesso       | Exibe mensagem “Erro ao salvar regras.” E não atualiza as regras salvas. |
-| Torneio       | Listar Jogadores     | CT-044-S | Jogadores inscritos                   | Lista retornada pela API                            | Sucesso         | Exibe nomes dos jogadores inscritos no torneio |
-| Torneio       | Listar Jogadores     | CT-045-I | Jogadores não inscritos               | Lista vazia retornada pela API                      | Insucesso       | Exibe a mensagem “Nenhum jogador inscrito ainda” |
-| Torneio       | Exibir Detalhes da Mesa | CT-046-S | Mesas com jogadores válidos          | Dados de emparelhamento retornados da API            | Sucesso         | Exibe corretamente número da mesa e jogadores |
-| Torneio       | Exibir Detalhes da Mesa | CT-047-I | Sem mesas emparelhadas               | Dados de emparelhamento vazios da API               | Insucesso       | Exibe a mensagem "Nenhuma mesa emparelhada para esta rodada." |
-| Torneio       | Visualizar Histórico | CT-048-S | LOJA visualiza aba "Seus Torneios" com torneios abertos | LOJA logada, com torneios no status "Aberto" | Sucesso | Exibe lista de torneios abertos da loja com status "Aberto" | Will |
-| Torneio       | Visualizar Histórico | CT-049-I | LOJA visualiza aba "Seus Torneios" sem torneios abertos | LOJA logada, sem torneios no status "Aberto" | Insucesso | Exibe mensagem "Você ainda não tem torneios abertos." | Will |
-| Torneio       | Visualizar Histórico | CT-050-S | JOGADOR visualiza aba "Torneios Inscritos" com torneios | JOGADOR logado, inscrito em torneios abertos | Sucesso | Exibe lista de torneios inscritos com status "Inscrito" | Will |
-| Torneio       | Visualizar Histórico | CT-051-I | JOGADOR visualiza aba "Torneios Inscritos" sem torneios | JOGADOR logado, não inscrito em torneios | Insucesso | Exibe mensagem "Você não está inscrito em nenhum torneio no momento." | Will |
-| Torneio       | Desinscrever-se de Torneio | CT-052-S | JOGADOR desinscreve-se de torneio com sucesso | JOGADOR logado, na aba "Torneios Inscritos", clica "Desinscrever-se" | Sucesso | Remove torneio da lista | Will |
-| Torneio       | Desinscrever-se de Torneio | CT-053-I | JOGADOR falha ao desinscrever-se | JOGADOR logado, tenta desinscrever com erro de API | Insucesso | Exibe mensagem "Não foi possível desinscrever-se do torneio." | Will |
-| Torneio       | Carregar Dados, Histórico | CT-054-S | Carregamento bem-sucedido, LOJA | LOJA logada com torneios existentes | Sucesso | Exibe lista de torneios organizada por status |
-| Torneio       | Carregar Dados, Histórico | CT-055-I | Carregamento falha, LOJA | LOJA logada com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." |
-| Torneio       | Carregar Dados, Histórico | CT-056-S | Carregamento bem-sucedido, JOGADOR | JOGADOR logado com torneios existentes | Sucesso | Exibe lista de torneios organizada por status |
-| Torneio       | Carregar Dados, Histórico | CT-057-I | Carregamento falha, JOGADOR | JOGADOR logado com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." |
-| Torneio       | Navegação Abas, Histórico | CT-058-S | Alternância entre abas LOJA | LOJA logada clica entre abas | Sucesso | Conteúdo da aba é atualizado corretamente |
-| Torneio       | Navegação Abas, Histórico | CT-059-S | Alternância entre abas JOGADOR | JOGADOR logado clica entre abas | Sucesso | Conteúdo da aba é atualizado corretamente |
+| Autenticação  | Realizar Login       | CT-026-I | Credenciais inválidas                 | Email válido, senha inválida                        | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Recuperar senha      | CT-027-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
+| Autenticação  | Recuperar senha      | CT-027-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-028-S | Acesso aos próprios dados             | SessionID atrelado ao dono dos dados                | Sucesso         | Usuário tem acesso aos próprios dados da rotina acessada na tela|
+| Permissão     | Controlar Acesso     | CT-028-I | Acesso a dados que pertencem a outro usuário                    | SessionID não atrelado ao dono dos dados    | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Recuperar senha      | CT-029-S | Recuperação com token válido          | Token válido                                        | Sucesso         | Nova senha enviada para email |
+| Autenticação  | Recuperar senha      | CT-029-I | Recuperação com token inválido        | Token inválido                                      | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Alterar senha        | CT-030-S | Alteração de senha com senha atual válida          | Senha atual válida                     | Sucesso         | Usuário consegue alterar a senha |
+| Autenticação  | Alterar senha        | CT-030-I | Alteração de senha com senha atual inválida        | Senha atual inválida                                | Insucesso       |Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Alterar senha        | CT-031-I | Alteração de senha com nova senha igual a senha atual        | Nova senha igual a senha atual                                | Insucesso       |  Alerta de falha aparece na tela com a mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-031-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Acessa aos dados de todos os usuários pela interface administrativa |
+| Autenticação  | Cadastro             | CT-032-S | Cadastro com email e usuário válidos  | Email e username válidos                            | Sucesso         | Cadastra o usuário no sistema |
+| Autenticação  | Cadastro             | CT-032-I | Cadastro com email e/ou usuário inválidos       | Email e/ou username inválidos                                      | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Torneio  | Buscar Torneio            | CT-033-S   | Torneio existente             | ID de torneio válido                                   | Sucesso     | Exibe ao abrir a tela Informação do Torneio nome, status, regras e lista de jogadores |
+| Torneio  | Buscar Torneio          | CT-033-I   | Torneio inexistente     | ID de torneio inexistente                              | Insucesso       | Exibe mensagem “Erro ao buscar torneio.” |
+| Torneio  | Editar Regras           | CT-034-S   | Atualização bem-sucedida | Texto válido de regras                                 | Sucesso    | Regras atualizadas e mensagem de sucesso exibida |
+| Torneio  | Editar Regras           | CT-034-I   | Falha ao salvar regras   | Texto de regras + erro 500                             | Insucesso  | Exibe mensagem “Erro ao salvar regras.” E não atualiza as regras salvas. |
+| Torneio  | Listar Jogadores                   | CT-035-S   | Jogadores inscritos   | Lista retornada pela API  | Sucesso         | Exibe nomes dos jogadores inscritos no torneio |
+| Torneio  | Listar Jogadores                   | CT-035-I   | Jogadores inscritos   | Lista retornada pela API  | Insucesso         | Exibe a mensagem  “Nenhum jogador inscrito ainda”|
+| Torneio | Exibir Detalhes da Mesa          | CT-036-S   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Sucesso         | Exibe corretamente número da mesa e jogadores |
+| Torneio | Exibir Detalhes da Mesa          | CT-036-I   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Insucesso         | Exibe a mesnagem "Nenhuma mesa emparelhada para esta rodada." |
+| Torneio | Carregar Dados | CT-037-S | Carregamento bem-sucedido, LOJA | LOJA logada com torneios existentes | Sucesso | Exibe lista de torneios organizada por status | Will |  |
+| Torneio | Carregar Dados | CT-037-I | Carregamento falha, LOJA | LOJA logada com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." | Will |  |
+| Torneio | Visualizar Histórico | CT-038-S | LOJA visualiza Seus Torneios com torneios abertos | LOJA logada, com torneios no status "Aberto" | Sucesso | Exibe lista de torneios abertos da loja com status "Aberto" | Will |  |
+| Torneio | Visualizar Histórico | CT-038-I | LOJA visualiza Seus Torneios sem torneios abertos | LOJA logada, sem torneios no status "Aberto" | Insucesso | Exibe mensagem "Você ainda não tem torneios abertos." | Will |  |
+| Torneio | Visualizar Histórico | CT-039-S | JOGADOR visualiza Torneios Inscritos | JOGADOR logado, inscrito em torneios abertos | Sucesso | Exibe lista de torneios inscritos com status "Inscrito" | Will |  |
+| Torneio | Visualizar Histórico | CT-039-I | JOGADOR visualiza Torneios Inscritos | JOGADOR logado, não inscrito em torneios | Insucesso | Exibe mensagem "Você não está inscrito em nenhum torneio no momento." | Will |  |
+| Torneio | Desinscrever-se de Torneio| CT-040-S | JOGADOR desinscreve-se de torneio com sucesso | JOGADOR logado, acessa Torneios Inscritos, clica "Desinscrever-se" | Sucesso | Remove torneio da lista | Will |  |
+| Torneio | Desinscrever-se de Torneio| CT-040-I | JOGADOR falha ao desinscrever-se | JOGADOR logado, tenta desinscrever com erro de API | Insucesso | Exibe mensagem "Não foi possível desinscrever-se do torneio." | Will |  |
+| Torneio | Visualizar torneio e rodadas | CT-041-S | Logado com a loja responsável pelo torneio | Loja logada clica nos detalhes do torneio | Sucesso | Conteúdo do torneio e rodadas é renderizado |
+| Torneio | Visualizar torneio e rodadas | CT-041-I | Logado com a loja não responsável pelo torneio | Loja logada acessa url do torneio | Insucesso | Mensagem torneio não encontrado |
+| Torneio | Confirmar resultado | CT-042-S | Loja confirma resultado | Loja abre modal e confirma resultado | Sucesso | Mensagem de sucesso e altera status da mesa para finalizado |
+| Torneio | Visualizar mesa | CT-043-S | Jogador vizualiza mesa ativa | Jogador clica no torneio | Sucesso | Renderiza mesa ativa do torneio clicado |
+| Torneio | Visualizar mesa | CT-043-I | Jogador vizualiza mesa ativa | Jogador acessa mesa inexistente pela url | Insucesso | Mensagem mesa não encontrada |
+| Torneio | Visualizar mesa | CT-044-S | Jogador confirma resultado | Jogador informa o resultado e confirma | Sucesso | Mensagem sucesso e altera a renderização para visualização |
 
 
 
