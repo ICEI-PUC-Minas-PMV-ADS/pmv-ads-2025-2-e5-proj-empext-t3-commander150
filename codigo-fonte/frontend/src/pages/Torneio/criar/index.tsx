@@ -20,6 +20,7 @@ const CriarTorneio: React.FC = () => {
   const [nomeTorneio, setNomeTorneio] = useState("");
   const [dataHoraTorneio, setDataHoraTorneio] = useState("");
   const [bannerSelecionado, setBannerSelecionado] = useState("b1.png");
+  const [bannerBase64, setBannerBase64] = useState<string>("");
   const [descricao, setDescricao] = useState("");
   const [regrasTorneio, setRegrasTorneio] = useState(`• Formato Commander padrão (100 cartas)
 • Time limit: 50 minutos por partida
@@ -54,6 +55,36 @@ const CriarTorneio: React.FC = () => {
     "b3.png": b3
   };
 
+  // Função para converter imagem para base64
+  const converterImagemParaBase64 = async (imagemUrl: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const base64 = canvas.toDataURL('image/png');
+          resolve(base64);
+        } else {
+          reject(new Error('Não foi possível obter contexto do canvas'));
+        }
+      };
+      img.onerror = () => reject(new Error('Erro ao carregar imagem'));
+      img.src = imagemUrl;
+    });
+  };
+
+  // Função para converter base64 para File
+  const base64ParaFile = async (base64: string, nomeArquivo: string): Promise<File> => {
+    const response = await fetch(base64);
+    const blob = await response.blob();
+    return new File([blob], nomeArquivo, { type: 'image/png' });
+  };
+
   // Função para formatar valor monetário
   const formatarValor = (valor: string) => {
     // Remove caracteres não numéricos
@@ -67,7 +98,7 @@ const CriarTorneio: React.FC = () => {
   };
 
   // Função para mapear dados do formulário para o formato da API
-  const mapearDadosParaAPI = (): ITorneioCriacao => {
+  const mapearDadosParaAPI = async (): Promise<ITorneioCriacao> => {
     // Converter data/hora para ISO string
     const dataHoraInicio = dataHoraTorneio 
       ? new Date(dataHoraTorneio).toISOString()
@@ -78,12 +109,25 @@ const CriarTorneio: React.FC = () => {
       ? parseFloat(valorInscricao.replace(/[^\d,]/g, '').replace(',', '.')) || 0
       : 0;
 
+    // Converter imagem selecionada para File
+    let bannerFile: File | undefined = undefined;
+    if (bannerSelecionado && imagensBanner[bannerSelecionado as keyof typeof imagensBanner]) {
+      try {
+        const imagemUrl = imagensBanner[bannerSelecionado as keyof typeof imagensBanner];
+        const base64 = await converterImagemParaBase64(imagemUrl);
+        setBannerBase64(base64); // Salvar base64 para uso posterior
+        bannerFile = await base64ParaFile(base64, bannerSelecionado);
+      } catch (error) {
+        console.error('Erro ao converter imagem:', error);
+      }
+    }
+
     return {
       nome: nomeTorneio,
       descricao: descricao || undefined,
       status: "Aberto", // Status padrão para novos torneios
       regras: regrasTorneio,
-      banner: undefined, // Não enviar arquivo, apenas o nome da imagem selecionada
+      banner: bannerFile,
       vagas_limitadas: vagasLimitadas === "limitadas",
       qnt_vagas: vagasLimitadas === "limitadas" ? parseInt(capacidadeMaxima) || undefined : undefined,
       incricao_gratuita: modalidadeInscricao === "gratuito",
@@ -117,7 +161,7 @@ const CriarTorneio: React.FC = () => {
 
     try {
       // Mapear dados para o formato da API
-      const dadosTorneio = mapearDadosParaAPI();
+      const dadosTorneio = await mapearDadosParaAPI();
       
       // Chamar a API
       const torneioCriado = await criarTorneio(dadosTorneio);
@@ -133,6 +177,7 @@ const CriarTorneio: React.FC = () => {
         setNomeTorneio("");
         setDataHoraTorneio("");
         setBannerSelecionado("b1.png");
+        setBannerBase64("");
         setDescricao("");
         setRegrasTorneio(`• Formato Commander padrão (100 cartas)
 • Time limit: 50 minutos por partida

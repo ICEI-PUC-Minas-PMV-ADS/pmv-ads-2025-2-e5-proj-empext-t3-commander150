@@ -27,11 +27,11 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         # Campos necessários para o cadastro.
-        fields = ['email', 'username', 'tipo', 'password']
-
+        fields = ['id', 'email', 'username', 'tipo', 'password']
         # 'password' como 'write_only' significa que NUNCA será retornado em uma resposta da API (leitura).
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            'id': {'read_only': True}
         }
 
     def create(self, validated_data):
@@ -49,7 +49,6 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
 
 class RequisitarTrocaSenhaSerializer(serializers.Serializer):
     email = serializers.EmailField()
-
     def validate_email(self, value):
         if not Usuario.objects.filter(email=value).exists():
             raise serializers.ValidationError("Usuário com este email não foi encontrado.")

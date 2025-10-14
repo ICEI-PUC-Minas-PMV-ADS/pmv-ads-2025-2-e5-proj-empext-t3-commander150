@@ -87,6 +87,30 @@
   align-items: center;
 }
 
+.btnInscrever {
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--var-cor-primaria);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnInscrever:hover {
+  background: var(--var-cor-rosa);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btnInscrever:active {
+  transform: translateY(0);
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
   .card {

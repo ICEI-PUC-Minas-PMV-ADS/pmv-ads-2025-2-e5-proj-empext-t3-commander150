@@ -20,6 +20,7 @@ interface CardTorneioProps {
   loja?: string; // nome da loja
   status?: string; // status do torneio
   usuario?: any; // dados do usuário logado
+  onInscreverJogador?: () => void; // callback para inscrever jogador (apenas para lojas)
 }
 
 const CardTorneio = ({ 
@@ -31,12 +32,18 @@ const CardTorneio = ({
   tags = [], 
   loja, 
   status, 
-  usuario 
+  usuario,
+  onInscreverJogador
 }: CardTorneioProps) => {
   const navigate = useNavigate();
 
   // Função para lidar com o clique no card
   const handleClick = () => {
+    // Se for loja, não navega ao clicar no card
+    if (usuario?.tipo === 'LOJA') {
+      return;
+    }
+    
     if (usuario) {
       // Se usuário está logado, vai direto para inscrição
       navigate(`/inscricao-torneio/${id}`);
@@ -45,6 +52,14 @@ const CardTorneio = ({
       // Salvar o ID do torneio no localStorage para redirecionar após login
       localStorage.setItem('redirectAfterLogin', `/inscricao-torneio/${id}`);
       navigate('/login/');
+    }
+  };
+
+  // Função para lidar com o botão de inscrever jogador
+  const handleInscreverJogador = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita que o clique no botão dispare o handleClick do card
+    if (onInscreverJogador) {
+      onInscreverJogador();
     }
   };
 
@@ -76,6 +91,16 @@ const CardTorneio = ({
             </div>
           ))}
         </div>
+
+        {/* Botão de inscrever jogador (apenas para lojas) */}
+        {usuario?.tipo === 'LOJA' && onInscreverJogador && (
+          <button 
+            className={styles.btnInscrever}
+            onClick={handleInscreverJogador}
+          >
+            + Inscrever Jogador
+          </button>
+        )}
       </div>
     </div>
   );

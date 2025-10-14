@@ -18,6 +18,18 @@ class TorneioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Torneio
         fields = '__all__'
+    
+    def validate_data_inicio(self, value):
+        """
+        Valida se a data de início do torneio não é no passado.
+        Torneios só podem ser criados para datas futuras.
+        """
+        agora = timezone.now()
+        if value and value < agora:
+            raise serializers.ValidationError(
+                "A data de início do torneio não pode ser no passado. Torneios devem ser criados apenas para datas futuras."
+            )
+        return value
 
 
 class InscricaoSerializer(serializers.ModelSerializer):
@@ -87,11 +99,11 @@ class InscricaoCreateSerializer(serializers.ModelSerializer):
         ).exists():
             raise serializers.ValidationError("Você já está inscrito neste torneio.")
         
-        # Bloqueia inscrição se a data de início for posterior ao momento atual
+        # Bloqueia inscrição se a data de início do torneio já passou
         agora = timezone.now()
-        if value.data_inicio and value.data_inicio > agora:
+        if value.data_inicio and value.data_inicio < agora:
             raise serializers.ValidationError(
-                "Não é possível se inscrever: a data de início do torneio ainda não chegou."
+                "Não é possível se inscrever: a data de início do torneio já passou."
             )
         
         # Verifica limite de vagas quando aplicável
@@ -162,12 +174,18 @@ class InscricaoLojaSerializer(serializers.ModelSerializer):
                 )
         
         # Validações adicionais para criação de novas inscrições
-        if not self.instance and torneio:
-            # Bloqueia inscrição se a data de início for posterior ao momento atual
-            agora = timezone.now()
-            if torneio.data_inicio and torneio.data_inicio > agora:
+        if not self.instance and torneio and usuario:
+            # Verifica se o usuário já está inscrito
+            if Inscricao.objects.filter(id_usuario=usuario, id_torneio=torneio).exists():
                 raise serializers.ValidationError(
-                    "Não é possível inscrever jogadores: a data de início do torneio ainda não chegou."
+                    f"O jogador {usuario.username} já está inscrito neste torneio."
+                )
+            
+            # Bloqueia inscrição se a data de início do torneio já passou
+            agora = timezone.now()
+            if torneio.data_inicio and torneio.data_inicio < agora:
+                raise serializers.ValidationError(
+                    "Não é possível inscrever jogadores: a data de início do torneio já passou."
                 )
             
             # Verifica limite de vagas quando aplicável
