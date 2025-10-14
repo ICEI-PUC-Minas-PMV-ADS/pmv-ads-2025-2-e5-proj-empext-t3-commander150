@@ -19,7 +19,6 @@ export default function Navbar() {
   const navItems = [
     { label: "Criar evento", url: "/criar-evento", icon: "➕" },
     { label: "Meus eventos", url: "/historico", icon: "📅" },
-    { label: "Meus ingressos", url: "/meus-ingressos", icon: "🎫" },
   ];
 
   // Fechar menus ao clicar fora

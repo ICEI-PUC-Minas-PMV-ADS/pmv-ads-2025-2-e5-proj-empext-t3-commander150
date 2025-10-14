@@ -9,6 +9,7 @@ import b3 from "./assets/b3.png";
 
 // Importa o CardTorneio já pronto
 import CardTorneio from "./components/CardTorneio";
+import ModalInscricaoJogador from "./components/ModalInscricaoJogador";
 
 // Importa ícones do react-icons
 import { FaUsers } from "react-icons/fa";
@@ -31,6 +32,10 @@ function App() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
+  // Estados para o modal de inscrição de jogador
+  const [modalAberto, setModalAberto] = useState(false);
+  const [torneioSelecionado, setTorneioSelecionado] = useState<{ id: number; nome: string } | null>(null);
+
   // Função para formatar data
   const formatarData = (data: string) => {
     return new Date(data).toLocaleDateString('pt-BR', {
@@ -48,13 +53,24 @@ function App() {
     });
   };
 
+  // Mapeamento de banners do backend para imagens locais
+  const imagensBanner: { [key: string]: string } = {
+    "b1.png": b1,
+    "b2.png": b2,
+    "b3.png": b3
+  };
+
   // Função para obter imagem do banner
   const obterImagemBanner = (banner: string | null) => {
     if (banner) {
-      // Se há banner da API, usar ele
+      
+      const nomeArquivo = banner.split('/').pop() || '';
+            if (imagensBanner[nomeArquivo]) {
+        return imagensBanner[nomeArquivo];
+      }
+      
       return banner;
     }
-    // Senão, usar imagens padrão baseadas no ID
     const imagens = [b1, b2, b3];
     return imagens[Math.floor(Math.random() * imagens.length)];
   };
@@ -76,6 +92,32 @@ function App() {
     }
 
     return tags;
+  };
+
+  // Função para abrir modal de inscrição de jogador
+  const handleAbrirModalInscricao = (torneioId: number, torneioNome: string) => {
+    setTorneioSelecionado({ id: torneioId, nome: torneioNome });
+    setModalAberto(true);
+  };
+
+  // Função para fechar modal
+  const handleFecharModal = () => {
+    setModalAberto(false);
+    setTorneioSelecionado(null);
+  };
+
+  // Função para recarregar torneios após inscrição bem-sucedida
+  const handleSucessoInscricao = async () => {
+    try {
+      const resposta = await buscarTorneios(1, 20);
+      if (resposta && Array.isArray(resposta)) {
+        setTorneios(resposta);
+      } else if (resposta && resposta.results && Array.isArray(resposta.results)) {
+        setTorneios(resposta.results);
+      }
+    } catch (error) {
+      console.error("Erro ao recarregar torneios:", error);
+    }
   };
 
   // Buscar torneios quando o componente carregar
@@ -137,7 +179,9 @@ function App() {
 
       {/* LISTAGEM DE TORNEIOS */}
       <section className={estilos.listaTorneios}>
-        <h2 className={estilos.tituloSecao}>Torneios disponíveis</h2>
+        <h2 className={estilos.tituloSecao}>
+          {usuario?.tipo === 'LOJA' ? 'Meus torneios' : 'Torneios disponíveis'}
+        </h2>
         
         {carregando ? (
           <div style={{ textAlign: 'center', padding: '2rem' }}>
@@ -166,11 +210,26 @@ function App() {
                 loja={torneio.loja_nome}
                 status={torneio.status}
                 usuario={usuario}
+                onInscreverJogador={
+                  usuario?.tipo === 'LOJA' 
+                    ? () => handleAbrirModalInscricao(torneio.id, torneio.nome)
+                    : undefined
+                }
               />
             ))}
           </div>
         )}
       </section>
+
+      {/* Modal de inscrição de jogador */}
+      {modalAberto && torneioSelecionado && (
+        <ModalInscricaoJogador
+          torneioId={torneioSelecionado.id}
+          torneioNome={torneioSelecionado.nome}
+          onClose={handleFecharModal}
+          onSuccess={handleSucessoInscricao}
+        />
+      )}
     </div>
   );
 }

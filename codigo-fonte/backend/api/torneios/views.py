@@ -224,20 +224,44 @@ class InscricaoViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def desinscrever(self, request, pk=None):
-        """Desinscreve um jogador do torneio (marca inscrição como inativa)"""
+        """
+        Desinscreve um jogador do torneio usando soft delete.
+        Altera o status para 'Cancelado' mantendo histórico e pontuação.
+        """
         inscricao = self.get_object()
         
-        # Verificar se o torneio não está em andamento
-        if inscricao.id_torneio.status.lower() == 'em andamento':
+        # Verificar se a inscrição já está cancelada
+        if inscricao.status == 'Cancelado':
             return Response(
-                {"detail": "Não é possível desinscrever-se de um torneio em andamento."},
+                {"detail": "Esta inscrição já foi cancelada."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
-        inscricao.ativo = False
-        inscricao.save(update_fields=['ativo'])
+                    
+        # Bloqueia desinscrição apenas de torneios finalizados
+        if inscricao.id_torneio.status == 'Finalizado':
+            return Response(
+                {"detail": "Não é possível desinscrever-se de um torneio finalizado."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
-        return Response({"message": "Desinscrição realizada com sucesso"})
+        # Verifica se há rodada ativa (não bloqueia, apenas avisa)
+        rodada_ativa = Rodada.objects.filter(
+            id_torneio=inscricao.id_torneio,
+            status='Em Andamento'
+        ).exists()
+        
+        # Soft delete: marca como cancelado
+        inscricao.status = 'Cancelado'
+        inscricao.save(update_fields=['status'])
+        
+        message = "Desinscrição realizada com sucesso."
+        if rodada_ativa:
+            message += " Sua pontuação até o momento foi mantida no histórico do torneio."
+        
+        return Response({
+            "message": message,
+            "inscricao": InscricaoSerializer(inscricao).data
+        }, status=status.HTTP_200_OK)
 
 
 class RodadaViewSet(viewsets.ModelViewSet):
