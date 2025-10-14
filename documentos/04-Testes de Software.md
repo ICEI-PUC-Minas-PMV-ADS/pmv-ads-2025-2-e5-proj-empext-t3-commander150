@@ -1032,7 +1032,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
 </table>
 
 ### ETAPA 3
-Colocar evidências de teste da etapa 3
+Evidências apresentadas na tabela ETAPA 3 da Parte 2 - Testes por pares
 
 ### ETAPA 4
 Colocar evidências de teste da etapa 4
@@ -2300,9 +2300,6 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><br><img src="img/img.png"/></td>
   </tr>
 </table>
-
-### ETAPA 3
-Colocar evidências de teste da etapa 3
 
 ### ETAPA 4
 Colocar evidências de teste da etapa 4
