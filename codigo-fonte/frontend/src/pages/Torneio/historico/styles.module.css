@@ -10,7 +10,7 @@ section{
 
 .conteudo {
     background-color: var(--var-cor-secundaria);
-    max-width: 900px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 40px 20px;
 }
@@ -76,7 +76,6 @@ section{
 }
 
 .secaoTitulo {
-    font-size: 18px;
     font-weight: 600;
     color: var(--var-cor-branca);
     margin: 0;
@@ -84,7 +83,9 @@ section{
 
 .lista {
     display: grid;
-    gap: 12px;
+    grid-template-columns: repeat(3, calc(33.333% - 14px));
+    gap: 20px;
+    justify-content: space-between;
 }
 
 /* Para o Estado Vazio */
@@ -112,6 +113,14 @@ section{
 }
 
 /* Para responsividade */
+@media (max-width: 1200px) {
+    .lista {
+        grid-template-columns: repeat(2, calc(50% - 10px));
+        gap: 20px;
+        justify-content: space-between;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -144,5 +153,11 @@ section{
     .card {
         width: 280px;
         max-width: 90vw;
+    }
+
+    .lista {
+        grid-template-columns: 100%;
+        gap: 20px;
+        justify-content: center;
     }
 }

@@ -3,7 +3,7 @@
   padding: 1rem;
   border-radius: 0.75rem;
   border: var(--var-borda-section);
-  max-width: 300px;
+  max-width: 100%;
   color: var(--var-cor-branca);
   font-family: "Poppins", sans-serif;
   transition: all 0.2s ease-in-out;
