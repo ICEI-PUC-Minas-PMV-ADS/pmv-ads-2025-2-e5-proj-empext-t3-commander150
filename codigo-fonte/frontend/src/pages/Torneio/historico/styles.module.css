@@ -88,6 +88,13 @@ section{
     justify-content: space-between;
 }
 
+/* Botões de ação */
+.btnDesinscrever,
+.btnInscrever {
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
 /* Para o Estado Vazio */
 .vazio {
     display: grid;

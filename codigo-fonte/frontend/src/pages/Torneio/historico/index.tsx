@@ -4,6 +4,7 @@ import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
 import Button from "../../../components/Button";
+import ModalInscricaoJogador from "../../../components/ModalInscricaoJogador";
 import {buscarAgrupadoPorAba, buscarAgrupadoPorAbaLoja, desinscreverDoTorneio,} from "../../../services/torneioServico";
 
 import { useSessao } from "../../../contextos/AuthContexto";
@@ -34,6 +35,10 @@ const HistoricoTorneios: React.FC = () => {
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState<string | null>(null);
     const [loadingAcao, setLoadingAcao] = useState<Record<number, boolean>>({});
+
+    // Estados para o modal de inscrição de jogador
+    const [modalAberto, setModalAberto] = useState(false);
+    const [torneioSelecionado, setTorneioSelecionado] = useState<{ id: number; nome: string } | null>(null);
 
     // Carregamento inicial conforme o tipo (JOGADOR ou LOJA)
     const carregar = useCallback(async () => {
@@ -119,6 +124,23 @@ const HistoricoTorneios: React.FC = () => {
         }
     }, []);
 
+    // Função para abrir modal de inscrição de jogador
+    const handleAbrirModalInscricao = (torneioId: number, torneioNome: string) => {
+        setTorneioSelecionado({ id: torneioId, nome: torneioNome });
+        setModalAberto(true);
+    };
+
+    // Função para fechar modal
+    const handleFecharModal = () => {
+        setModalAberto(false);
+        setTorneioSelecionado(null);
+    };
+
+    // Função para recarregar torneios após inscrição bem-sucedida
+    const handleSucessoInscricao = () => {
+        carregar();
+    };
+
     // Aqui mapeia torneio -> props do CardInfoTorneio
     const mapToCardInfo = (t: any) => {
         const dt = t.data_inicio ? new Date(t.data_inicio) : null;
@@ -147,9 +169,29 @@ const HistoricoTorneios: React.FC = () => {
 
     // Slot de ação que injeta o Button do projeto
     const renderActionFor = (t: any) => {
-        if (isLoja) return null;
         if (aba !== "inscritos") return null;
+        
         const tid = Number(t.id);
+        
+        // Se for LOJA, mostrar botão de inscrever jogador
+        if (isLoja) {
+            return (
+                <Button
+                    label="+ Inscrever Jogador"
+                    onClick={(e: any) => {
+                        e.stopPropagation();
+                        handleAbrirModalInscricao(tid, t.nome);
+                    }}
+                    backgroundColor="var(--var-cor-primaria)"
+                    textColor="var(--var-cor-branca)"
+                    borderColor="var(--var-cor-rosa)"
+                    hoverColor="var(--var-cor-rosa)"
+                    className={styles.btnInscrever}
+                />
+            );
+        }
+        
+        // Se for JOGADOR, mostrar botão de desinscrever
         return (
             <Button
                 label={loadingAcao[tid] ? "Desinscrevendo..." : "Desinscrever-se"}
@@ -254,6 +296,16 @@ const HistoricoTorneios: React.FC = () => {
                     )}
                 </section>
             </div>
+
+            {/* Modal de inscrição de jogador */}
+            {modalAberto && torneioSelecionado && (
+                <ModalInscricaoJogador
+                    torneioId={torneioSelecionado.id}
+                    torneioNome={torneioSelecionado.nome}
+                    onClose={handleFecharModal}
+                    onSuccess={handleSucessoInscricao}
+                />
+            )}
         </div>
     );
 };
