@@ -97,7 +97,12 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Torneio | Visualizar mesa | CT-043-S | Jogador vizualiza mesa ativa | Jogador clica no torneio | Sucesso | Renderiza mesa ativa do torneio clicado |
 | Torneio | Visualizar mesa | CT-043-I | Jogador vizualiza mesa ativa | Jogador acessa mesa inexistente pela url | Insucesso | Mensagem mesa não encontrada |
 | Torneio | Visualizar mesa | CT-044-S | Jogador confirma resultado | Jogador informa o resultado e confirma | Sucesso | Mensagem sucesso e altera a renderização para visualização |
-
+| Loja          | Gerenciar torneios   | CT-045-S | Criação válida de torneio             | Dados válidos                                       | Sucesso         | Torneio criado | Rafael
+| Loja          | Gerenciar torneios   | CT-045-I | Criação inválida de torneio           | Nome vazio                                          | Insucesso       | Sistema rejeita criação | Rafael
+| Torneio       | Inscrição            | CT-046-S | Jogador se inscreve                   | Dados válidos, torneio aberto                       | Sucesso         | Jogador inscrito | Rafael
+| Torneio       | Inscrição            | CT-046-I | Inscrição fora do prazo               | Jogador válido, torneio encerrado                   | Insucesso       | Mensagem Mensagem de erro | Rafael
+| Loja          | Inscrição jogador    | CT-048-S | Inscrição pela loja                   | Jogador válido, torneio aberto                      | Sucesso         | Jogador inscrito pela loja | Rafael
+| Loja          | Inscrição jogador | CT-048-I | Inscrição fora do prazo             | Jogador válido, torneio encerrado                   | Insucesso       | Mensagem de erro | Rafael
 
 
 ### ETAPA 4
