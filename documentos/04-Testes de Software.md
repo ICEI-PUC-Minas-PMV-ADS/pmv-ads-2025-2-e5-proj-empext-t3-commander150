@@ -59,31 +59,42 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Torneio  | Loja edita resultado     | CT-025-I | Eviar ID de rodada inexistente    | ID de rodada inexistente      | Insucesso       | Retorna 404 e mensagem de erro |
 
 ### ETAPA 3
-| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Teste por Pares |
-|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|----------------------------|
-| Autenticação  | Realizar Login       | CT-001-S | Credenciais válidas                   | Email válido, senha válida                          | Sucesso  | Redireciona o usuário para a tela inicial ou tela requisitada antes da autenticação |
-| Autenticação  | Realizar Login       | CT-001-I | Credenciais inválidas                 | Email válido, senha inválida                        | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Autenticação  | Recuperar senha      | CT-002-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
-| Autenticação  | Recuperar senha      | CT-002-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Permissão     | Controlar Acesso     | CT-003-S | Acesso aos próprios dados             | SessionID atrelado ao dono dos dados                | Sucesso         | Usuário tem acesso aos próprios dados da rotina acessada na tela|
-| Permissão     | Controlar Acesso     | CT-003-I | Acesso a dados que pertencem a outro usuário                    | SessionID não atrelado ao dono dos dados    | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Autenticação  | Recuperar senha      | CT-004-S | Recuperação com token válido          | Token válido                                        | Sucesso         | Nova senha enviada para email | Nova senha enviada para email |
-| Autenticação  | Recuperar senha      | CT-004-I | Recuperação com token inválido        | Token inválido                                      | Insucesso       | Retorna código e mensagem de erro | Alerta de falha aparece na tela com a mensagem de erro |
-| Autenticação  | Alterar senha        | CT-005-S | Alteração de senha com senha atual válida          | Senha atual válida                     | Sucesso         | Altera a senha | Usuário consegue alterar a senha |
-| Autenticação  | Alterar senha        | CT-005-I | Alteração de senha com senha atual inválida        | Senha atual inválida                                | Insucesso       |Alerta de falha aparece na tela com a mensagem de erro |
-| Autenticação  | Alterar senha        | CT-006-I | Alteração de senha com nova senha igual a senha atual        | Nova senha igual a senha atual                                | Insucesso       |  Alerta de falha aparece na tela com a mensagem de erro |
-| Permissão     | Controlar Acesso     | CT-006-S | Acesso a dados que pertencem a outro usuário sendo Admin             | ID de usuário com tipo ADMIN           | Sucesso         | Acessa aos dados de todos os usuários pela interface administrativa |
-| Autenticação  | Cadastro             | CT-007-S | Cadastro com email e usuário válidos  | Email e username válidos                            | Sucesso         | Cadastra o usuário no sistema
-| Autenticação  | Cadastro             | CT-007-I | Cadastro com email e/ou usuário inválidos       | Email e/ou username inválidos                                      | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
-| Torneio  | Buscar Torneio            | CT-008-S   | Torneio existente             | ID de torneio válido                                   | Sucesso     | Exibe ao abrir a tela Informação do Torneio nome, status, regras e lista de jogadores |
-| Torneio  | Buscar Torneio          | CT-008-I   | Torneio inexistente     | ID de torneio inexistente                              | Insucesso       | Exibe mensagem “Erro ao buscar torneio.” |
-| Torneio  | Editar Regras           | CT-009-S   | Atualização bem-sucedida | Texto válido de regras                                 | Sucesso    | Regras atualizadas e mensagem de sucesso exibida |
-| Torneio  | Editar Regras           | CT-009-I   | Falha ao salvar regras   | Texto de regras + erro 500                             | Insucesso  | Exibe mensagem “Erro ao salvar regras.” E não atualiza as regras salvas. |
-| Torneio  | Listar Jogadores                   | CT-010-S   | Jogadores inscritos   | Lista retornada pela API  | Sucesso         | Exibe nomes dos jogadores inscritos no torneio |
-| Torneio  | Listar Jogadores                   | CT-010-I   | Jogadores inscritos   | Lista retornada pela API  | Insucesso         | Exibe a mensagem  “Nenhum jogador inscrito ainda”|
-| Torneio | Exibir Detalhes da Mesa          | CT-011-S   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Sucesso         | Exibe corretamente número da mesa e jogadores |
-| Torneio | Exibir Detalhes da Mesa          | CT-011-I   | Mesas com jogadores válidos                    | Dados de emparelhamento retornados da API             | Insucesso         | Exibe a mesnagem "Nenhuma mesa emparelhada para esta rodada." |
-
+| Módulo        | Operação             | ID       | Cenário                               | Entrada                                             | Status Esperado | Assertivas Teste por Pares | Desenvolvedor
+|---------------|----------------------|----------|---------------------------------------|-----------------------------------------------------|-----------------|----------------------------|----------------------------|
+| Autenticação  | Realizar Login       | CT-026-S | Credenciais válidas                   | Email válido, senha válida                          | Sucesso  | Redireciona o usuário para a tela inicial ou tela requisitada antes da autenticação |
+| Autenticação  | Realizar Login       | CT-027-I | Credenciais inválidas                 | Email válido, senha inválida                        | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Recuperar senha      | CT-028-S | Recuperação com email válido          | Email cadastrado                                    | Sucesso         | Token enviado para email |
+| Autenticação  | Recuperar senha      | CT-029-I | Recuperação com email inválido        | Email não cadastrado                                | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-030-S | Acesso aos próprios dados             | SessionID atrelado ao dono dos dados                | Sucesso         | Usuário tem acesso aos próprios dados da rotina acessada na tela |
+| Permissão     | Controlar Acesso     | CT-031-I | Acesso a dados que pertencem a outro usuário | SessionID não atrelado ao dono dos dados    | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Recuperar senha      | CT-032-S | Recuperação com token válido          | Token válido                                        | Sucesso         | Nova senha enviada para email |
+| Autenticação  | Recuperar senha      | CT-033-I | Recuperação com token inválido        | Token inválido                                      | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Alterar senha        | CT-034-S | Alteração de senha com senha atual válida | Senha atual válida                     | Sucesso         | Usuário consegue alterar a senha |
+| Autenticação  | Alterar senha        | CT-035-I | Alteração de senha com senha atual inválida | Senha atual inválida                                | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Autenticação  | Alterar senha        | CT-036-I | Alteração de senha com nova senha igual à senha atual | Nova senha igual à senha atual        | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Permissão     | Controlar Acesso     | CT-037-S | Acesso a dados que pertencem a outro usuário sendo Admin | ID de usuário com tipo ADMIN           | Sucesso         | Acessa aos dados de todos os usuários pela interface administrativa |
+| Autenticação  | Cadastro             | CT-038-S | Cadastro com email e usuário válidos  | Email e username válidos                            | Sucesso         | Cadastra o usuário no sistema |
+| Autenticação  | Cadastro             | CT-039-I | Cadastro com email e/ou usuário inválidos | Email e/ou username inválidos                       | Insucesso       | Alerta de falha aparece na tela com a mensagem de erro |
+| Torneio       | Buscar Torneio       | CT-040-S | Torneio existente                     | ID de torneio válido                                | Sucesso         | Exibe ao abrir a tela Informação do Torneio: nome, status, regras e lista de jogadores |
+| Torneio       | Buscar Torneio       | CT-041-I | Torneio inexistente                   | ID de torneio inexistente                           | Insucesso       | Exibe mensagem “Erro ao buscar torneio.” |
+| Torneio       | Editar Regras        | CT-042-S | Atualização bem-sucedida              | Texto válido de regras                              | Sucesso         | Regras atualizadas e mensagem de sucesso exibida |
+| Torneio       | Editar Regras        | CT-043-I | Falha ao salvar regras                | Texto de regras + erro 500                          | Insucesso       | Exibe mensagem “Erro ao salvar regras.” E não atualiza as regras salvas. |
+| Torneio       | Listar Jogadores     | CT-044-S | Jogadores inscritos                   | Lista retornada pela API                            | Sucesso         | Exibe nomes dos jogadores inscritos no torneio |
+| Torneio       | Listar Jogadores     | CT-045-I | Jogadores não inscritos               | Lista vazia retornada pela API                      | Insucesso       | Exibe a mensagem “Nenhum jogador inscrito ainda” |
+| Torneio       | Exibir Detalhes da Mesa | CT-046-S | Mesas com jogadores válidos          | Dados de emparelhamento retornados da API            | Sucesso         | Exibe corretamente número da mesa e jogadores |
+| Torneio       | Exibir Detalhes da Mesa | CT-047-I | Sem mesas emparelhadas               | Dados de emparelhamento vazios da API               | Insucesso       | Exibe a mensagem "Nenhuma mesa emparelhada para esta rodada." |
+| Torneio       | Visualizar Histórico | CT-048-S | LOJA visualiza aba "Seus Torneios" com torneios abertos | LOJA logada, com torneios no status "Aberto" | Sucesso | Exibe lista de torneios abertos da loja com status "Aberto" | Will |
+| Torneio       | Visualizar Histórico | CT-049-I | LOJA visualiza aba "Seus Torneios" sem torneios abertos | LOJA logada, sem torneios no status "Aberto" | Insucesso | Exibe mensagem "Você ainda não tem torneios abertos." | Will |
+| Torneio       | Visualizar Histórico | CT-050-S | JOGADOR visualiza aba "Torneios Inscritos" com torneios | JOGADOR logado, inscrito em torneios abertos | Sucesso | Exibe lista de torneios inscritos com status "Inscrito" | Will |
+| Torneio       | Visualizar Histórico | CT-051-I | JOGADOR visualiza aba "Torneios Inscritos" sem torneios | JOGADOR logado, não inscrito em torneios | Insucesso | Exibe mensagem "Você não está inscrito em nenhum torneio no momento." | Will |
+| Torneio       | Desinscrever-se de Torneio | CT-052-S | JOGADOR desinscreve-se de torneio com sucesso | JOGADOR logado, na aba "Torneios Inscritos", clica "Desinscrever-se" | Sucesso | Remove torneio da lista | Will |
+| Torneio       | Desinscrever-se de Torneio | CT-053-I | JOGADOR falha ao desinscrever-se | JOGADOR logado, tenta desinscrever com erro de API | Insucesso | Exibe mensagem "Não foi possível desinscrever-se do torneio." | Will |
+| Torneio       | Carregar Dados, Histórico | CT-054-S | Carregamento bem-sucedido, LOJA | LOJA logada com torneios existentes | Sucesso | Exibe lista de torneios organizada por status |
+| Torneio       | Carregar Dados, Histórico | CT-055-I | Carregamento falha, LOJA | LOJA logada com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." |
+| Torneio       | Carregar Dados, Histórico | CT-056-S | Carregamento bem-sucedido, JOGADOR | JOGADOR logado com torneios existentes | Sucesso | Exibe lista de torneios organizada por status |
+| Torneio       | Carregar Dados, Histórico | CT-057-I | Carregamento falha, JOGADOR | JOGADOR logado com erro de API | Insucesso | Exibe mensagem "Não foi possível carregar seus torneios." |
+| Torneio       | Navegação Abas, Histórico | CT-058-S | Alternância entre abas LOJA | LOJA logada clica entre abas | Sucesso | Conteúdo da aba é atualizado corretamente |
+| Torneio       | Navegação Abas, Histórico | CT-059-S | Alternância entre abas JOGADOR | JOGADOR logado clica entre abas | Sucesso | Conteúdo da aba é atualizado corretamente |
 
 
 
@@ -384,6 +395,22 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
     <td colspan="6" align="center"><br><img src="img/CT-003-I_2.png"/></td>
   </tr>
 </table>
+
+
+
+
+
+<table> <tr> <th colspan="6" width="1000">CT-004-S <br>Inscrição em torneio</th> </tr> <tr> <td width="170"><strong>Critérios de êxito</strong></td> <td colspan="5">Jogador deve ser inscrito com sucesso quando o torneio estiver aberto e os dados forem válidos.</td> </tr> <tr> <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td> <td width="430">Rafael Costa Souza</td> <td width="100"><strong>Data do Teste</strong></td> <td width="150">12/10/2025</td> </tr> <tr> <td width="170"><strong>Comentário</strong></td> <td colspan="5">A inscrição foi concluída com sucesso. O sistema retornou status 200 e o jogador foi incluído na lista de inscritos do torneio.</td> </tr> <tr> <td colspan="6" align="center"><strong>Evidência</strong></td> </tr> <tr> <td colspan="6" align="center"><br><img src="img/CT-004-S.png"/></td> </tr> </table>
+
+<table> <tr> <th colspan="6" width="1000">CT-004-I <br>Inscrição fora do prazo</th> </tr> <tr> <td width="170"><strong>Critérios de êxito</strong></td> <td colspan="5">Jogadores não devem conseguir se inscrever em torneios encerrados.</td> </tr> <tr> <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td> <td width="430">Rafael Costa Souza</td> <td width="100"><strong>Data do Teste</strong></td> <td width="150">12/10/2025</td> </tr> <tr> <td width="170"><strong>Comentário</strong></td> <td colspan="5">O sistema retorna código 400 e mensagem de erro “Não é possível se inscrever: a data de início do torneio já passou.” com código 400.</td> </tr> <tr> <td colspan="6" align="center"><strong>Evidência</strong></td> </tr> <tr> <td colspan="6" align="center"><br><img src="img/CT-004-I.png"/></td> </tr> </table>
+
+<table> <tr> <th colspan="6" width="1000">CT-005-S <br>Desinscrição de torneio</th> </tr> <tr> <td width="170"><strong>Critérios de êxito</strong></td> <td colspan="5">Jogador deve conseguir se desinscrever de torneios entre turnos, desde que já esteja inscrito.</td> </tr> <tr> <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td> <td width="430">Rafael Costa Souza</td> <td width="100"><strong>Data do Teste</strong></td> <td width="150">12/10/2025</td> </tr> <tr> <td width="170"><strong>Comentário</strong></td> <td colspan="5">A desinscrição foi realizada com sucesso e o jogador foi removido da lista de participantes.</td> </tr> <tr> <td colspan="6" align="center"><strong>Evidência</strong></td> </tr> <tr> <td colspan="6" align="center"><br><img src="img/CT-005-S.png"/></td> </tr> </table>
+
+<table> <tr> <th colspan="6" width="1000">CT-005-I <br>Desinscrição fora do prazo</th> </tr> <tr> <td width="170"><strong>Critérios de êxito</strong></td> <td colspan="5">Jogadores não devem conseguir se desinscrever de torneios com rodada em andamento.</td> </tr> <tr> <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td> <td width="430">Rafael Costa Souza</td> <td width="100"><strong>Data do Teste</strong></td> <td width="150">12/10/2025</td> </tr> <tr> <td width="170"><strong>Comentário</strong></td> <td colspan="5">O sistema retorna código 400 e mensagem de erro ao tentar remover o jogador durante uma rodada ativa.</td> </tr> <tr> <td colspan="6" align="center"><strong>Evidência</strong></td> </tr> <tr> <td colspan="6" align="center"><br><img src="img/CT-005-I.png"/></td> </tr> </table>
+
+<table> <tr> <th colspan="6" width="1000">CT-006-S <br>Inscrição pela loja</th> </tr> <tr> <td width="170"><strong>Critérios de êxito</strong></td> <td colspan="5">A loja deve conseguir inscrever jogadores em torneios abertos com dados válidos.</td> </tr> <tr> <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td> <td width="430">Rafael Costa Souza</td> <td width="100"><strong>Data do Teste</strong></td> <td width="150">12/10/2025</td> <td width="150">18/09/2025</td> </tr> <tr> <td width="170"><strong>Comentário</strong></td> <td colspan="5">A inscrição via loja foi bem-sucedida e o jogador foi registrado corretamente no torneio.</td> </tr> <tr> <td colspan="6" align="center"><strong>Evidência</strong></td> </tr> <tr> <td colspan="6" align="center"><br><img src="img/CT-006-S.png"/></td> </tr> </table>
+
+<table> <tr> <th colspan="6" width="1000">CT-006-I <br>Desinscrição após término do torneio</th> </tr> <tr> <td width="170"><strong>Critérios de êxito</strong></td> <td colspan="5">Não deve ser possível desinscrever jogadores após o término do torneio.</td> </tr> <tr> <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td> <td width="430">Rafael Costa Souza</td> <td width="100"><strong>Data do Teste</strong></td> <td width="150">12/10/2025</td> </tr> <tr> <td width="170"><strong>Comentário</strong></td> <td colspan="5">O sistema retorna código 400 e mensagem de erro ao tentar realizar a desinscrição após o término do torneio.</td> </tr> <tr> <td colspan="6" align="center"><strong>Evidência</strong></td> </tr> <tr> <td colspan="6" align="center"><br><img src="img/CT-006-I.png"/></td> </tr> </table>
 
 <table>
   <tr>
@@ -1183,6 +1210,469 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><br><img src="img/img.png"/></td>
   </tr>
 </table>
+
+
+<!-- Testes Gabriela -->
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-033-S <br> Buscar Torneio existente</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve abrir a tela Informação do Torneio que deve exibir nome do torneio, status, regras e lista de jogadores.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A tela foi exibida com as informações corretas do torneio especifico.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-033-I <br> Buscar Torneio inexistente</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário  não deve conseguir abrir a tela Informação do Torneio, pois o id do torneio informado é inexistente.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A tela não foi exibida, pois o id do torneio estava incorreto.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-034-S <br>Editar Regras do Torneio</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve editar as regras do torneio, e essa atualização deve ser salva.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">As regras foram alteradas com as informações editadas.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-034-I <br> Editar Regras do Torneio </th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve tentar editar as regras do torneio, mas essa atualização não deve ser salva, por erro 500 ou 400, exibe mensagem “Erro ao salvar regras.”.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">As regras não foram atualizadas.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-035-S <br>Exibe Jogadores inscritos</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve visualizar a lista de jogadores inscritos na tela de Informações do Torneio.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A lista de jogadores foi exibida na tela.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-035-I <br>Não exibe jogadores inscritos</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve visualizar a lista de jogadores inscritos na tela de Informações do Torneio, deve exibir a mensagem  “Nenhum jogador inscrito ainda”.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A lista de jogadores não foi exibida na tela.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-036-S <br>Exibir Detalhes da Mesa </th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário deve visualizar o número da mesa e jogadores na tela de Embaralhamento do Torneio.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O número da mesa e os jogadores foi exibido na tela.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-036-I <br>Não Exibir Detalhes da Mesa </th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O usuário não deve conseguir visualizar o número da mesa e jogadores na tela de Embaralhamento do Torneio.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">O número da mesa e os jogadores não foi exibido na tela, foi exibida a mensagem "Nenhuma mesa emparelhada para esta rodada.".</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+
+
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-004-S <br>Jogador se inscreve</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O jogador deve conseguir se inscrever no torneio, desde que os dados sejam válidos e o torneio esteja aberto.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Rafael Costa Souza</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui...</td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">12/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Jogador deve receber um alerta de sucesso e ser inscrito no torneio.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-004-I <br>Inscrição fora do prazo</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O jogador não deve conseguir se inscrever caso o torneio esteja encerrado ou em andamento.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Rafael Costa Souza</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui...</td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">12/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Jogador deve receber um alerta de erro e ser impossibilitado de se inscrever no torneio.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-005-S <br>Jogador se desinscreve</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O jogador deve conseguir se desinscrever do torneio, desde que já esteja inscrito e o torneio não esteja finalizado ou cancelado.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Rafael Costa Souza</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui...</td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">12/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Jogador deve receber um alerta de sucesso e ser removido do torneio.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-005-I <br>Desinscrição fora do prazo</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O jogador não deve conseguir se desinscrever se o torneio estiver finalizado ou cancelado.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Rafael Costa Souza</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui...</td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">12/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Jogador deve receber um alerta de erro e não ser capaz de se desinscrever do torneio.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-006-S <br>Inscrição pela loja</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">A loja deve conseguir inscrever o jogador em um torneio aberto ou em andamento, desde que os dados sejam válidos.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Rafael Costa Souza</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui...</td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">12/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Loja deve receber um alerta de sucesso com os dados do novo jogador inscrito no torneio.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-006-I <br>Desinscrição após término</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">A loja não deve conseguir desinscrever o jogador após o término ou cancelamento do torneio.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Rafael Costa Souza</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui...</td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Loja deve receber um alerta de erro impossibilitando a desinscrição do jogador.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-011-S <br>Criação válida de torneio</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">A loja deve conseguir criar um torneio quando todos os dados informados forem válidos.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Rafael Costa Souza</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui...</td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">A loja recebe um alerta informando que o torneio foi criado com sucesso.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-011-I <br>Criação inválida de torneio</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">O sistema não deve permitir a criação de um torneio quando o nome estiver vazio.</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Rafael Costa Souza</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui...</td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+  <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Loja deve receber um alerta informando que o campo nome é obrigatório e deve ser preenchido para criação do torneio.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+
+
+
+
+
+
 
 <table>
   <tr>
