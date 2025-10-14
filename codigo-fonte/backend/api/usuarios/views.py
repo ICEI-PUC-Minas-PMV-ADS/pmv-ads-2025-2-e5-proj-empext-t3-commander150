@@ -88,8 +88,6 @@ class ValidarSessaoView(APIView):
       retorna uma resposta de sucesso sem conteúdo (status 204), evitando
       que um erro seja enviado e mal interpretado, como um 403.
     """
-    print('cheguei na view')
-
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(
