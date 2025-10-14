@@ -1904,6 +1904,174 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
   </tr>
 </table>
 
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-041-S<br>Visualizar torneio e rodadas</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Conteúdo do torneio e as rodadas são renderizadas</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-041-I<br>Loja tenta acessar torneio que não a pertence pela URL</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Renderiza mensagem de erro com torneio não encontrado</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-042-S<br>Loja confirma resultado da mesa</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Mensagem de sucesso e altera status da mesa para finalizado</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-043-S<br>Jogador visualiza sua mesa ativa durante o torneio</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Ao clicar no torneio em andamento é redirecionado para a mesa ativa</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-043-I<br>Jogador tenta acessar outra mesa pela url</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Renderiza mensagem de mesa não encontrada</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th colspan="6" width="1000">CT-044-S<br>Jogador registra o resultado da sua mesa</th>
+  </tr>
+  <tr>
+    <td width="170"><strong>Critérios de êxito</strong></td>
+    <td colspan="5">Mensagem de sucesso e altera a tela para Intervalo</td>
+  </tr>
+  <tr>
+    <td><strong>Responsável pela funcionalidade</strong></td>
+    <td width="430">Guilherme Pena Matsumura</td>
+    <td><strong>Responsável pelo teste</strong></td>
+    <td width="430">Digite seu nome aqui... </td>
+    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="150">11/10/2025</td>
+  </tr>
+    <tr>
+    <td width="170"><strong>Comentário</strong></td>
+    <td colspan="5">Digite seu comentário aqui.</td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><strong>Evidência</strong></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  </tr>
+</table>
+
 ### ETAPA 3
 Colocar evidências de teste da etapa 3
 
