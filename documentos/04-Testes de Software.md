@@ -1046,7 +1046,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
 <!-- Testes Lucas -->
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-001-S <br>Autenticação com credenciais válidas</th>
+    <th colspan="6" width="1000">CT-0026-S <br>Autenticação com credenciais válidas</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1056,9 +1056,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Lucas Campos de Abreu </td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Rafael Costa Souza</td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">14/10/2025</td>
   </tr>
   <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -1068,7 +1068,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-026-S.gif"/></td>
   </tr>
 </table>
 
@@ -1084,9 +1084,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Lucas Campos de Abreu </td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Rafael Costa Souza</td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">14/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -1096,7 +1096,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-026-I.gif"/></td>
   </tr>
 </table>
 
