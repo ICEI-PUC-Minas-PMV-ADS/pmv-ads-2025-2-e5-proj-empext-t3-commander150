@@ -1102,7 +1102,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
 
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-002-S <br>Recuperação de senha com email válido</th>
+    <th colspan="6" width="1000">CT-027-S <br>Recuperação de senha com email válido</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1112,9 +1112,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Lucas Campos de Abreu </td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Rafael Costa Souza</td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">15/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -1124,16 +1124,16 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-027-S.gif"/></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-027-S-2.gif"/></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-002-I <br>Recuperação de senha com email inválido</th>
+    <th colspan="6" width="1000">CT-027-I <br>Recuperação de senha com email inválido</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1145,7 +1145,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pelo teste</strong></td>
     <td width="430">Digite seu nome aqui... </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">15/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -1155,13 +1155,13 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-027-I.gif"/></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-003-S <br>Acesso aos própios dados</th>
+    <th colspan="6" width="1000">CT-028-S <br>Acesso aos própios dados</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1171,9 +1171,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Lucas Campos de Abreu </td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Rafael Costa Souza </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">15/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -1183,16 +1183,16 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/imgng"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-028-S.gif"/></td>
   </tr>
-   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+  <tr>
+    <td colspan="6" align="center"><br><img src="img/CT-028-S-2.gif"/></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-003-I <br>Acesso aos dados de outro usuário</th>
+    <th colspan="6" width="1000">CT-028-I <br>Acesso aos dados de outro usuário</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1202,9 +1202,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Lucas Campos de Abreu </td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Rafael Costa Souza </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">15/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -1214,7 +1214,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-028-I.gif"/></td>
   </tr>
 </table>
 
