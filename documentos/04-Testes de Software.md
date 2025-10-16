@@ -1190,35 +1190,6 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
   </tr>
 </table>
 
-<table>
-  <tr>
-    <th colspan="6" width="1000">CT-028-I <br>Acesso aos dados de outro usuário</th>
-  </tr>
-  <tr>
-    <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O usuário não deve ter acesso aos dados de outro usuário, visualizando e gerenciando somente os próprios dados em todas as telas que acessar.</td>
-  </tr>
-  <tr>
-    <td><strong>Responsável pela funcionalidade</strong></td>
-    <td width="430">Lucas Campos de Abreu </td>
-    <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Rafael Costa Souza </td>
-    <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">15/10/2025</td>
-  </tr>
-    <tr>
-    <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O usuário só visualizou e gerenciou seus próprios dados.</td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><strong>Evidência</strong></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><br><img src="img/CT-028-I.gif"/></td>
-  </tr>
-</table>
-
-
 <!-- Testes Gabriela -->
 <table>
   <tr>
