@@ -1183,9 +1183,11 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
+    <td width="150">Visão do jogador</td>
     <td colspan="6" align="center"><br><img src="img/CT-028-S.gif"/></td>
   </tr>
   <tr>
+    <td width="150">Visão da loja</td>
     <td colspan="6" align="center"><br><img src="img/CT-028-S-2.gif"/></td>
   </tr>
 </table>
