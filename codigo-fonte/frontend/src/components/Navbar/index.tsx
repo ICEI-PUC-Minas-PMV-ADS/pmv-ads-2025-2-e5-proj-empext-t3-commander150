@@ -17,8 +17,13 @@ export default function Navbar() {
   const { logout, usuario } = useSessao();
 
   const navItems = [
-    { label: "Criar evento", url: "/criar-evento", icon: "➕" },
-    { label: "Meus eventos", url: "/historico", icon: "📅" },
+    { label: "Criar evento", url: "/criar-evento", icon: "➕", apenasLoja: true },
+    { 
+      label: usuario?.tipo === 'JOGADOR' ? "Meus ingressos" : "Meus eventos", 
+      url: "/historico", 
+      icon: usuario?.tipo === 'JOGADOR' ? "🎫" : "📅", 
+      apenasLoja: false 
+    },
   ];
 
   // Fechar menus ao clicar fora
@@ -103,12 +108,14 @@ export default function Navbar() {
             <>
               {/* Navegação */}
               <div className="nav-items">
-                {navItems.map((item, index) => (
-                  <a key={index} href={item.url} className="nav-item">
-                    <span className="nav-icon">{item.icon}</span>
-                    <span className="nav-label">{item.label}</span>
-                  </a>
-                ))}
+                {navItems
+                  .filter(item => !item.apenasLoja || usuario?.tipo === 'LOJA' || usuario?.tipo === 'ADMIN')
+                  .map((item, index) => (
+                    <a key={index} href={item.url} className="nav-item">
+                      <span className="nav-icon">{item.icon}</span>
+                      <span className="nav-label">{item.label}</span>
+                    </a>
+                  ))}
               </div>
 
               {/* Perfil do usuário */}
@@ -172,16 +179,18 @@ export default function Navbar() {
                   <>
                     {/* Navegação */}
                     <div className="mobile-nav-items">
-                      {navItems.map((item, index) => (
-                        <button
-                          key={index}
-                          className="mobile-nav-item"
-                          onClick={() => handleNavItemClick(item.url)}
-                        >
-                          <span className="nav-icon">{item.icon}</span>
-                          <span className="nav-label">{item.label}</span>
-                        </button>
-                      ))}
+                      {navItems
+                        .filter(item => !item.apenasLoja || usuario?.tipo === 'LOJA' || usuario?.tipo === 'ADMIN')
+                        .map((item, index) => (
+                          <button
+                            key={index}
+                            className="mobile-nav-item"
+                            onClick={() => handleNavItemClick(item.url)}
+                          >
+                            <span className="nav-icon">{item.icon}</span>
+                            <span className="nav-label">{item.label}</span>
+                          </button>
+                        ))}
                     </div>
 
                     {/* Perfil mobile */}
