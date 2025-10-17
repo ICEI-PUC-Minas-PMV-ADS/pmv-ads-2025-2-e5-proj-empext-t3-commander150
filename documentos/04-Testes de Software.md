@@ -1954,9 +1954,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Willams Andrade Lima</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">DD/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -1966,7 +1966,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-038-S-1.gif"/></td>
   </tr>
 </table>
 
@@ -1982,9 +1982,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Willams Andrade Lima</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">DD/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -1994,7 +1994,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-038-S-2.gif"/></td>
   </tr>
 </table>
 
@@ -2010,9 +2010,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Willams Andrade Lima</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430"> Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">DD/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -2022,7 +2022,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-039-S.gif"/></td>
   </tr>
 </table>
 
@@ -2038,9 +2038,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Willams Andrade Lima</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430"> Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">DD/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -2050,7 +2050,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-039-I.gif"/></td>
   </tr>
 </table>
 
@@ -2066,9 +2066,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Willams Andrade Lima</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">DD/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
@@ -2078,7 +2078,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-040-S.gif"/></td>
   </tr>
 </table>
 
@@ -2094,19 +2094,19 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Willams Andrade Lima</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">DD/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Digite seu comentário aqui.</td>
+    <td colspan="5">O usuario JOGADOR não consegue se desinscrever do torneio.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-040-I.gif"/></td>
   </tr>
 </table>
 
@@ -2125,19 +2125,19 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Guilherme Pena Matsumura</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Digite seu comentário aqui.</td>
+    <td colspan="5">O usuario LOJA consegue visualizar o torneio e suas informações.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-041-S.gif"/></td>
   </tr>
 </table>
 
@@ -2153,19 +2153,19 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Guilherme Pena Matsumura</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Digite seu comentário aqui.</td>
+    <td colspan="5">O usuario LOJA não consegue encontrar um torneio, pois não foi o criador desse torneio.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-041-I.gif"/></td>
   </tr>
 </table>
 
@@ -2181,19 +2181,19 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Guilherme Pena Matsumura</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Gabriela Franklin Sá de Moura </td>
     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
+    <td width="150">16/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Digite seu comentário aqui.</td>
+    <td colspan="5">O usuario LOJA edita o resultado e altera o status da mesa para finalizado</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-042-S.gif"/></td>
   </tr>
 </table>
 
