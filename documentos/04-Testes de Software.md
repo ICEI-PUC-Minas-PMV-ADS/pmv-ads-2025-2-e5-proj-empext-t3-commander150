@@ -100,9 +100,8 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 | Loja          | Gerenciar torneios   | CT-045-S | Criação válida de torneio             | Dados válidos                                       | Sucesso         | Torneio criado | Rafael | Lucas |
 | Loja          | Gerenciar torneios   | CT-045-I | Criação inválida de torneio           | Nome vazio                                          | Insucesso       | Sistema rejeita criação | Rafael | Lucas |
 | Torneio       | Inscrição            | CT-046-S | Jogador se inscreve                   | Dados válidos, torneio aberto                       | Sucesso         | Jogador inscrito | Rafael | Lucas |
-| Torneio       | Inscrição            | CT-046-I | Inscrição fora do prazo               | Jogador válido, torneio encerrado                   | Insucesso       | Mensagem Mensagem de erro | Rafael | Lucas |
 | Loja          | Inscrição jogador    | CT-047-S | Inscrição pela loja                   | Jogador válido, torneio aberto                      | Sucesso         | Jogador inscrito pela loja | Rafael | Lucas |
-| Loja          | Inscrição jogador | CT-047-I | Inscrição fora do prazo             | Jogador válido, torneio encerrado                   | Insucesso       | Mensagem de erro | Rafael | Lucas |
+
 
 
 ### ETAPA 4
@@ -1594,12 +1593,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
   </tr>
 </table>
 
-
-
-
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-004-S <br>Jogador se inscreve</th>
+    <th colspan="6" width="1000">CT-046-S<br>Jogador se inscreve</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1609,7 +1605,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Rafael Costa Souza</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui...</td>
+    <td width="430">Lucas Campos de Abreu</td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">12/10/2025</td>
   </tr>
@@ -1621,97 +1617,13 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-046-S.gif"/></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-004-I <br>Inscrição fora do prazo</th>
-  </tr>
-  <tr>
-    <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O jogador não deve conseguir se inscrever caso o torneio esteja encerrado ou em andamento.</td>
-  </tr>
-  <tr>
-    <td><strong>Responsável pela funcionalidade</strong></td>
-    <td width="430">Rafael Costa Souza</td>
-    <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui...</td>
-    <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">12/10/2025</td>
-  </tr>
-  <tr>
-    <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Jogador deve receber um alerta de erro e ser impossibilitado de se inscrever no torneio.</td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><strong>Evidência</strong></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th colspan="6" width="1000">CT-005-S <br>Jogador se desinscreve</th>
-  </tr>
-  <tr>
-    <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O jogador deve conseguir se desinscrever do torneio, desde que já esteja inscrito e o torneio não esteja finalizado ou cancelado.</td>
-  </tr>
-  <tr>
-    <td><strong>Responsável pela funcionalidade</strong></td>
-    <td width="430">Rafael Costa Souza</td>
-    <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui...</td>
-    <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">12/10/2025</td>
-  </tr>
-  <tr>
-    <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Jogador deve receber um alerta de sucesso e ser removido do torneio.</td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><strong>Evidência</strong></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th colspan="6" width="1000">CT-005-I <br>Desinscrição fora do prazo</th>
-  </tr>
-  <tr>
-    <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O jogador não deve conseguir se desinscrever se o torneio estiver finalizado ou cancelado.</td>
-  </tr>
-  <tr>
-    <td><strong>Responsável pela funcionalidade</strong></td>
-    <td width="430">Rafael Costa Souza</td>
-    <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui...</td>
-    <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">12/10/2025</td>
-  </tr>
-  <tr>
-    <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Jogador deve receber um alerta de erro e não ser capaz de se desinscrever do torneio.</td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><strong>Evidência</strong></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th colspan="6" width="1000">CT-006-S <br>Inscrição pela loja</th>
+    <th colspan="6" width="1000">CT-047-S<br>Inscrição pela loja</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1721,7 +1633,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Rafael Costa Souza</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui...</td>
+    <td width="430">Lucas Campos de Abreu</td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">12/10/2025</td>
   </tr>
@@ -1733,41 +1645,13 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-047-S.gif"/></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-006-I <br>Desinscrição após término</th>
-  </tr>
-  <tr>
-    <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">A loja não deve conseguir desinscrever o jogador após o término ou cancelamento do torneio.</td>
-  </tr>
-  <tr>
-    <td><strong>Responsável pela funcionalidade</strong></td>
-    <td width="430">Rafael Costa Souza</td>
-    <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui...</td>
-    <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">11/10/2025</td>
-  </tr>
-  <tr>
-    <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Loja deve receber um alerta de erro impossibilitando a desinscrição do jogador.</td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><strong>Evidência</strong></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th colspan="6" width="1000">CT-011-S <br>Criação válida de torneio</th>
+    <th colspan="6" width="1000">CT-045-S <br>Criação válida de torneio</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1777,7 +1661,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Rafael Costa Souza</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui...</td>
+    <td width="430">Lucas Campos de Abreu</td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">11/10/2025</td>
   </tr>
@@ -1789,13 +1673,13 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-045-S.gif"/></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <th colspan="6" width="1000">CT-011-I <br>Criação inválida de torneio</th>
+    <th colspan="6" width="1000">CT-045-I<br>Criação inválida de torneio</th>
   </tr>
   <tr>
     <td width="170"><strong>Critérios de êxito</strong></td>
@@ -1805,7 +1689,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Rafael Costa Souza</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui...</td>
+    <td width="430">Lucas Campos de Abreu</td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">11/10/2025</td>
   </tr>
@@ -1817,16 +1701,9 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-045-I.gif"/></td>
   </tr>
 </table>
-
-
-
-
-
-
-
 
 <table>
   <tr>
@@ -2209,19 +2086,19 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Guilherme Pena Matsumura</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Lucas Campos de Abreu</td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">11/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Digite seu comentário aqui.</td>
+    <td colspan="5">Jogador visualizou a tela da sua mesa ativa com sucesso.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-043-S.png"/></td>
   </tr>
 </table>
 
@@ -2237,19 +2114,19 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Guilherme Pena Matsumura</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Lucas Campos de Abreu </td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">11/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Digite seu comentário aqui.</td>
+    <td colspan="5">Jogador não conseguiu acessar uma mesa que ele não está e a mensagem de erro foi renderizada.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-043-I.png"/></td>
   </tr>
 </table>
 
@@ -2265,13 +2142,13 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Guilherme Pena Matsumura</td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Lucas Campos de Abreu</td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">11/10/2025</td>
   </tr>
     <tr>
     <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">Digite seu comentário aqui.</td>
+    <td colspan="5">Jogador conseguir reportar o resultado com sucesso.</td>
   </tr>
   <tr>
     <td colspan="6" align="center"><strong>Evidência</strong></td>
