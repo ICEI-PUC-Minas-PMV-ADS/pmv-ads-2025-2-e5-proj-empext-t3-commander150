@@ -1379,7 +1379,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td width="430">Gabriela Franklin Sá de Moura </td>
     <td><strong>Responsável pelo teste</strong></td>
     <td width="430">Willams Andrade Lima</td>
-    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="100"><strong>18/10/2025</strong></td>
     <td width="150">17/10/2025</td>
   </tr>
   <tr>
@@ -1390,7 +1390,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-033-S.gif"/></td>
   </tr>
 </table>
 
@@ -1408,7 +1408,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td width="430">Gabriela Franklin Sá de Moura </td>
     <td><strong>Responsável pelo teste</strong></td>
     <td width="430">Willams Andrade Lima</td>
-    <td width="100"><strong>Data do Teste</strong></td>
+    <td width="100"><strong>18/10/2025</strong></td>
     <td width="150">17/10/2025</td>
   </tr>
   <tr>
@@ -1419,7 +1419,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td colspan="6" align="center"><strong>Evidência</strong></td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><br><img src="img/img.png"/></td>
+    <td colspan="6" align="center"><br><img src="img/CT-033-I.gif"/></td>
   </tr>
 </table>
 
