@@ -257,7 +257,7 @@ const InformacaoTorneioLoja: React.FC = () => {
     } else if (tournament?.status === "Finalizado") {
       return "Finalizado";
     } else if (tournament?.status === "Aberto") {
-      return "Em andamento";
+      return "Aberto";
     }
     return "Em andamento";
   };
@@ -594,37 +594,39 @@ const InformacaoTorneioLoja: React.FC = () => {
             </>
           )}
 
-          {/* Dropdown de Rodadas */}
-          <div className={styles.rodadaDropdownContainer}>
-          <button
-            className={styles.rodadaDropdownButton}
-            onClick={() => setDropdownAberto(!dropdownAberto)}
-          >
-            <span>
-              {rodadaSelecionada
-                ? `Rodada ${rodadaSelecionada.numero_rodada} de ${rodadas.length}`
-                : 'Selecione uma rodada'}
-            </span>
-            <FiChevronDown className={dropdownAberto ? styles.iconRotate : ''} />
-          </button>
+          {/* Dropdown de Rodadas - Aparece apenas para torneios em andamento ou finalizados */}
+          {tournament.status !== "Aberto" && (
+            <div className={styles.rodadaDropdownContainer}>
+            <button
+              className={styles.rodadaDropdownButton}
+              onClick={() => setDropdownAberto(!dropdownAberto)}
+            >
+              <span>
+                {rodadaSelecionada
+                  ? `Rodada ${rodadaSelecionada.numero_rodada} de ${rodadas.length}`
+                  : 'Selecione uma rodada'}
+              </span>
+              <FiChevronDown className={dropdownAberto ? styles.iconRotate : ''} />
+            </button>
 
-          {dropdownAberto && (
-            <div className={styles.rodadaDropdownMenu}>
-              {rodadas.map((rodada) => (
-                <div
-                  key={rodada.id}
-                  className={`${styles.rodadaDropdownItem} ${
-                    rodadaSelecionada?.id === rodada.id ? styles.rodadaAtiva : ''
-                  }`}
-                  onClick={() => handleSelecionarRodada(rodada)}
-                >
-                  <span>Rodada {rodada.numero_rodada}</span>
-                  <span className={styles.rodadaStatus}>{rodada.status}</span>
-                </div>
-              ))}
+            {dropdownAberto && (
+              <div className={styles.rodadaDropdownMenu}>
+                {rodadas.map((rodada) => (
+                  <div
+                    key={rodada.id}
+                    className={`${styles.rodadaDropdownItem} ${
+                      rodadaSelecionada?.id === rodada.id ? styles.rodadaAtiva : ''
+                    }`}
+                    onClick={() => handleSelecionarRodada(rodada)}
+                  >
+                    <span>Rodada {rodada.numero_rodada}</span>
+                    <span className={styles.rodadaStatus}>{rodada.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             </div>
           )}
-          </div>
         </div>
       </div>
 
@@ -632,56 +634,81 @@ const InformacaoTorneioLoja: React.FC = () => {
       <div className={styles.gridContainer}>
         {/* Coluna Esquerda - Mesas e Sobressalentes */}
         <div className={styles.colunaEsquerda}>
-          {/* Mesas Participantes */}
-          <div className={styles.mesasCard}>
-            <h2 className={styles.cardTitulo}>Mesas participantes</h2>
-            {erro && (
-              <div className={styles.mensagemErro}>
-                {erro}
-              </div>
-            )}
-            {carregandoMesas ? (
-              <div className={styles.loading}>Carregando mesas...</div>
-            ) : (
-              <div className={styles.mesasGrid}>
-                {mesas.filter(m => m.numero_mesa !== 0).length > 0 ? (
-                  mesas
-                    .filter(m => m.numero_mesa !== 0)
-                    .map((mesa) => (
-                      <MesaCard
-                        key={mesa.id}
-                        mesaId={mesa.id}
-                        numeroMesa={mesa.numero_mesa}
-                        time1={mesa.time1}
-                        time2={mesa.time2}
-                        status={mesa.status}
-                        pontuacaoTime1={mesa.pontuacao_time_1}
-                        pontuacaoTime2={mesa.pontuacao_time_2}
-                        onConfirmarResultado={handleConfirmarResultado}
-                      />
-                    ))
-                ) : (
-                  <p className={styles.mensagemVazia}>Nenhuma mesa criada ainda.</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Participantes Sobressalentes */}
-          <div className={styles.sobressalentesCard}>
-            <h2 className={styles.cardTitulo}>Participantes sobressalentes</h2>
-            <div className={styles.sobressalentesList}>
-              {sobressalentes.length > 0 ? (
-                sobressalentes.map((participante) => (
-                  <div key={participante.id} className={styles.sobressalenteItem}>
-                    {participante.nome}
-                  </div>
-                ))
+          {/* Condicional: Exibe Mesas para torneios em andamento ou Jogadores Inscritos para torneios abertos */}
+          {tournament.status === "Aberto" ? (
+            /* Jogadores Inscritos - Para torneios abertos */
+            <div className={styles.mesasCard}>
+              <h2 className={styles.cardTitulo}>Usuários inscritos</h2>
+              <span className={styles.infoJogadores}>
+                {jogadoresInscritos.length} {jogadoresInscritos.length === 1 ? 'jogador' : 'jogadores'}
+              </span>
+              {jogadoresInscritos.length > 0 ? (
+                <ul className={styles.playerList}>
+                  {jogadoresInscritos.map((player, index) => (
+                    <li key={index} className={styles.playerItem}>
+                      <span className={styles.numeroJogador}>{index + 1}. </span>
+                      <span className={styles.nomeJogador}>{player}</span>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p className={styles.mensagemVazia}>Nenhum participante sobressalente.</p>
+                <div className={styles.mensagemVazia}>Nenhum jogador inscrito ainda.</div>
               )}
             </div>
-          </div>
+          ) : (
+            /* Mesas Participantes - Para torneios em andamento */
+            <>
+              <div className={styles.mesasCard}>
+                <h2 className={styles.cardTitulo}>Mesas participantes</h2>
+                {erro && (
+                  <div className={styles.mensagemErro}>
+                    {erro}
+                  </div>
+                )}
+                {carregandoMesas ? (
+                  <div className={styles.loading}>Carregando mesas...</div>
+                ) : (
+                  <div className={styles.mesasGrid}>
+                    {mesas.filter(m => m.numero_mesa !== 0).length > 0 ? (
+                      mesas
+                        .filter(m => m.numero_mesa !== 0)
+                        .map((mesa) => (
+                          <MesaCard
+                            key={mesa.id}
+                            mesaId={mesa.id}
+                            numeroMesa={mesa.numero_mesa}
+                            time1={mesa.time1}
+                            time2={mesa.time2}
+                            status={mesa.status}
+                            pontuacaoTime1={mesa.pontuacao_time_1}
+                            pontuacaoTime2={mesa.pontuacao_time_2}
+                            onConfirmarResultado={handleConfirmarResultado}
+                          />
+                        ))
+                    ) : (
+                      <p className={styles.mensagemVazia}>Nenhuma mesa criada ainda.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Participantes Sobressalentes */}
+              <div className={styles.sobressalentesCard}>
+                <h2 className={styles.cardTitulo}>Participantes sobressalentes</h2>
+                <div className={styles.sobressalentesList}>
+                  {sobressalentes.length > 0 ? (
+                    sobressalentes.map((participante) => (
+                      <div key={participante.id} className={styles.sobressalenteItem}>
+                        {participante.nome}
+                      </div>
+                    ))
+                  ) : (
+                    <p className={styles.mensagemVazia}>Nenhum participante sobressalente.</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Coluna Direita - Informações */}

@@ -1,3 +1,44 @@
+/* Lista de Jogadores Inscritos */
+.playerList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.playerItem {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s ease;
+}
+
+.infoJogadores{
+  font-size: 1rem;
+  color: var(--var-cor-branca);
+  margin-bottom: 1rem;
+}
+
+.playerItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.playerItem:last-child {
+  border-bottom: none;
+}
+
+.numeroJogador {
+  font-weight: 600;
+  color: var(--var-cor-branca);
+  min-width: 24px;
+  margin-right: 0.5rem;
+}
+
+.nomeJogador {
+  color: var(--var-cor-branca);
+  font-weight: 400;
+}
+
 /* Visão da Loja - Informações do Torneio */
 .container {
   padding: 2rem 5rem;
@@ -197,11 +238,6 @@
   gap: 1.5rem;
   position: sticky;
   top: 2rem;
-}
-
-/* Card de Premiação */
-.cardPremiacaoWrapper {
-  width: 334px;
 }
 
 .cardPremiacaoWrapper > div,
