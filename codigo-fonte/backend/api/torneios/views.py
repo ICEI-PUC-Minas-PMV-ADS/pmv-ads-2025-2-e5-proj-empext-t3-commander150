@@ -491,6 +491,132 @@ class TorneioViewSet(viewsets.ModelViewSet):
         
         return pontuacao
 
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter(
+                'rodada_id',
+                openapi.IN_QUERY,
+                description='ID da rodada para calcular ranking até essa rodada',
+                type=openapi.TYPE_INTEGER,
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Ranking de uma rodada específica",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'rodada_numero': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'ranking': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'posicao': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'jogador_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'jogador_nome': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'pontos': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                }
+                            )
+                        ),
+                    }
+                )
+            ),
+            400: 'Erro de validação',
+            404: 'Rodada não encontrada'
+        },
+        operation_summary="Obter ranking parcial de uma rodada",
+        operation_description="""
+        Retorna o ranking dos jogadores até a rodada específica (acumulado).
+        
+        **Parâmetros Query:**
+        - rodada_id: ID da rodada para calcular ranking até essa rodada
+        """
+    )
+    @action(detail=True, methods=['get'], permission_classes=[IsLojaOuAdmin | IsApenasLeitura])
+    def ranking_rodada(self, request, pk=None):
+        """
+        Retorna o ranking parcial até uma rodada específica.
+        """
+        torneio = self.get_object()
+        rodada_id = request.query_params.get('rodada_id')
+
+        if not rodada_id:
+            return Response(
+                {"detail": "Parâmetro 'rodada_id' é obrigatório"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            rodada_alvo = Rodada.objects.get(id=rodada_id, id_torneio=torneio)
+        except Rodada.DoesNotExist:
+            return Response(
+                {"detail": "Rodada não encontrada neste torneio"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Calcula pontuação até a rodada especificada
+        pontuacao = {}
+        inscricoes = Inscricao.objects.filter(
+            id_torneio=torneio
+        ).exclude(status='Cancelado')
+
+        for inscricao in inscricoes:
+            pontuacao[inscricao.id_usuario_id] = 0
+
+        # Percorre rodadas até a alvo
+        rodadas_até_alvo = Rodada.objects.filter(
+            id_torneio=torneio,
+            numero_rodada__lte=rodada_alvo.numero_rodada
+        ).order_by('numero_rodada')
+
+        for rodada in rodadas_até_alvo:
+            jogadores_na_rodada = set()
+            mesas = Mesa.objects.filter(id_rodada=rodada)
+
+            for mesa in mesas:
+                jogadores_mesa = MesaJogador.objects.filter(id_mesa=mesa).select_related('id_usuario')
+
+                for jogador_mesa in jogadores_mesa:
+                    jogador_id = jogador_mesa.id_usuario_id
+                    jogadores_na_rodada.add(jogador_id)
+
+                    if mesa.time_vencedor == 0:
+                        pontuacao[jogador_id] += torneio.pontuacao_empate
+                    elif mesa.time_vencedor == jogador_mesa.time:
+                        pontuacao[jogador_id] += torneio.pontuacao_vitoria
+                    else:
+                        pontuacao[jogador_id] += torneio.pontuacao_derrota
+
+            for jogador_id in pontuacao.keys():
+                if jogador_id not in jogadores_na_rodada:
+                    pontuacao[jogador_id] += torneio.pontuacao_bye
+
+        # Gera ranking ordenado
+        ranking = []
+        jogadores_ordenados = sorted(
+            pontuacao.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+        for posicao, (usuario_id, pontos) in enumerate(jogadores_ordenados, start=1):
+            from usuarios.models import Usuario
+            usuario = Usuario.objects.get(id=usuario_id)
+            ranking.append({
+                'posicao': posicao,
+                'jogador_id': usuario_id,
+                'jogador_nome': usuario.username,
+                'pontos': pontos
+            })
+
+        return Response({
+            'rodada_numero': rodada_alvo.numero_rodada,
+            'ranking': ranking
+        }, status=status.HTTP_200_OK)
+
     def _criar_mesas_swiss(self, rodada, jogadores_ordenados, torneio):
         """
         Cria mesas usando sistema Swiss pairing.
