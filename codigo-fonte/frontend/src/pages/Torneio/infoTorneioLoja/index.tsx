@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from "react";
 import type { ITorneio, IRodada, IMesaRodada } from "../../../tipos/tipos";
-import { buscarJogadoresInscritos, buscarTorneioPorId, tratarErroTorneio, iniciarTorneio, proximaRodadaTorneio, finalizarTorneio } from "../../../services/torneioServico";
+import { buscarJogadoresInscritos, buscarSobressalentes, buscarTorneioPorId, tratarErroTorneio, iniciarTorneio, proximaRodadaTorneio, finalizarTorneio } from "../../../services/torneioServico";
 import { buscarRodadasDoTorneio, buscarMesasDaRodada } from "../../../services/mesaServico";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
@@ -153,39 +153,17 @@ const InformacaoTorneioLoja: React.FC = () => {
       const mesasProcessadas = processarMesasDaAPI(mesasDaRodada, confirmadas, rodada.status);
       setMesas(mesasProcessadas);
 
-      // Calcular participantes sobressalentes (jogadores inscritos que não estão em nenhuma mesa da rodada)
-      if (tournament) {
-        const torneioId = tournament.id;
-        
-        // IDs de jogadores que estão em mesas da rodada
-        const jogadoresEmMesas = new Set<number>();
-        mesasDaRodada.forEach(mesa => {
-          mesa.jogadores.forEach(j => {
-            jogadoresEmMesas.add(j.id_usuario);
-          });
-        });
+      // Buscar jogadores sobressalentes
+      try {
+        const sobressalentesRodada = await buscarSobressalentes(rodada.id);
+        const jogadoresSobressalentes = sobressalentesRodada.map(s => ({
+          id: s.id,
+          nome: s.username
+        }));
 
-        // Buscar todos os inscritos
-        try {
-          const inscricoesResponse = await buscarJogadoresInscritos(torneioId);
-          
-          // NOTA: A função buscarJogadoresInscritos retorna apenas os nomes (strings),
-          // não os IDs dos jogadores. Para identificar corretamente os sobressalentes,
-          // seria necessário ter acesso aos IDs dos jogadores inscritos.
-          
-          const mesasBye = mesasDaRodada.filter(m => m.numero_mesa === 0);
-          if (mesasBye.length > 0) {
-            const mesaBye = mesasBye[0];
-            const jogadoresBye = mesaBye.jogadores.map(j => j.username);
-            setSobressalentes(jogadoresBye.map((nome, idx) => ({ id: idx, nome })));
-          } else {
-            setSobressalentes([]);
-          }
-        } catch (error) {
-          console.error('Erro ao buscar inscritos para calcular sobressalentes:', error);
-          setSobressalentes([]);
-        }
-      } else {
+        setSobressalentes(jogadoresSobressalentes);
+      } catch (error) {
+        console.error('Erro ao buscar sobressalentes:', error);
         setSobressalentes([]);
       }
 

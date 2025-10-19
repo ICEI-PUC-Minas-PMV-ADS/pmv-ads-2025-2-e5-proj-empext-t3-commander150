@@ -8,6 +8,10 @@
   flex-direction: column;
 }
 
+h3{
+  color: var(--var-cor-branca);
+}
+
 /* HERO */
 .hero {
   width: 100%;
