@@ -1436,7 +1436,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Gabriela Franklin Sá de Moura </td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Guilherme Pena Matsumura</td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">11/10/2025</td>
   </tr>
@@ -1464,7 +1464,7 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
     <td><strong>Responsável pela funcionalidade</strong></td>
     <td width="430">Gabriela Franklin Sá de Moura </td>
     <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Digite seu nome aqui... </td>
+    <td width="430">Guilherme Pena Matsumura</td>
     <td width="100"><strong>Data do Teste</strong></td>
     <td width="150">11/10/2025</td>
   </tr>
