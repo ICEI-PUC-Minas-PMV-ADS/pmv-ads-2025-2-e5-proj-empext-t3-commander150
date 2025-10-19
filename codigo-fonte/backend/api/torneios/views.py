@@ -735,6 +735,89 @@ class RodadaViewSet(viewsets.ModelViewSet):
         serializer = MesaDetailSerializer(mesas, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        operation_summary="Listar sobressalentes da rodada",
+        operation_description="""
+        Retorna a lista de jogadores que foram sobressalentes nesta rodada específica.
+
+        Essa lista é recalculada e registrada automaticamente quando a rodada é criada,
+        permitindo manter um histórico preciso de quem não jogou em cada rodada,
+        mesmo que novos jogadores entrem ou saiam do torneio entre rodadas.
+
+        **GET** `/api/v1/torneios/rodadas/{id}/sobressalentes/`
+
+        **Resposta:**
+        ```json
+        [
+            {
+                "id": 4,
+                "username": "RafaelJogador3",
+                "email": "rafael.jogador3@gmail.com"
+            }
+        ]
+        ```
+
+        **Notas:**
+        - Sobressalentes são jogadores inscritos ativos que não foram colocados em mesas
+        - A lista é específica para cada rodada (histórico preservado)
+        - Jogadores que saem aparecem na lista até a rodada da saída
+        - Novos jogadores não aparecem como sobressalentes em rodadas anteriores
+        """,
+        responses={
+            200: openapi.Response(
+                description="Lista de sobressalentes",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="ID do usuário"),
+                            'username': openapi.Schema(type=openapi.TYPE_STRING, description="Nome de usuário"),
+                            'email': openapi.Schema(type=openapi.TYPE_STRING, description="Email do usuário"),
+                        }
+                    )
+                )
+            ),
+            404: 'Rodada não encontrada',
+            403: 'Acesso negado'
+        }
+    )
+    @action(detail=True, methods=['get'], permission_classes=[IsLojaOuAdmin | IsApenasLeitura])
+    def sobressalentes(self, request, pk=None):
+        """
+        Retorna lista calculada de jogadores que foram sobressalentes nesta rodada específica.
+        Jogadores inscritos ativos que não foram colocados em nenhuma mesa da rodada.
+        """
+        rodada = self.get_object()
+
+        # Busca todos os jogadores inscritos ATIVOS no torneio desta rodada
+        jogadores_inscritos = set(
+            Inscricao.objects.filter(
+                id_torneio=rodada.id_torneio
+            ).exclude(status='Cancelado').values_list('id_usuario_id', flat=True)
+        )
+
+        # Busca todos os jogadores que ESTÃO em mesas desta rodada
+        jogadores_em_mesas = set(
+            MesaJogador.objects.filter(
+                id_mesa__id_rodada=rodada
+            ).values_list('id_usuario_id', flat=True)
+        )
+
+        # Jogadores sobressalentes = inscritos ativos - jogadores que estão em mesas
+        jogadores_sobressalentes_ids = jogadores_inscritos - jogadores_em_mesas
+
+        # Busca dados dos usuários sobressalentes
+        if jogadores_sobressalentes_ids:
+            from usuarios.models import Usuario
+            jogadores_sobressalentes = Usuario.objects.filter(
+                id__in=jogadores_sobressalentes_ids
+            ).values('id', 'username', 'email')
+        else:
+            jogadores_sobressalentes = []
+
+        return Response(list(jogadores_sobressalentes), status=200)
+
     def get_queryset(self):
         """
         Filtra as rodadas por torneio se o parâmetro for fornecido

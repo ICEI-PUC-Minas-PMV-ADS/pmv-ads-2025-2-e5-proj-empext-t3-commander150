@@ -43,14 +43,24 @@ class Inscricao(models.Model):
     id_usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='inscricoes')
     id_torneio = models.ForeignKey(Torneio, on_delete=models.CASCADE, related_name='inscritos')
     decklist = models.TextField(blank=True, help_text="Lista de cartas do deck do jogador.")
-    status = models.CharField(max_length=50, default='Inscrito')
-    data_inscricao = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, default='Inscrito', help_text="'Inscrito', 'Cancelado', ou 'Inativo'")
+    data_inscricao = models.DateTimeField(auto_now_add=True, help_text="Data da primeira inscrição")
+    data_saida = models.DateTimeField(null=True, blank=True, help_text="Data em que saiu ou foi removido")
 
     class Meta:
         unique_together = ('id_usuario', 'id_torneio')
 
     def __str__(self):
         return f'{self.id_usuario.username} no {self.id_torneio.nome}'
+
+    def esta_ativo_na_data(self, data_referencia):
+        """
+        Verifica se a inscrição estava ativa em uma determinada data.
+        Ativa se: não foi cancelada OU foi cancelada depois da data de referência.
+        """
+        if self.status == 'Cancelado':
+            return self.data_saida is None or self.data_saida > data_referencia
+        return self.data_inscricao <= data_referencia
 
 
 class Rodada(models.Model):

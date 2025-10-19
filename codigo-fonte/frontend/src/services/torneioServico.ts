@@ -242,6 +242,35 @@ export const buscarJogadoresInscritos = async (idTorneio: number): Promise<strin
   const inscricoes = resposta.data.results || resposta.data;
   return inscricoes.map((inscricao: any) => inscricao.username);
 };
+
+/**
+ * Busca todas as inscrições ativas de um torneio específico.
+ *
+ * @param idTorneio
+ * @returns
+ */
+export const buscarInscricoesAtivasCompletas = async (idTorneio: number): Promise<{
+  id: number;
+  id_usuario: number;
+  username: string;
+  email: string;
+  id_torneio: number;
+  nome_torneio: string;
+  decklist?: string;
+  status: string;
+  data_inscricao: string;
+}[]> => {
+  const resposta = await api.get('/torneios/inscricoes/', {
+    params: {
+      id_torneio: idTorneio,
+      page_size: 200
+    }
+  });
+  const inscricoes = resposta.data.results || resposta.data;
+
+  // Filtrar apenas inscrições ativas
+  return inscricoes.filter((inscricao: any) => inscricao.status !== 'Cancelado');
+};
 export async function contarInscritosTorneio(idTorneio: number): Promise<number> {
   try {
     const lista = await buscarJogadoresInscritos(idTorneio);
@@ -304,8 +333,25 @@ export const finalizarTorneio = async (id: number): Promise<{
 };
 
 /**
+ * Busca jogadores sobressalentes de uma rodada específica.
+ */
+export async function buscarSobressalentes(rodadaId: number): Promise<{
+  id: number;
+  username: string;
+  email: string;
+}[]> {
+  try {
+    const resposta = await api.get(`/torneios/rodadas/${rodadaId}/sobressalentes/`);
+    return resposta.data;
+  } catch (error) {
+    console.error('Erro ao buscar sobressalentes:', error);
+    throw error;
+  }
+}
+
+/**
  * Utilitário para tratar erros de torneio de forma consistente.
- * 
+ *
  * @param erro - Erro do Axios
  * @returns Mensagem de erro amigável
  */
@@ -335,7 +381,6 @@ export async function buscarInscricoes(): Promise<IInscricao[]> {
   if (Array.isArray(data?.results)) return data.results;
   return [];
 }
-
 
 /** Busca TODOS os torneios.
 export async function buscarTorneios(): Promise<ITorneio[]> {
