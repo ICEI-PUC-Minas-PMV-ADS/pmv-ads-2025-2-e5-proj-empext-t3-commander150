@@ -33,7 +33,12 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
 
     const handleClick = () => {
         if (tournamentId) {
-            navigate(`/torneios/${tournamentId}`);
+            // Para torneios históricos, navegar com parâmetro para pré-selecionar resultado final
+            if (title === "Concluído") {
+                navigate(`/torneios/${tournamentId}?preselect=result`);
+            } else {
+                navigate(`/torneios/${tournamentId}`);
+            }
         }
     };
 
