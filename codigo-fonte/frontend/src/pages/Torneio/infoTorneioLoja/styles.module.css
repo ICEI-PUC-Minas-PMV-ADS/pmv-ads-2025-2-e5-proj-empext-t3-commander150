@@ -231,6 +231,55 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* Ranking Final */
+.rankingContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rankingItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(155, 128, 182, 0.1);
+  border: 1px solid rgba(155, 128, 182, 0.3);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.rankingItem:hover {
+  background: rgba(155, 128, 182, 0.15);
+  border-color: rgba(155, 128, 182, 0.5);
+}
+
+.rankingPosicao {
+  font-size: 1.75rem;
+  font-weight: 700;
+  min-width: 50px;
+  text-align: center;
+  color: var(--var-cor-branca);
+}
+
+.rankingInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.rankingNome {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--var-cor-branca);
+  margin-bottom: 0.25rem;
+}
+
+.rankingPontos {
+  font-size: 0.9rem;
+  color: var(--var-cor-cinza-placeholder);
+}
+
 /* Coluna Direita */
 .colunaDireita {
   display: flex;

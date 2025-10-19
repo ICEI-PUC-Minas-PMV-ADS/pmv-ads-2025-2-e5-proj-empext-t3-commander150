@@ -350,6 +350,33 @@ export async function buscarSobressalentes(rodadaId: number): Promise<{
 }
 
 /**
+ * Busca o ranking parcial (acumulado) até uma rodada específica.
+ * 
+ * @param idTorneio - ID do torneio
+ * @param rodadaId - ID da rodada para calcular o ranking até ela
+ * @returns Ranking com posição, nome do jogador e pontos acumulados
+ */
+export const buscarRankingRodada = async (
+  idTorneio: number,
+  rodadaId: number
+): Promise<{
+  rodada_numero: number;
+  ranking: Array<{
+    posicao: number;
+    jogador_id: number;
+    jogador_nome: string;
+    pontos: number;
+  }>;
+}> => {
+  const resposta = await api.get(`/torneios/torneios/${idTorneio}/ranking_rodada/`, {
+    params: {
+      rodada_id: rodadaId
+    }
+  });
+  return resposta.data;
+};
+
+/**
  * Utilitário para tratar erros de torneio de forma consistente.
  *
  * @param erro - Erro do Axios
