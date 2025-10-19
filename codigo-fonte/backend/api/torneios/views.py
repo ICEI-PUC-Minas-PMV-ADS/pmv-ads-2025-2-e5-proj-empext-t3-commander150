@@ -547,11 +547,15 @@ class InscricaoViewSet(viewsets.ModelViewSet):
     Endpoint da API para gerenciamento de inscrições em torneios.
 
     Regras de acesso:
-    - GET (list/retrieve): 
+    - GET (list/retrieve):
         • Jogadores: Veem apenas suas próprias inscrições
         • Lojas: Veem inscrições dos seus torneios
         • Admins: Veem todas as inscrições
-    - POST (create): 
+
+    Query Parameters (GET):
+    - id_torneio: Filtra inscrições por torneio específico (ex: ?id_torneio=1)
+
+    - POST (create):
         • Jogadores: Podem se inscrever em torneios abertos
         • Lojas/Admins: Podem inscrever jogadores em seus torneios
     - PUT (update):
@@ -571,14 +575,22 @@ class InscricaoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Filtra as inscrições visíveis baseado no tipo do usuário.
+        Suporta filtro por id_torneio via query params.
         """
+        queryset = Inscricao.objects.all()
         user = self.request.user
 
+        # Filtro por torneio via query params
+        torneio_id = self.request.query_params.get('id_torneio')
+        if torneio_id:
+            queryset = queryset.filter(id_torneio_id=torneio_id)
+
+        # Filtros baseados no tipo de usuário
         if user.tipo == 'ADMIN':
-            return Inscricao.objects.all()
+            return queryset
         elif user.tipo == 'LOJA':
-            return Inscricao.objects.filter(id_torneio__id_loja=user)
-        return Inscricao.objects.filter(id_usuario=user)
+            return queryset.filter(id_torneio__id_loja=user)
+        return queryset.filter(id_usuario=user)
 
     def get_serializer_class(self):
         """
