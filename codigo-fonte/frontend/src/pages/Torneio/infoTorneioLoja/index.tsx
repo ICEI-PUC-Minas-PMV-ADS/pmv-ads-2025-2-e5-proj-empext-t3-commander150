@@ -10,15 +10,17 @@
 
 import { useEffect, useState } from "react";
 import type { ITorneio, IRodada, IMesaRodada } from "../../../tipos/tipos";
-import { buscarJogadoresInscritos, buscarTorneioPorId, tratarErroTorneio } from "../../../services/torneioServico";
+import { buscarJogadoresInscritos, buscarTorneioPorId, tratarErroTorneio, iniciarTorneio, proximaRodadaTorneio, finalizarTorneio } from "../../../services/torneioServico";
 import { buscarRodadasDoTorneio, buscarMesasDaRodada } from "../../../services/mesaServico";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
-import { FiGift, FiChevronDown } from "react-icons/fi";
+import { FiGift, FiChevronDown, FiPlay, FiSkipForward, FiCheckCircle } from "react-icons/fi";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
 import RegrasPartida from "../../../components/CardRegrasPartida";
 import MesaCard from "../../../components/CardMesaParticipante";
 import { useParams } from "react-router-dom";
+import Button from "../../../components/Button";
+import Swal from 'sweetalert2';
 
 interface Mesa {
   id: number;
@@ -46,6 +48,9 @@ const InformacaoTorneioLoja: React.FC = () => {
   const [rodadaSelecionada, setRodadaSelecionada] = useState<IRodada | null>(null);
   const [dropdownAberto, setDropdownAberto] = useState(false);
   const [carregandoMesas, setCarregandoMesas] = useState(false);
+  const [iniciandoTorneio, setIniciandoTorneio] = useState(false);
+  const [avancandoRodada, setAvancandoRodada] = useState(false);
+  const [finalizandoTorneio, setFinalizandoTorneio] = useState(false);
 
   const { id } = useParams<{ id: string }>();
 
@@ -148,13 +153,38 @@ const InformacaoTorneioLoja: React.FC = () => {
       const mesasProcessadas = processarMesasDaAPI(mesasDaRodada, confirmadas, rodada.status);
       setMesas(mesasProcessadas);
 
-      // Definir sobressalentes (mesa 0)
-      const mesasBye = mesasDaRodada.filter(m => m.numero_mesa === 0);
+      // Calcular participantes sobressalentes (jogadores inscritos que não estão em nenhuma mesa da rodada)
+      if (tournament) {
+        const torneioId = tournament.id;
+        
+        // IDs de jogadores que estão em mesas da rodada
+        const jogadoresEmMesas = new Set<number>();
+        mesasDaRodada.forEach(mesa => {
+          mesa.jogadores.forEach(j => {
+            jogadoresEmMesas.add(j.id_usuario);
+          });
+        });
 
-      if (mesasBye.length > 0) {
-        const mesaBye = mesasBye[0];
-        const jogadoresBye = mesaBye.jogadores.map(j => j.username);
-        setSobressalentes(jogadoresBye.map((nome, idx) => ({ id: idx, nome })));
+        // Buscar todos os inscritos
+        try {
+          const inscricoesResponse = await buscarJogadoresInscritos(torneioId);
+          
+          // NOTA: A função buscarJogadoresInscritos retorna apenas os nomes (strings),
+          // não os IDs dos jogadores. Para identificar corretamente os sobressalentes,
+          // seria necessário ter acesso aos IDs dos jogadores inscritos.
+          
+          const mesasBye = mesasDaRodada.filter(m => m.numero_mesa === 0);
+          if (mesasBye.length > 0) {
+            const mesaBye = mesasBye[0];
+            const jogadoresBye = mesaBye.jogadores.map(j => j.username);
+            setSobressalentes(jogadoresBye.map((nome, idx) => ({ id: idx, nome })));
+          } else {
+            setSobressalentes([]);
+          }
+        } catch (error) {
+          console.error('Erro ao buscar inscritos para calcular sobressalentes:', error);
+          setSobressalentes([]);
+        }
       } else {
         setSobressalentes([]);
       }
@@ -274,6 +304,225 @@ const InformacaoTorneioLoja: React.FC = () => {
     await carregarMesasDaRodada(rodada);
   };
 
+  // Handler para iniciar torneio
+  const handleIniciarTorneio = async () => {
+    if (!tournament?.id) return;
+
+    const result = await Swal.fire({
+      title: 'Iniciar Torneio',
+      html: `
+        <p>Deseja realmente iniciar o torneio <strong>"${tournament.nome}"</strong>?</p>
+        <br>
+        <p><strong>Jogadores inscritos:</strong> ${jogadoresInscritos.length}</p>
+        <p>Esta ação criará a primeira rodada e emparelhará os jogadores.</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, iniciar!',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#9b80b6',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setIniciandoTorneio(true);
+      setErro(null);
+
+      const resultado = await iniciarTorneio(tournament.id);
+
+      await Swal.fire({
+        title: 'Torneio Iniciado!',
+        html: `
+          <p>${resultado.message}</p>
+          <br>
+          <p><strong>Mesas criadas:</strong> ${resultado.mesas_criadas}</p>
+          <p><strong>Total de jogadores:</strong> ${resultado.total_jogadores}</p>
+        `,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#46AF87',
+      });
+
+      // Recarregar dados do torneio
+      const torneioAtualizado = await buscarTorneioPorId(tournament.id);
+      setTournament(torneioAtualizado);
+
+      // Recarregar rodadas
+      const rodadasAtualizadas = await buscarRodadasDoTorneio(tournament.id);
+      setRodadas(rodadasAtualizadas);
+
+      // Selecionar a primeira rodada criada
+      if (rodadasAtualizadas.length > 0) {
+        const primeiraRodada = rodadasAtualizadas[0];
+        setRodadaSelecionada(primeiraRodada);
+        await carregarMesasDaRodada(primeiraRodada);
+      }
+
+    } catch (e: any) {
+      console.error('Erro ao iniciar torneio:', e);
+      const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
+      
+      await Swal.fire({
+        title: 'Erro!',
+        text: mensagemErro,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#DC2626',
+      });
+    } finally {
+      setIniciandoTorneio(false);
+    }
+  };
+
+  // Handler para avançar para próxima rodada
+  const handleProximaRodada = async () => {
+    if (!tournament?.id) return;
+
+    const result = await Swal.fire({
+      title: 'Avançar para Próxima Rodada',
+      html: `
+        <p>Deseja avançar para a próxima rodada?</p>
+        <br>
+        <p>Esta ação finalizará a rodada atual e criará uma nova rodada com emparelhamento Swiss.</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, avançar!',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#46AF87',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setAvancandoRodada(true);
+      setErro(null);
+
+      const resultado = await proximaRodadaTorneio(tournament.id);
+
+      await Swal.fire({
+        title: 'Rodada Avançada!',
+        html: `
+          <p>${resultado.message}</p>
+          <br>
+          <p><strong>Mesas criadas:</strong> ${resultado.mesas_criadas}</p>
+        `,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#46AF87',
+      });
+
+      // Recarregar rodadas
+      const rodadasAtualizadas = await buscarRodadasDoTorneio(tournament.id);
+      setRodadas(rodadasAtualizadas);
+
+      // Selecionar a nova rodada criada
+      if (rodadasAtualizadas.length > 0) {
+        const novaRodada = rodadasAtualizadas[rodadasAtualizadas.length - 1];
+        setRodadaSelecionada(novaRodada);
+        await carregarMesasDaRodada(novaRodada);
+      }
+
+    } catch (e: any) {
+      console.error('Erro ao avançar rodada:', e);
+      const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
+      
+      await Swal.fire({
+        title: 'Erro!',
+        text: mensagemErro,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#DC2626',
+      });
+    } finally {
+      setAvancandoRodada(false);
+    }
+  };
+
+  // Handler para finalizar torneio
+  const handleFinalizarTorneio = async () => {
+    if (!tournament?.id) return;
+
+    const result = await Swal.fire({
+      title: 'Finalizar Torneio',
+      html: `
+        <p>Deseja realmente finalizar o torneio <strong>"${tournament.nome}"</strong>?</p>
+        <br>
+        <p><strong>⚠️ Esta ação é irreversível!</strong></p>
+        <p>O ranking final será gerado e o torneio será encerrado.</p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, finalizar!',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#DC2626',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setFinalizandoTorneio(true);
+      setErro(null);
+
+      const resultado = await finalizarTorneio(tournament.id);
+
+      // Formatar ranking para exibição em HTML
+      const rankingHtml = resultado.ranking
+        .map(r => `
+          <div style="display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee;">
+            <span><strong>${r.posicao}º</strong> - ${r.jogador_nome}</span>
+            <span><strong>${r.pontos}</strong> pontos</span>
+          </div>
+        `)
+        .join('');
+
+      await Swal.fire({
+        title: 'Torneio Finalizado!',
+        html: `
+          <p>${resultado.message}</p>
+          <p><strong>Total de rodadas:</strong> ${resultado.total_rodadas}</p>
+          <br>
+          <div style="text-align: left; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
+            <div style="background: #f8f9fa; padding: 10px; border-bottom: 2px solid #ddd; position: sticky; top: 0;">
+              <strong>🏆 RANKING FINAL</strong>
+            </div>
+            ${rankingHtml}
+          </div>
+        `,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#46AF87',
+        width: '600px',
+      });
+
+      // Recarregar dados do torneio
+      const torneioAtualizado = await buscarTorneioPorId(tournament.id);
+      setTournament(torneioAtualizado);
+
+      // Recarregar rodadas
+      const rodadasAtualizadas = await buscarRodadasDoTorneio(tournament.id);
+      setRodadas(rodadasAtualizadas);
+
+    } catch (e: any) {
+      console.error('Erro ao finalizar torneio:', e);
+      const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
+      
+      await Swal.fire({
+        title: 'Erro!',
+        text: mensagemErro,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#DC2626',
+      });
+    } finally {
+      setFinalizandoTorneio(false);
+    }
+  };
+
   // Fechar dropdown ao clicar fora
   useEffect(() => {
     const handleClickFora = (e: MouseEvent) => {
@@ -305,8 +554,48 @@ const InformacaoTorneioLoja: React.FC = () => {
           <p className={styles.subtitulo}>{tournament.nome}</p>
         </div>
 
-        {/* Dropdown de Rodadas */}
-        <div className={styles.rodadaDropdownContainer}>
+        <div className={styles.headerActions}>
+          {/* Botão Iniciar Torneio - Aparece apenas quando status é "Aberto" */}
+          {tournament.status === "Aberto" && (
+            <Button
+              label="Iniciar Torneio"
+              onClick={handleIniciarTorneio}
+              disabled={iniciandoTorneio}
+              width="auto"
+              height="44px"
+              paddingHorizontal="24px"
+              fontSize="14px"
+            />
+          )}
+
+          {/* Botões para torneio "Em Andamento" */}
+          {tournament.status === "Em Andamento" && (
+            <>
+              <Button
+                label="Próxima Rodada"
+                onClick={handleProximaRodada}
+                disabled={avancandoRodada}
+                width="auto"
+                height="44px"
+                paddingHorizontal="24px"
+                fontSize="14px"
+                backgroundColor="#46AF87"
+              />
+              <Button
+                label="Finalizar Torneio"
+                onClick={handleFinalizarTorneio}
+                disabled={finalizandoTorneio}
+                width="auto"
+                height="44px"
+                paddingHorizontal="24px"
+                fontSize="14px"
+                backgroundColor="#DC2626"
+              />
+            </>
+          )}
+
+          {/* Dropdown de Rodadas */}
+          <div className={styles.rodadaDropdownContainer}>
           <button
             className={styles.rodadaDropdownButton}
             onClick={() => setDropdownAberto(!dropdownAberto)}
@@ -335,6 +624,7 @@ const InformacaoTorneioLoja: React.FC = () => {
               ))}
             </div>
           )}
+          </div>
         </div>
       </div>
 

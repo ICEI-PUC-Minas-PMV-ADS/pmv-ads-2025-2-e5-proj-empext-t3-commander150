@@ -253,6 +253,57 @@ export async function contarInscritosTorneio(idTorneio: number): Promise<number>
 
 
 /**
+ * Inicia um torneio.
+ * 
+ * @param id - ID do torneio a ser iniciado
+ * @returns Resposta da API com informações da rodada criada
+ */
+export const iniciarTorneio = async (id: number): Promise<{
+  message: string;
+  rodada: any;
+  mesas_criadas: number;
+  total_jogadores: number;
+}> => {
+  const resposta = await api.post(`/torneios/torneios/${id}/iniciar/`);
+  return resposta.data;
+};
+
+/**
+ * Avança para a próxima rodada do torneio.
+ * 
+ * @param id - ID do torneio
+ * @returns Resposta da API com informações da nova rodada criada
+ */
+export const proximaRodadaTorneio = async (id: number): Promise<{
+  message: string;
+  rodada: any;
+  mesas_criadas: number;
+}> => {
+  const resposta = await api.post(`/torneios/torneios/${id}/proxima_rodada/`);
+  return resposta.data;
+};
+
+/**
+ * Finaliza um torneio.
+ * 
+ * @param id - ID do torneio a ser finalizado
+ * @returns Resposta da API com ranking final
+ */
+export const finalizarTorneio = async (id: number): Promise<{
+  message: string;
+  ranking: Array<{
+    posicao: number;
+    jogador_id: number;
+    jogador_nome: string;
+    pontos: number;
+  }>;
+  total_rodadas: number;
+}> => {
+  const resposta = await api.post(`/torneios/torneios/${id}/finalizar/`);
+  return resposta.data;
+};
+
+/**
  * Utilitário para tratar erros de torneio de forma consistente.
  * 
  * @param erro - Erro do Axios
