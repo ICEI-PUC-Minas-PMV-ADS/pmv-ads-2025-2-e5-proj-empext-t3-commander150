@@ -206,6 +206,7 @@ function App() {
                 titulo={torneio.nome}
                 data={formatarData(torneio.data_inicio)}
                 hora={formatarHora(torneio.data_inicio)}
+                 dataOriginal={formatarData(torneio.data_inicio)}
                 tags={obterTagsTorneio(torneio)}
                 loja={torneio.loja_nome}
                 status={torneio.status}

@@ -87,9 +87,10 @@ const InscricaoTorneio: React.FC = () => {
     });
   };
 
-  const formatarValor = (valor: number | null | undefined) => {
-    if (valor === null || valor === undefined) return "Gratuito";
-    return `R$ ${valor.toFixed(2).replace('.', ',')}`;
+  const formatarValor = (valor?: number | null, gratuito?: boolean) => {
+    if (gratuito) return 'Gratuito';
+    if (!valor) return 'R$ 0,00';
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   const formatarRegras = (regras: string | null | undefined) => {
