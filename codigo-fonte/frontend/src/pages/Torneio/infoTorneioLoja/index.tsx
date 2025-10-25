@@ -10,15 +10,17 @@
 
 import { useEffect, useState } from "react";
 import type { ITorneio, IRodada, IMesaRodada } from "../../../tipos/tipos";
-import { buscarJogadoresInscritos, buscarTorneioPorId, tratarErroTorneio } from "../../../services/torneioServico";
+import { buscarJogadoresInscritos, buscarSobressalentes, buscarTorneioPorId, tratarErroTorneio, iniciarTorneio, proximaRodadaTorneio, finalizarTorneio, buscarRankingRodada } from "../../../services/torneioServico";
 import { buscarRodadasDoTorneio, buscarMesasDaRodada } from "../../../services/mesaServico";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
-import { FiGift, FiChevronDown } from "react-icons/fi";
+import { FiGift, FiChevronDown, FiPlay, FiSkipForward, FiCheckCircle } from "react-icons/fi";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
 import RegrasPartida from "../../../components/CardRegrasPartida";
 import MesaCard from "../../../components/CardMesaParticipante";
 import { useParams } from "react-router-dom";
+import Button from "../../../components/Button";
+import Swal from 'sweetalert2';
 
 interface Mesa {
   id: number;
@@ -46,8 +48,43 @@ const InformacaoTorneioLoja: React.FC = () => {
   const [rodadaSelecionada, setRodadaSelecionada] = useState<IRodada | null>(null);
   const [dropdownAberto, setDropdownAberto] = useState(false);
   const [carregandoMesas, setCarregandoMesas] = useState(false);
+  const [iniciandoTorneio, setIniciandoTorneio] = useState(false);
+  const [avancandoRodada, setAvancandoRodada] = useState(false);
+  const [finalizandoTorneio, setFinalizandoTorneio] = useState(false);
+  const [resultadoFinalSelecionado, setResultadoFinalSelecionado] = useState(false);
+  const [rankingParcial, setRankingParcial] = useState<Array<{
+    posicao: number;
+    jogador_id: number;
+    jogador_nome: string;
+    pontos: number;
+  }> | null>(null);
+  const [rankingDireita, setRankingDireita] = useState<Array<{
+    posicao: number;
+    jogador_id: number;
+    jogador_nome: string;
+    pontos: number;
+  }> | null>(null);
+  const [carregandoRankingDireita, setCarregandoRankingDireita] = useState(false);
+
+  // Carregar ranking para coluna direita
+  const carregarRankingDireita = async (rodadaId: number) => {
+    if (!tournament?.id) return;
+
+    try {
+      setCarregandoRankingDireita(true);
+      const response = await buscarRankingRodada(tournament.id, rodadaId);
+      setRankingDireita(response.ranking);
+    } catch (error) {
+      console.error('Erro ao carregar ranking da coluna direita:', error);
+      setRankingDireita(null);
+    } finally {
+      setCarregandoRankingDireita(false);
+    }
+  };
 
   const { id } = useParams<{ id: string }>();
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectResult = urlParams.get('preselect') === 'result';
 
   // Recuperar mesas confirmadas do localStorage
   const getStorageKey = () => `mesasConfirmadas_torneio_${id}`;
@@ -148,14 +185,17 @@ const InformacaoTorneioLoja: React.FC = () => {
       const mesasProcessadas = processarMesasDaAPI(mesasDaRodada, confirmadas, rodada.status);
       setMesas(mesasProcessadas);
 
-      // Definir sobressalentes (mesa 0)
-      const mesasBye = mesasDaRodada.filter(m => m.numero_mesa === 0);
+      // Buscar jogadores sobressalentes
+      try {
+        const sobressalentesRodada = await buscarSobressalentes(rodada.id);
+        const jogadoresSobressalentes = sobressalentesRodada.map(s => ({
+          id: s.id,
+          nome: s.username
+        }));
 
-      if (mesasBye.length > 0) {
-        const mesaBye = mesasBye[0];
-        const jogadoresBye = mesaBye.jogadores.map(j => j.username);
-        setSobressalentes(jogadoresBye.map((nome, idx) => ({ id: idx, nome })));
-      } else {
+        setSobressalentes(jogadoresSobressalentes);
+      } catch (error) {
+        console.error('Erro ao buscar sobressalentes:', error);
         setSobressalentes([]);
       }
 
@@ -194,6 +234,11 @@ const InformacaoTorneioLoja: React.FC = () => {
           const rodadaInicial = rodadaEmAndamento || rodadasTorneio[0];
           setRodadaSelecionada(rodadaInicial);
           await carregarMesasDaRodada(rodadaInicial);
+
+          // Carregar ranking inicial para coluna direita
+          if (dadosTorneio.status === "Em Andamento" || dadosTorneio.status === "Finalizado") {
+            await carregarRankingDireita(rodadaInicial.id);
+          }
         }
 
       } catch (e) {
@@ -227,7 +272,7 @@ const InformacaoTorneioLoja: React.FC = () => {
     } else if (tournament?.status === "Finalizado") {
       return "Finalizado";
     } else if (tournament?.status === "Aberto") {
-      return "Em andamento";
+      return "Aberto";
     }
     return "Em andamento";
   };
@@ -271,8 +316,266 @@ const InformacaoTorneioLoja: React.FC = () => {
   const handleSelecionarRodada = async (rodada: IRodada) => {
     setRodadaSelecionada(rodada);
     setDropdownAberto(false);
+    setResultadoFinalSelecionado(false);
     await carregarMesasDaRodada(rodada);
+
+    // Carregar ranking para coluna direita
+    if (tournament?.status === "Em Andamento" || tournament?.status === "Finalizado") {
+      await carregarRankingDireita(rodada.id);
+    }
   };
+
+  // Handler para selecionar resultado final
+  const handleSelecionarResultadoFinal = async () => {
+    if (!tournament?.id || rodadas.length === 0) return;
+
+    try {
+      setCarregandoMesas(true);
+      setDropdownAberto(false);
+      setResultadoFinalSelecionado(true);
+
+      // Buscar ranking da última rodada
+      const ultimaRodada = rodadas[rodadas.length - 1];
+      const response = await buscarRankingRodada(tournament.id, ultimaRodada.id);
+
+      setRankingParcial(response.ranking);
+      setMesas([]);
+      setSobressalentes([]);
+      // Limpar ranking da coluna direita quando visões resultado final
+      setRankingDireita(null);
+    } catch (e: any) {
+      console.error('Erro ao carregar ranking final:', e);
+      setResultadoFinalSelecionado(false);
+    } finally {
+      setCarregandoMesas(false);
+    }
+  };
+
+  // Handler para iniciar torneio
+  const handleIniciarTorneio = async () => {
+    if (!tournament?.id) return;
+
+    const result = await Swal.fire({
+      title: 'Iniciar Torneio',
+      html: `
+        <p>Deseja realmente iniciar o torneio <strong>"${tournament.nome}"</strong>?</p>
+        <br>
+        <p><strong>Jogadores inscritos:</strong> ${jogadoresInscritos.length}</p>
+        <p>Esta ação criará a primeira rodada e emparelhará os jogadores.</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, iniciar!',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#9b80b6',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setIniciandoTorneio(true);
+      setErro(null);
+
+      const resultado = await iniciarTorneio(tournament.id);
+
+      await Swal.fire({
+        title: 'Torneio Iniciado!',
+        html: `
+          <p>${resultado.message}</p>
+          <br>
+          <p><strong>Mesas criadas:</strong> ${resultado.mesas_criadas}</p>
+          <p><strong>Total de jogadores:</strong> ${resultado.total_jogadores}</p>
+        `,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#46AF87',
+      });
+
+      // Recarregar dados do torneio
+      const torneioAtualizado = await buscarTorneioPorId(tournament.id);
+      setTournament(torneioAtualizado);
+
+      // Recarregar rodadas
+      const rodadasAtualizadas = await buscarRodadasDoTorneio(tournament.id);
+      setRodadas(rodadasAtualizadas);
+
+      // Selecionar a primeira rodada criada
+      if (rodadasAtualizadas.length > 0) {
+        const primeiraRodada = rodadasAtualizadas[0];
+        setRodadaSelecionada(primeiraRodada);
+        await carregarMesasDaRodada(primeiraRodada);
+      }
+
+    } catch (e: any) {
+      console.error('Erro ao iniciar torneio:', e);
+      const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
+      
+      await Swal.fire({
+        title: 'Erro!',
+        text: mensagemErro,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#DC2626',
+      });
+    } finally {
+      setIniciandoTorneio(false);
+    }
+  };
+
+  // Handler para avançar para próxima rodada
+  const handleProximaRodada = async () => {
+    if (!tournament?.id) return;
+
+    const result = await Swal.fire({
+      title: 'Avançar para Próxima Rodada',
+      html: `
+        <p>Deseja avançar para a próxima rodada?</p>
+        <br>
+        <p>Esta ação finalizará a rodada atual e criará uma nova rodada com emparelhamento Swiss.</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, avançar!',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#46AF87',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setAvancandoRodada(true);
+      setErro(null);
+
+      const resultado = await proximaRodadaTorneio(tournament.id);
+
+      await Swal.fire({
+        title: 'Rodada Avançada!',
+        html: `
+          <p>${resultado.message}</p>
+          <br>
+          <p><strong>Mesas criadas:</strong> ${resultado.mesas_criadas}</p>
+        `,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#46AF87',
+      });
+
+      // Recarregar rodadas
+      const rodadasAtualizadas = await buscarRodadasDoTorneio(tournament.id);
+      setRodadas(rodadasAtualizadas);
+
+      // Selecionar a nova rodada criada
+      if (rodadasAtualizadas.length > 0) {
+        const novaRodada = rodadasAtualizadas[rodadasAtualizadas.length - 1];
+        setRodadaSelecionada(novaRodada);
+        await carregarMesasDaRodada(novaRodada);
+      }
+
+    } catch (e: any) {
+      console.error('Erro ao avançar rodada:', e);
+      const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
+      
+      await Swal.fire({
+        title: 'Erro!',
+        text: mensagemErro,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#DC2626',
+      });
+    } finally {
+      setAvancandoRodada(false);
+    }
+  };
+
+  // Handler para finalizar torneio
+  const handleFinalizarTorneio = async () => {
+    if (!tournament?.id) return;
+
+    const result = await Swal.fire({
+      title: 'Finalizar Torneio',
+      html: `
+        <p>Deseja realmente finalizar o torneio <strong>"${tournament.nome}"</strong>?</p>
+        <br>
+        <p><strong>⚠️ Esta ação é irreversível!</strong></p>
+        <p>O ranking final será gerado e o torneio será encerrado.</p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, finalizar!',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#DC2626',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setFinalizandoTorneio(true);
+      setErro(null);
+
+      const resultado = await finalizarTorneio(tournament.id);
+
+      // Formatar ranking para exibição em HTML
+      const rankingHtml = resultado.ranking
+        .map(r => `
+          <div style="display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee;">
+            <span><strong>${r.posicao}º</strong> - ${r.jogador_nome}</span>
+            <span><strong>${r.pontos}</strong> pontos</span>
+          </div>
+        `)
+        .join('');
+
+      await Swal.fire({
+        title: 'Torneio Finalizado!',
+        html: `
+          <p>${resultado.message}</p>
+          <p><strong>Total de rodadas:</strong> ${resultado.total_rodadas}</p>
+          <br>
+          <div style="text-align: left; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
+            <div style="background: #f8f9fa; padding: 10px; border-bottom: 2px solid #ddd; position: sticky; top: 0;">
+              <strong>🏆 RANKING FINAL</strong>
+            </div>
+            ${rankingHtml}
+          </div>
+        `,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#46AF87',
+        width: '600px',
+      });
+
+      // Recarregar dados do torneio
+      const torneioAtualizado = await buscarTorneioPorId(tournament.id);
+      setTournament(torneioAtualizado);
+
+      // Recarregar rodadas
+      const rodadasAtualizadas = await buscarRodadasDoTorneio(tournament.id);
+      setRodadas(rodadasAtualizadas);
+
+    } catch (e: any) {
+      console.error('Erro ao finalizar torneio:', e);
+      const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
+      
+      await Swal.fire({
+        title: 'Erro!',
+        text: mensagemErro,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#DC2626',
+      });
+    } finally {
+      setFinalizandoTorneio(false);
+    }
+  };
+
+  // Handler para pré-selecionar resultado final quando vindo do histórico
+  useEffect(() => {
+    if (preselectResult && rodadas.length > 0 && tournament?.status === "Finalizado") {
+      handleSelecionarResultadoFinal();
+    }
+  }, [preselectResult, rodadas, tournament]);
 
   // Fechar dropdown ao clicar fora
   useEffect(() => {
@@ -305,34 +608,90 @@ const InformacaoTorneioLoja: React.FC = () => {
           <p className={styles.subtitulo}>{tournament.nome}</p>
         </div>
 
-        {/* Dropdown de Rodadas */}
-        <div className={styles.rodadaDropdownContainer}>
-          <button
-            className={styles.rodadaDropdownButton}
-            onClick={() => setDropdownAberto(!dropdownAberto)}
-          >
-            <span>
-              {rodadaSelecionada
-                ? `Rodada ${rodadaSelecionada.numero_rodada} de ${rodadas.length}`
-                : 'Selecione uma rodada'}
-            </span>
-            <FiChevronDown className={dropdownAberto ? styles.iconRotate : ''} />
-          </button>
+        <div className={styles.headerActions}>
+          {/* Botão Iniciar Torneio - Aparece apenas quando status é "Aberto" */}
+          {tournament.status === "Aberto" && (
+            <Button
+              label="Iniciar Torneio"
+              onClick={handleIniciarTorneio}
+              disabled={iniciandoTorneio}
+              width="auto"
+              height="44px"
+              paddingHorizontal="24px"
+              fontSize="14px"
+            />
+          )}
 
-          {dropdownAberto && (
-            <div className={styles.rodadaDropdownMenu}>
-              {rodadas.map((rodada) => (
-                <div
-                  key={rodada.id}
-                  className={`${styles.rodadaDropdownItem} ${
-                    rodadaSelecionada?.id === rodada.id ? styles.rodadaAtiva : ''
-                  }`}
-                  onClick={() => handleSelecionarRodada(rodada)}
-                >
-                  <span>Rodada {rodada.numero_rodada}</span>
-                  <span className={styles.rodadaStatus}>{rodada.status}</span>
-                </div>
-              ))}
+          {/* Botões para torneio "Em Andamento" */}
+          {tournament.status === "Em Andamento" && (
+            <>
+              <Button
+                label="Próxima Rodada"
+                onClick={handleProximaRodada}
+                disabled={avancandoRodada}
+                width="auto"
+                height="44px"
+                paddingHorizontal="24px"
+                fontSize="14px"
+                backgroundColor="#46AF87"
+              />
+              <Button
+                label="Finalizar Torneio"
+                onClick={handleFinalizarTorneio}
+                disabled={finalizandoTorneio}
+                width="auto"
+                height="44px"
+                paddingHorizontal="24px"
+                fontSize="14px"
+                backgroundColor="#DC2626"
+              />
+            </>
+          )}
+
+          {/* Dropdown de Rodadas - Aparece apenas para torneios em andamento ou finalizados */}
+          {tournament.status !== "Aberto" && (
+            <div className={styles.rodadaDropdownContainer}>
+            <button
+              className={styles.rodadaDropdownButton}
+              onClick={() => setDropdownAberto(!dropdownAberto)}
+            >
+              <span>
+                {resultadoFinalSelecionado
+                  ? 'Resultado final'
+                  : rodadaSelecionada
+                  ? `Rodada ${rodadaSelecionada.numero_rodada} de ${rodadas.length}`
+                  : 'Selecione uma rodada'}
+              </span>
+              <FiChevronDown className={dropdownAberto ? styles.iconRotate : ''} />
+            </button>
+
+            {dropdownAberto && (
+              <div className={styles.rodadaDropdownMenu}>
+                {rodadas.map((rodada) => (
+                  <div
+                    key={rodada.id}
+                    className={`${styles.rodadaDropdownItem} ${
+                      rodadaSelecionada?.id === rodada.id && !resultadoFinalSelecionado ? styles.rodadaAtiva : ''
+                    }`}
+                    onClick={() => handleSelecionarRodada(rodada)}
+                  >
+                    <span>Rodada {rodada.numero_rodada}</span>
+                    <span className={styles.rodadaStatus}>{rodada.status}</span>
+                  </div>
+                ))}
+                {tournament.status === "Finalizado" && (
+                  <div
+                    className={`${styles.rodadaDropdownItem} ${
+                      resultadoFinalSelecionado ? styles.rodadaAtiva : ''
+                    }`}
+                    onClick={() => handleSelecionarResultadoFinal()}
+                  >
+                    <span>🏆 Resultado final</span>
+                    <span className={styles.rodadaStatus}>Final</span>
+                  </div>
+                )}
+              </div>
+            )}
             </div>
           )}
         </div>
@@ -342,56 +701,108 @@ const InformacaoTorneioLoja: React.FC = () => {
       <div className={styles.gridContainer}>
         {/* Coluna Esquerda - Mesas e Sobressalentes */}
         <div className={styles.colunaEsquerda}>
-          {/* Mesas Participantes */}
-          <div className={styles.mesasCard}>
-            <h2 className={styles.cardTitulo}>Mesas participantes</h2>
-            {erro && (
-              <div className={styles.mensagemErro}>
-                {erro}
-              </div>
-            )}
-            {carregandoMesas ? (
-              <div className={styles.loading}>Carregando mesas...</div>
-            ) : (
-              <div className={styles.mesasGrid}>
-                {mesas.filter(m => m.numero_mesa !== 0).length > 0 ? (
-                  mesas
-                    .filter(m => m.numero_mesa !== 0)
-                    .map((mesa) => (
-                      <MesaCard
-                        key={mesa.id}
-                        mesaId={mesa.id}
-                        numeroMesa={mesa.numero_mesa}
-                        time1={mesa.time1}
-                        time2={mesa.time2}
-                        status={mesa.status}
-                        pontuacaoTime1={mesa.pontuacao_time_1}
-                        pontuacaoTime2={mesa.pontuacao_time_2}
-                        onConfirmarResultado={handleConfirmarResultado}
-                      />
-                    ))
-                ) : (
-                  <p className={styles.mensagemVazia}>Nenhuma mesa criada ainda.</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Participantes Sobressalentes */}
-          <div className={styles.sobressalentesCard}>
-            <h2 className={styles.cardTitulo}>Participantes sobressalentes</h2>
-            <div className={styles.sobressalentesList}>
-              {sobressalentes.length > 0 ? (
-                sobressalentes.map((participante) => (
-                  <div key={participante.id} className={styles.sobressalenteItem}>
-                    {participante.nome}
-                  </div>
-                ))
+          {/* Condicional: Exibe Mesas para torneios em andamento ou Jogadores Inscritos para torneios abertos */}
+          {tournament.status === "Aberto" ? (
+            /* Jogadores Inscritos - Para torneios abertos */
+            <div className={styles.mesasCard}>
+              <h2 className={styles.cardTitulo}>Usuários inscritos</h2>
+              <span className={styles.infoJogadores}>
+                {jogadoresInscritos.length} {jogadoresInscritos.length === 1 ? 'jogador' : 'jogadores'}
+              </span>
+              {jogadoresInscritos.length > 0 ? (
+                <ul className={styles.playerList}>
+                  {jogadoresInscritos.map((player, index) => (
+                    <li key={index} className={styles.playerItem}>
+                      <span className={styles.numeroJogador}>{index + 1}. </span>
+                      <span className={styles.nomeJogador}>{player}</span>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p className={styles.mensagemVazia}>Nenhum participante sobressalente.</p>
+                <div className={styles.mensagemVazia}>Nenhum jogador inscrito ainda.</div>
               )}
             </div>
-          </div>
+          ) : resultadoFinalSelecionado && rankingParcial ? (
+            /* Ranking Final - Quando resultado final é selecionado */
+            <div className={styles.mesasCard}>
+              <h2 className={styles.cardTitulo}>🏆 Ranking Final do Torneio</h2>
+              {carregandoMesas ? (
+                <div className={styles.loading}>Carregando ranking...</div>
+              ) : rankingParcial.length > 0 ? (
+                <div className={styles.rankingContainer}>
+                  {rankingParcial.map((jogador) => (
+                    <div key={jogador.jogador_id} className={styles.rankingItem}>
+                      <div className={styles.rankingPosicao}>
+                        {jogador.posicao === 1 && '🥇'}
+                        {jogador.posicao === 2 && '🥈'}
+                        {jogador.posicao === 3 && '🥉'}
+                        {jogador.posicao > 3 && <span>{jogador.posicao}º</span>}
+                      </div>
+                      <div className={styles.rankingInfo}>
+                        <span className={styles.rankingNome}>{jogador.jogador_nome}</span>
+                        <span className={styles.rankingPontos}>{jogador.pontos} pontos</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className={styles.mensagemVazia}>Nenhum ranking disponível.</div>
+              )}
+            </div>
+          ) : (
+            /* Mesas Participantes - Para torneios em andamento */
+            <>
+              <div className={styles.mesasCard}>
+                <h2 className={styles.cardTitulo}>Mesas participantes</h2>
+                {erro && (
+                  <div className={styles.mensagemErro}>
+                    {erro}
+                  </div>
+                )}
+                {carregandoMesas ? (
+                  <div className={styles.loading}>Carregando mesas...</div>
+                ) : (
+                  <div className={styles.mesasGrid}>
+                    {mesas.filter(m => m.numero_mesa !== 0).length > 0 ? (
+                      mesas
+                        .filter(m => m.numero_mesa !== 0)
+                        .map((mesa) => (
+                          <MesaCard
+                            key={mesa.id}
+                            mesaId={mesa.id}
+                            numeroMesa={mesa.numero_mesa}
+                            time1={mesa.time1}
+                            time2={mesa.time2}
+                            status={mesa.status}
+                            pontuacaoTime1={mesa.pontuacao_time_1}
+                            pontuacaoTime2={mesa.pontuacao_time_2}
+                            onConfirmarResultado={handleConfirmarResultado}
+                          />
+                        ))
+                    ) : (
+                      <p className={styles.mensagemVazia}>Nenhuma mesa criada ainda.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Participantes Sobressalentes */}
+              <div className={styles.sobressalentesCard}>
+                <h2 className={styles.cardTitulo}>Participantes sobressalentes</h2>
+                <div className={styles.sobressalentesList}>
+                  {sobressalentes.length > 0 ? (
+                    sobressalentes.map((participante) => (
+                      <div key={participante.id} className={styles.sobressalenteItem}>
+                        {participante.nome}
+                      </div>
+                    ))
+                  ) : (
+                    <p className={styles.mensagemVazia}>Nenhum participante sobressalente.</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Coluna Direita - Informações */}
@@ -436,6 +847,51 @@ const InformacaoTorneioLoja: React.FC = () => {
 
           {/* Regras da Partida */}
           <RegrasPartida regras={regrasPartida} />
+
+          {/* Ranking Parcial - Apenas para torneios em andamento ou finalizados */}
+          {(tournament.status === "Em Andamento" || tournament.status === "Finalizado") && !resultadoFinalSelecionado && (
+            <div className={styles.mesasCard}>
+              <h2 className={styles.cardTitulo}>🏆 Ranking Atual</h2>
+              {carregandoRankingDireita ? (
+                <div className={styles.loading}>Carregando ranking...</div>
+              ) : rankingDireita ? (
+                <div className={styles.rankingContainer}>
+                  <div style={{
+                    fontSize: '0.9rem',
+                    color: 'var(--var-cor-cinza-placeholder)',
+                    marginBottom: '1rem',
+                    fontWeight: 500
+                  }}>
+                    Rodada {rodadaSelecionada?.numero_rodada} - Pontuação acumulada
+                  </div>
+                  {rankingDireita.slice(0, 10).map((jogador) => (
+                    <div key={jogador.jogador_id} className={styles.rankingItem}>
+                      <div className={styles.rankingPosicao}>
+                        {jogador.posicao === 1 && '🥇'}
+                        {jogador.posicao === 2 && '🥈'}
+                        {jogador.posicao === 3 && '🥉'}
+                        {jogador.posicao > 3 && <span>{jogador.posicao}º</span>}
+                      </div>
+                      <div className={styles.rankingInfo}>
+                        <span className={styles.rankingNome}>{jogador.jogador_nome}</span>
+                        <span className={styles.rankingPontos}>{jogador.pontos} pontos</span>
+                      </div>
+                    </div>
+                  ))}
+                  {rankingDireita.length === 0 && (
+                    <div className={styles.mensagemVazia}>Nenhum ranking disponível.</div>
+                  )}
+                  {carregandoRankingDireita && (
+                    <div className={styles.loading}>Carregando ranking...</div>
+                  )}
+                </div>
+              ) : (
+                <div className={styles.mensagemVazia}>
+                  Selecione uma rodada para visualizar o ranking
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

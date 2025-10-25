@@ -13,7 +13,6 @@ import PaginaRecuperarSenha from "../pages/auth/recuperar-senha";
 import PaginaCadastrar from "../pages/auth/cadastrar";
 import PaginaAlterarSenha from "../pages/auth/alterar-senha";
 import InscricaoTorneio from "../pages/Torneio/inscrever";
-import PaginaTorneio from "../pages/Torneio/visualizar";
 import CriarTorneio from "../pages/Torneio/criar";
 import HistoricoTorneios from "../pages/Torneio/historico";
 import TorneioRouter from "../pages/Torneio/TorneioRouter";
@@ -49,7 +48,6 @@ export default function AppRoutes() {
           <Route path="/loja/" element={<LojaTeste />} />
           <Route path="/admin/" element={<App />} />
           <Route path="/alterar-senha/" element={<PaginaAlterarSenha />} />
-          <Route path="/torneio/" element={<PaginaTorneio />} />
           <Route path="/inscricao-torneio/:id" element={<InscricaoTorneio />} />
           <Route path="/criar-evento/" element={<CriarTorneio />} />
           <Route path="/historico/" element={<HistoricoTorneios />} />

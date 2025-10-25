@@ -3,24 +3,26 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
+import Swal from 'sweetalert2';
 
 interface TagProps {
   texto: string;
-  icone?: React.ReactNode; // ícone opcional (esquerda)
-  corFundo?: string; // cor customizável
+  icone?: React.ReactNode;
+  corFundo?: string;
 }
 
 interface CardTorneioProps {
-  id: number; // ID do torneio
-  imagem: string; // URL da imagem
-  titulo: string; // título do torneio
-  data: string; // data (ex: 18.08.23)
-  hora: string; // hora (ex: 19:00)
-  tags?: TagProps[]; // lista de tags
-  loja?: string; // nome da loja
-  status?: string; // status do torneio
-  usuario?: any; // dados do usuário logado
-  onInscreverJogador?: () => void; // callback para inscrever jogador (apenas para lojas)
+  id: number;
+  imagem: string;
+  titulo: string;
+  data: string; // Data formatada (ex: 18.08.23)
+  hora: string; // Hora formatada (ex: 19:00)
+  dataOriginal: string; // Data/hora original do torneio para comparação
+  tags?: TagProps[];
+  loja?: string;
+  status?: string;
+  usuario?: any;
+  onInscreverJogador?: () => void;
 }
 
 const CardTorneio = ({ 
@@ -29,6 +31,7 @@ const CardTorneio = ({
   titulo, 
   data, 
   hora, 
+  dataOriginal, // Nova prop
   tags = [], 
   loja, 
   status, 
@@ -37,19 +40,40 @@ const CardTorneio = ({
 }: CardTorneioProps) => {
   const navigate = useNavigate();
 
+  // Função para verificar se o torneio já aconteceu
+  const torneioJaOcorreu = () => {
+    const dataTorneio = new Date(dataOriginal);
+    const dataAtual = new Date();
+    return dataTorneio < dataAtual;
+  };
+
+  // Função para mostrar alerta de torneio já realizado
+  const mostrarAlertaTorneioPassado = () => {
+    Swal.fire({
+      title: 'Torneio já realizado',
+      text: 'Este torneio já aconteceu e não está mais disponível para inscrição.',
+      icon: 'warning',
+      confirmButtonText: 'Entendi',
+      confirmButtonColor: '#334155',
+    });
+  };
+
   // Função para lidar com o clique no card
   const handleClick = () => {
     // Se for loja, não navega ao clicar no card
     if (usuario?.tipo === 'LOJA') {
       return;
     }
+
+    // Verifica se o torneio já aconteceu
+    if (torneioJaOcorreu()) {
+      mostrarAlertaTorneioPassado();
+      return;
+    }
     
     if (usuario) {
-      // Se usuário está logado, vai direto para inscrição
       navigate(`/inscricao-torneio/${id}`);
     } else {
-      // Se não está logado, vai para login com redirecionamento
-      // Salvar o ID do torneio no localStorage para redirecionar após login
       localStorage.setItem('redirectAfterLogin', `/inscricao-torneio/${id}`);
       navigate('/login/');
     }
@@ -57,7 +81,14 @@ const CardTorneio = ({
 
   // Função para lidar com o botão de inscrever jogador
   const handleInscreverJogador = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Evita que o clique no botão dispare o handleClick do card
+    e.stopPropagation();
+    
+    // Verifica se o torneio já aconteceu antes de inscrever
+    if (torneioJaOcorreu()) {
+      mostrarAlertaTorneioPassado();
+      return;
+    }
+    
     if (onInscreverJogador) {
       onInscreverJogador();
     }
@@ -69,6 +100,13 @@ const CardTorneio = ({
       <div className={styles.imagemWrapper}>
         <img src={imagem} alt={titulo} className={styles.imagem} />
         <div className={styles.degrade}></div>
+        
+        {/* Badge se torneio já aconteceu */}
+        {torneioJaOcorreu() && (
+          <div className={styles.badgeExpirado}>
+            Realizado
+          </div>
+        )}
       </div>
 
       {/* Conteúdo abaixo da imagem */}
@@ -97,8 +135,9 @@ const CardTorneio = ({
           <button 
             className={styles.btnInscrever}
             onClick={handleInscreverJogador}
+            disabled={torneioJaOcorreu()} // Desabilita se torneio já aconteceu
           >
-            + Inscrever Jogador
+            {torneioJaOcorreu() ? 'Torneio Realizado' : '+ Inscrever Jogador'}
           </button>
         )}
       </div>

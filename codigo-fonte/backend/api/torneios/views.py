@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django.db import transaction
+from django.db.models import Sum, Count, Q
+import random
 
 from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador
 from .permissoes import IsLojaOuAdmin, IsApenasLeitura, IsJogadorNaMesa
@@ -98,17 +100,588 @@ class TorneioViewSet(viewsets.ModelViewSet):
             self.check_object_permissions(self.request, obj)
         return obj
 
+    @swagger_auto_schema(
+        method='post',
+        responses={
+            200: openapi.Response(
+                description="Torneio iniciado com sucesso",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'rodada': openapi.Schema(type=openapi.TYPE_OBJECT),
+                        'mesas_criadas': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'total_jogadores': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    }
+                )
+            ),
+            400: 'Erro de validação',
+            403: 'Permissão negada'
+        },
+        operation_summary="Iniciar torneio",
+        operation_description="""
+        Inicia um torneio criando a primeira rodada e emparelhando jogadores.
+        
+        **Validações:**
+        - Torneio deve estar com status 'Aberto'
+        - Deve ter no mínimo 4 jogadores inscritos (para formar 2v2)
+        
+        **Ações:**
+        - Valida número de inscritos
+        - Muda status do torneio para 'Em Andamento'
+        - Cria a Rodada 1
+        - Emparelha jogadores aleatoriamente em mesas 2v2
+        - Se número de jogadores for ímpar ou sobrar menos de 4, jogadores recebem bye
+        """
+    )
+    @action(detail=True, methods=['post'], permission_classes=[IsLojaOuAdmin])
+    def iniciar(self, request, pk=None):
+        """
+        Inicia o torneio criando a primeira rodada e emparelhando jogadores.
+        """
+        torneio = self.get_object()
+        
+        # Validação: Status deve ser 'Aberto'
+        if torneio.status != 'Aberto':
+            return Response(
+                {"detail": f"Torneio deve estar com status 'Aberto'. Status atual: {torneio.status}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Busca inscrições ativas (não canceladas)
+        inscricoes_ativas = Inscricao.objects.filter(
+            id_torneio=torneio
+        ).exclude(status='Cancelado')
+        
+        total_jogadores = inscricoes_ativas.count()
+        
+        # Validação: Mínimo 4 jogadores
+        if total_jogadores < 4:
+            return Response(
+                {"detail": f"É necessário ter no mínimo 4 jogadores inscritos. Total atual: {total_jogadores}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        with transaction.atomic():
+            # Muda status do torneio para 'Em Andamento'
+            torneio.status = 'Em Andamento'
+            torneio.save(update_fields=['status'])
+            
+            # Cria Rodada 1
+            rodada = Rodada.objects.create(
+                id_torneio=torneio,
+                numero_rodada=1,
+                status='Em Andamento'
+            )
+            
+            # Pega lista de jogadores e embaralha aleatoriamente
+            jogadores = list(inscricoes_ativas.values_list('id_usuario_id', flat=True))
+            random.shuffle(jogadores)
+            
+            # Calcula quantas mesas completas (4 jogadores) podem ser formadas
+            num_mesas = len(jogadores) // 4
+            mesas_criadas = 0
+            
+            # Cria mesas 2v2
+            for i in range(num_mesas):
+                mesa = Mesa.objects.create(
+                    id_rodada=rodada,
+                    numero_mesa=i + 1
+                )
+                
+                # Pega 4 jogadores para esta mesa
+                jogadores_mesa = jogadores[i * 4:(i + 1) * 4]
+                
+                # Distribui em times (2 primeiros no Time 1, 2 últimos no Time 2)
+                for j, jogador_id in enumerate(jogadores_mesa):
+                    time = 1 if j < 2 else 2
+                    MesaJogador.objects.create(
+                        id_mesa=mesa,
+                        id_usuario_id=jogador_id,
+                        time=time
+                    )
+                
+                mesas_criadas += 1
+            
+            # Jogadores restantes (se houver) recebem bye implícito
+            # (não jogam nesta rodada)
+            jogadores_com_bye = len(jogadores) % 4
+        
+        message = f"Torneio iniciado com sucesso. {mesas_criadas} mesa(s) criada(s)."
+        if jogadores_com_bye > 0:
+            message += f" {jogadores_com_bye} jogador(es) recebeu(ram) bye nesta rodada."
+        
+        return Response({
+            'message': message,
+            'rodada': RodadaSerializer(rodada).data,
+            'mesas_criadas': mesas_criadas,
+            'total_jogadores': total_jogadores
+        }, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        method='post',
+        responses={
+            200: openapi.Response(
+                description="Nova rodada criada com sucesso",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'rodada': openapi.Schema(type=openapi.TYPE_OBJECT),
+                        'mesas_criadas': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    }
+                )
+            ),
+            400: 'Erro de validação',
+            403: 'Permissão negada'
+        },
+        operation_summary="Avançar para próxima rodada",
+        operation_description="""
+        Finaliza a rodada atual e cria a próxima rodada com emparelhamento Swiss.
+        
+        **Validações:**
+        - Torneio deve estar 'Em Andamento'
+        - Todas as mesas da rodada atual devem ter resultado reportado
+        - Não pode exceder o número máximo de rodadas configurado
+        
+        **Ações:**
+        - Finaliza rodada atual
+        - Calcula pontuação de cada jogador
+        - Ordena jogadores por pontuação (maior para menor)
+        - Emparelha jogadores com pontuações similares (Swiss pairing)
+        - Cria nova rodada
+        """
+    )
+    @action(detail=True, methods=['post'], permission_classes=[IsLojaOuAdmin])
+    def proxima_rodada(self, request, pk=None):
+        """
+        Avança para a próxima rodada do torneio.
+        """
+        torneio = self.get_object()
+        
+        # Validação: Status deve ser 'Em Andamento'
+        if torneio.status != 'Em Andamento':
+            return Response(
+                {"detail": f"Torneio deve estar 'Em Andamento'. Status atual: {torneio.status}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Busca rodada atual
+        try:
+            rodada_atual = Rodada.objects.filter(id_torneio=torneio).order_by('-numero_rodada').first()
+        except Rodada.DoesNotExist:
+            return Response(
+                {"detail": "Nenhuma rodada encontrada para este torneio."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validação: Todas as mesas devem ter resultado reportado
+        mesas_sem_resultado = Mesa.objects.filter(
+            id_rodada=rodada_atual,
+            time_vencedor__isnull=True
+        ).count()
+        
+        if mesas_sem_resultado > 0:
+            return Response(
+                {"detail": f"Existem {mesas_sem_resultado} mesa(s) sem resultado reportado na rodada atual."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validação: Não exceder número máximo de rodadas
+        if torneio.quantidade_rodadas and rodada_atual.numero_rodada >= torneio.quantidade_rodadas:
+            return Response(
+                {"detail": f"Número máximo de rodadas ({torneio.quantidade_rodadas}) atingido. Use o endpoint de finalizar torneio."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        with transaction.atomic():
+            # Finaliza rodada atual
+            rodada_atual.status = 'Finalizada'
+            rodada_atual.save(update_fields=['status'])
+            
+            # Calcula pontuação de cada jogador
+            jogadores_pontuacao = self._calcular_pontuacao_jogadores(torneio)
+            
+            # Ordena por pontuação (maior para menor)
+            jogadores_ordenados = sorted(
+                jogadores_pontuacao.items(),
+                key=lambda x: x[1],
+                reverse=True
+            )
+            
+            # Cria nova rodada
+            nova_rodada = Rodada.objects.create(
+                id_torneio=torneio,
+                numero_rodada=rodada_atual.numero_rodada + 1,
+                status='Em Andamento'
+            )
+            
+            # Cria mesas com Swiss pairing
+            mesas_criadas = self._criar_mesas_swiss(nova_rodada, jogadores_ordenados, torneio)
+        
+        return Response({
+            'message': f'Rodada {nova_rodada.numero_rodada} criada com sucesso',
+            'rodada': RodadaSerializer(nova_rodada).data,
+            'mesas_criadas': mesas_criadas
+        }, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        method='post',
+        responses={
+            200: openapi.Response(
+                description="Torneio finalizado com sucesso",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'ranking': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'posicao': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'jogador_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'jogador_nome': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'pontos': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                }
+                            )
+                        ),
+                        'total_rodadas': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    }
+                )
+            ),
+            400: 'Erro de validação',
+            403: 'Permissão negada'
+        },
+        operation_summary="Finalizar torneio",
+        operation_description="""
+        Finaliza o torneio e gera o ranking final.
+        
+        **Validações:**
+        - Torneio deve estar 'Em Andamento'
+        - Todas as mesas da rodada atual devem ter resultado reportado
+        
+        **Ações:**
+        - Finaliza rodada atual
+        - Calcula pontuação final de todos os jogadores
+        - Gera ranking ordenado por pontuação
+        - Muda status do torneio para 'Finalizado'
+        """
+    )
+    @action(detail=True, methods=['post'], permission_classes=[IsLojaOuAdmin])
+    def finalizar(self, request, pk=None):
+        """
+        Finaliza o torneio e gera o ranking final.
+        """
+        torneio = self.get_object()
+        
+        # Validação: Status deve ser 'Em Andamento'
+        if torneio.status != 'Em Andamento':
+            return Response(
+                {"detail": f"Torneio deve estar 'Em Andamento'. Status atual: {torneio.status}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Busca rodada atual
+        try:
+            rodada_atual = Rodada.objects.filter(id_torneio=torneio).order_by('-numero_rodada').first()
+        except Rodada.DoesNotExist:
+            return Response(
+                {"detail": "Nenhuma rodada encontrada para este torneio."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validação: Todas as mesas devem ter resultado reportado
+        mesas_sem_resultado = Mesa.objects.filter(
+            id_rodada=rodada_atual,
+            time_vencedor__isnull=True
+        ).count()
+        
+        if mesas_sem_resultado > 0:
+            return Response(
+                {"detail": f"Existem {mesas_sem_resultado} mesa(s) sem resultado reportado na rodada atual."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        with transaction.atomic():
+            # Finaliza rodada atual
+            rodada_atual.status = 'Finalizada'
+            rodada_atual.save(update_fields=['status'])
+            
+            # Calcula pontuação final de todos os jogadores
+            jogadores_pontuacao = self._calcular_pontuacao_jogadores(torneio)
+            
+            # Gera ranking ordenado
+            ranking = []
+            jogadores_ordenados = sorted(
+                jogadores_pontuacao.items(),
+                key=lambda x: x[1],
+                reverse=True
+            )
+            
+            for posicao, (usuario_id, pontos) in enumerate(jogadores_ordenados, start=1):
+                from usuarios.models import Usuario
+                usuario = Usuario.objects.get(id=usuario_id)
+                ranking.append({
+                    'posicao': posicao,
+                    'jogador_id': usuario_id,
+                    'jogador_nome': usuario.username,
+                    'pontos': pontos
+                })
+            
+            # Muda status do torneio para 'Finalizado'
+            torneio.status = 'Finalizado'
+            torneio.save(update_fields=['status'])
+            
+            total_rodadas = Rodada.objects.filter(id_torneio=torneio).count()
+        
+        return Response({
+            'message': 'Torneio finalizado com sucesso',
+            'ranking': ranking,
+            'total_rodadas': total_rodadas
+        }, status=status.HTTP_200_OK)
+
+    def _calcular_pontuacao_jogadores(self, torneio):
+        """
+        Calcula a pontuação total de cada jogador no torneio.
+        Retorna um dicionário {usuario_id: pontos}
+        """
+        pontuacao = {}
+        
+        # Busca todas as rodadas do torneio
+        rodadas = Rodada.objects.filter(id_torneio=torneio)
+        
+        # Busca inscrições ativas
+        inscricoes = Inscricao.objects.filter(
+            id_torneio=torneio
+        ).exclude(status='Cancelado')
+        
+        # Inicializa pontuação de todos os jogadores inscritos
+        for inscricao in inscricoes:
+            pontuacao[inscricao.id_usuario_id] = 0
+        
+        # Percorre todas as rodadas
+        for rodada in rodadas:
+            # Jogadores que jogaram nesta rodada
+            jogadores_na_rodada = set()
+            
+            # Busca todas as mesas da rodada
+            mesas = Mesa.objects.filter(id_rodada=rodada)
+            
+            for mesa in mesas:
+                # Busca jogadores da mesa
+                jogadores_mesa = MesaJogador.objects.filter(id_mesa=mesa).select_related('id_usuario')
+                
+                for jogador_mesa in jogadores_mesa:
+                    jogador_id = jogador_mesa.id_usuario_id
+                    jogadores_na_rodada.add(jogador_id)
+                    
+                    # Calcula pontos baseado no resultado
+                    if mesa.time_vencedor == 0:  # Empate
+                        pontuacao[jogador_id] += torneio.pontuacao_empate
+                    elif mesa.time_vencedor == jogador_mesa.time:  # Vitória
+                        pontuacao[jogador_id] += torneio.pontuacao_vitoria
+                    else:  # Derrota
+                        pontuacao[jogador_id] += torneio.pontuacao_derrota
+            
+            # Jogadores que não jogaram nesta rodada recebem bye
+            for jogador_id in pontuacao.keys():
+                if jogador_id not in jogadores_na_rodada:
+                    pontuacao[jogador_id] += torneio.pontuacao_bye
+        
+        return pontuacao
+
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter(
+                'rodada_id',
+                openapi.IN_QUERY,
+                description='ID da rodada para calcular ranking até essa rodada',
+                type=openapi.TYPE_INTEGER,
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Ranking de uma rodada específica",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'rodada_numero': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'ranking': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'posicao': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'jogador_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'jogador_nome': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'pontos': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                }
+                            )
+                        ),
+                    }
+                )
+            ),
+            400: 'Erro de validação',
+            404: 'Rodada não encontrada'
+        },
+        operation_summary="Obter ranking parcial de uma rodada",
+        operation_description="""
+        Retorna o ranking dos jogadores até a rodada específica (acumulado).
+        
+        **Parâmetros Query:**
+        - rodada_id: ID da rodada para calcular ranking até essa rodada
+        """
+    )
+    @action(detail=True, methods=['get'], permission_classes=[IsLojaOuAdmin | IsApenasLeitura])
+    def ranking_rodada(self, request, pk=None):
+        """
+        Retorna o ranking parcial até uma rodada específica.
+        """
+        torneio = self.get_object()
+        rodada_id = request.query_params.get('rodada_id')
+
+        if not rodada_id:
+            return Response(
+                {"detail": "Parâmetro 'rodada_id' é obrigatório"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            rodada_alvo = Rodada.objects.get(id=rodada_id, id_torneio=torneio)
+        except Rodada.DoesNotExist:
+            return Response(
+                {"detail": "Rodada não encontrada neste torneio"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Calcula pontuação até a rodada especificada
+        pontuacao = {}
+        inscricoes = Inscricao.objects.filter(
+            id_torneio=torneio
+        ).exclude(status='Cancelado')
+
+        for inscricao in inscricoes:
+            pontuacao[inscricao.id_usuario_id] = 0
+
+        # Percorre rodadas até a alvo
+        rodadas_até_alvo = Rodada.objects.filter(
+            id_torneio=torneio,
+            numero_rodada__lte=rodada_alvo.numero_rodada
+        ).order_by('numero_rodada')
+
+        for rodada in rodadas_até_alvo:
+            jogadores_na_rodada = set()
+            mesas = Mesa.objects.filter(id_rodada=rodada)
+
+            for mesa in mesas:
+                jogadores_mesa = MesaJogador.objects.filter(id_mesa=mesa).select_related('id_usuario')
+
+                for jogador_mesa in jogadores_mesa:
+                    jogador_id = jogador_mesa.id_usuario_id
+                    jogadores_na_rodada.add(jogador_id)
+
+                    if mesa.time_vencedor == 0:
+                        pontuacao[jogador_id] += torneio.pontuacao_empate
+                    elif mesa.time_vencedor == jogador_mesa.time:
+                        pontuacao[jogador_id] += torneio.pontuacao_vitoria
+                    else:
+                        pontuacao[jogador_id] += torneio.pontuacao_derrota
+
+            for jogador_id in pontuacao.keys():
+                if jogador_id not in jogadores_na_rodada:
+                    pontuacao[jogador_id] += torneio.pontuacao_bye
+
+        # Gera ranking ordenado
+        ranking = []
+        jogadores_ordenados = sorted(
+            pontuacao.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+        for posicao, (usuario_id, pontos) in enumerate(jogadores_ordenados, start=1):
+            from usuarios.models import Usuario
+            usuario = Usuario.objects.get(id=usuario_id)
+            ranking.append({
+                'posicao': posicao,
+                'jogador_id': usuario_id,
+                'jogador_nome': usuario.username,
+                'pontos': pontos
+            })
+
+        return Response({
+            'rodada_numero': rodada_alvo.numero_rodada,
+            'ranking': ranking
+        }, status=status.HTTP_200_OK)
+
+    def _criar_mesas_swiss(self, rodada, jogadores_ordenados, torneio):
+        """
+        Cria mesas usando sistema Swiss pairing.
+        Emparelha jogadores com pontuações similares.
+        Formato 2v2: primeiros vs últimos de cada grupo de 4.
+        """
+        mesas_criadas = 0
+        jogadores_ids = [j[0] for j in jogadores_ordenados]  # Extrai apenas os IDs
+        
+        # Calcula quantas mesas completas (4 jogadores) podem ser formadas
+        num_mesas = len(jogadores_ids) // 4
+        
+        for i in range(num_mesas):
+            mesa = Mesa.objects.create(
+                id_rodada=rodada,
+                numero_mesa=i + 1
+            )
+            
+            # Pega 4 jogadores consecutivos do ranking
+            inicio = i * 4
+            jogadores_mesa = jogadores_ids[inicio:inicio + 4]
+            
+            # Distribui em times: 1º e 4º vs 2º e 3º
+            # Time 1: jogadores 0 e 3 (1º e 4º do grupo)
+            # Time 2: jogadores 1 e 2 (2º e 3º do grupo)
+            MesaJogador.objects.create(
+                id_mesa=mesa,
+                id_usuario_id=jogadores_mesa[0],
+                time=1
+            )
+            MesaJogador.objects.create(
+                id_mesa=mesa,
+                id_usuario_id=jogadores_mesa[3],
+                time=1
+            )
+            MesaJogador.objects.create(
+                id_mesa=mesa,
+                id_usuario_id=jogadores_mesa[1],
+                time=2
+            )
+            MesaJogador.objects.create(
+                id_mesa=mesa,
+                id_usuario_id=jogadores_mesa[2],
+                time=2
+            )
+            
+            mesas_criadas += 1
+        
+        return mesas_criadas
+
 
 class InscricaoViewSet(viewsets.ModelViewSet):
     """
     Endpoint da API para gerenciamento de inscrições em torneios.
 
     Regras de acesso:
-    - GET (list/retrieve): 
+    - GET (list/retrieve):
         • Jogadores: Veem apenas suas próprias inscrições
         • Lojas: Veem inscrições dos seus torneios
         • Admins: Veem todas as inscrições
-    - POST (create): 
+
+    Query Parameters (GET):
+    - id_torneio: Filtra inscrições por torneio específico (ex: ?id_torneio=1)
+
+    - POST (create):
         • Jogadores: Podem se inscrever em torneios abertos
         • Lojas/Admins: Podem inscrever jogadores em seus torneios
     - PUT (update):
@@ -128,14 +701,22 @@ class InscricaoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Filtra as inscrições visíveis baseado no tipo do usuário.
+        Suporta filtro por id_torneio via query params.
         """
+        queryset = Inscricao.objects.all()
         user = self.request.user
 
+        # Filtro por torneio via query params
+        torneio_id = self.request.query_params.get('id_torneio')
+        if torneio_id:
+            queryset = queryset.filter(id_torneio_id=torneio_id)
+
+        # Filtros baseados no tipo de usuário
         if user.tipo == 'ADMIN':
-            return Inscricao.objects.all()
+            return queryset
         elif user.tipo == 'LOJA':
-            return Inscricao.objects.filter(id_torneio__id_loja=user)
-        return Inscricao.objects.filter(id_usuario=user)
+            return queryset.filter(id_torneio__id_loja=user)
+        return queryset.filter(id_usuario=user)
 
     def get_serializer_class(self):
         """
@@ -279,6 +860,89 @@ class RodadaViewSet(viewsets.ModelViewSet):
         mesas = Mesa.objects.filter(id_rodada=rodada).order_by('numero_mesa')
         serializer = MesaDetailSerializer(mesas, many=True)
         return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_summary="Listar sobressalentes da rodada",
+        operation_description="""
+        Retorna a lista de jogadores que foram sobressalentes nesta rodada específica.
+
+        Essa lista é recalculada e registrada automaticamente quando a rodada é criada,
+        permitindo manter um histórico preciso de quem não jogou em cada rodada,
+        mesmo que novos jogadores entrem ou saiam do torneio entre rodadas.
+
+        **GET** `/api/v1/torneios/rodadas/{id}/sobressalentes/`
+
+        **Resposta:**
+        ```json
+        [
+            {
+                "id": 4,
+                "username": "RafaelJogador3",
+                "email": "rafael.jogador3@gmail.com"
+            }
+        ]
+        ```
+
+        **Notas:**
+        - Sobressalentes são jogadores inscritos ativos que não foram colocados em mesas
+        - A lista é específica para cada rodada (histórico preservado)
+        - Jogadores que saem aparecem na lista até a rodada da saída
+        - Novos jogadores não aparecem como sobressalentes em rodadas anteriores
+        """,
+        responses={
+            200: openapi.Response(
+                description="Lista de sobressalentes",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="ID do usuário"),
+                            'username': openapi.Schema(type=openapi.TYPE_STRING, description="Nome de usuário"),
+                            'email': openapi.Schema(type=openapi.TYPE_STRING, description="Email do usuário"),
+                        }
+                    )
+                )
+            ),
+            404: 'Rodada não encontrada',
+            403: 'Acesso negado'
+        }
+    )
+    @action(detail=True, methods=['get'], permission_classes=[IsLojaOuAdmin | IsApenasLeitura])
+    def sobressalentes(self, request, pk=None):
+        """
+        Retorna lista calculada de jogadores que foram sobressalentes nesta rodada específica.
+        Jogadores inscritos ativos que não foram colocados em nenhuma mesa da rodada.
+        """
+        rodada = self.get_object()
+
+        # Busca todos os jogadores inscritos ATIVOS no torneio desta rodada
+        jogadores_inscritos = set(
+            Inscricao.objects.filter(
+                id_torneio=rodada.id_torneio
+            ).exclude(status='Cancelado').values_list('id_usuario_id', flat=True)
+        )
+
+        # Busca todos os jogadores que ESTÃO em mesas desta rodada
+        jogadores_em_mesas = set(
+            MesaJogador.objects.filter(
+                id_mesa__id_rodada=rodada
+            ).values_list('id_usuario_id', flat=True)
+        )
+
+        # Jogadores sobressalentes = inscritos ativos - jogadores que estão em mesas
+        jogadores_sobressalentes_ids = jogadores_inscritos - jogadores_em_mesas
+
+        # Busca dados dos usuários sobressalentes
+        if jogadores_sobressalentes_ids:
+            from usuarios.models import Usuario
+            jogadores_sobressalentes = Usuario.objects.filter(
+                id__in=jogadores_sobressalentes_ids
+            ).values('id', 'username', 'email')
+        else:
+            jogadores_sobressalentes = []
+
+        return Response(list(jogadores_sobressalentes), status=200)
 
     def get_queryset(self):
         """

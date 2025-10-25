@@ -241,6 +241,35 @@ export const buscarJogadoresInscritos = async (idTorneio: number): Promise<strin
   const inscricoes = resposta.data.results || resposta.data;
   return inscricoes.map((inscricao: any) => inscricao.username);
 };
+
+/**
+ * Busca todas as inscrições ativas de um torneio específico.
+ *
+ * @param idTorneio
+ * @returns
+ */
+export const buscarInscricoesAtivasCompletas = async (idTorneio: number): Promise<{
+  id: number;
+  id_usuario: number;
+  username: string;
+  email: string;
+  id_torneio: number;
+  nome_torneio: string;
+  decklist?: string;
+  status: string;
+  data_inscricao: string;
+}[]> => {
+  const resposta = await api.get('/torneios/inscricoes/', {
+    params: {
+      id_torneio: idTorneio,
+      page_size: 200
+    }
+  });
+  const inscricoes = resposta.data.results || resposta.data;
+
+  // Filtrar apenas inscrições ativas
+  return inscricoes.filter((inscricao: any) => inscricao.status !== 'Cancelado');
+};
 export async function contarInscritosTorneio(idTorneio: number): Promise<number> {
   try {
     const lista = await buscarJogadoresInscritos(idTorneio);
@@ -252,8 +281,103 @@ export async function contarInscritosTorneio(idTorneio: number): Promise<number>
 
 
 /**
- * Utilitário para tratar erros de torneio de forma consistente.
+ * Inicia um torneio.
  * 
+ * @param id - ID do torneio a ser iniciado
+ * @returns Resposta da API com informações da rodada criada
+ */
+export const iniciarTorneio = async (id: number): Promise<{
+  message: string;
+  rodada: any;
+  mesas_criadas: number;
+  total_jogadores: number;
+}> => {
+  const resposta = await api.post(`/torneios/torneios/${id}/iniciar/`);
+  return resposta.data;
+};
+
+/**
+ * Avança para a próxima rodada do torneio.
+ * 
+ * @param id - ID do torneio
+ * @returns Resposta da API com informações da nova rodada criada
+ */
+export const proximaRodadaTorneio = async (id: number): Promise<{
+  message: string;
+  rodada: any;
+  mesas_criadas: number;
+}> => {
+  const resposta = await api.post(`/torneios/torneios/${id}/proxima_rodada/`);
+  return resposta.data;
+};
+
+/**
+ * Finaliza um torneio.
+ * 
+ * @param id - ID do torneio a ser finalizado
+ * @returns Resposta da API com ranking final
+ */
+export const finalizarTorneio = async (id: number): Promise<{
+  message: string;
+  ranking: Array<{
+    posicao: number;
+    jogador_id: number;
+    jogador_nome: string;
+    pontos: number;
+  }>;
+  total_rodadas: number;
+}> => {
+  const resposta = await api.post(`/torneios/torneios/${id}/finalizar/`);
+  return resposta.data;
+};
+
+/**
+ * Busca jogadores sobressalentes de uma rodada específica.
+ */
+export async function buscarSobressalentes(rodadaId: number): Promise<{
+  id: number;
+  username: string;
+  email: string;
+}[]> {
+  try {
+    const resposta = await api.get(`/torneios/rodadas/${rodadaId}/sobressalentes/`);
+    return resposta.data;
+  } catch (error) {
+    console.error('Erro ao buscar sobressalentes:', error);
+    throw error;
+  }
+}
+
+/**
+ * Busca o ranking parcial (acumulado) até uma rodada específica.
+ * 
+ * @param idTorneio - ID do torneio
+ * @param rodadaId - ID da rodada para calcular o ranking até ela
+ * @returns Ranking com posição, nome do jogador e pontos acumulados
+ */
+export const buscarRankingRodada = async (
+  idTorneio: number,
+  rodadaId: number
+): Promise<{
+  rodada_numero: number;
+  ranking: Array<{
+    posicao: number;
+    jogador_id: number;
+    jogador_nome: string;
+    pontos: number;
+  }>;
+}> => {
+  const resposta = await api.get(`/torneios/torneios/${idTorneio}/ranking_rodada/`, {
+    params: {
+      rodada_id: rodadaId
+    }
+  });
+  return resposta.data;
+};
+
+/**
+ * Utilitário para tratar erros de torneio de forma consistente.
+ *
  * @param erro - Erro do Axios
  * @returns Mensagem de erro amigável
  */
@@ -283,7 +407,6 @@ export async function buscarInscricoes(): Promise<IInscricao[]> {
   if (Array.isArray(data?.results)) return data.results;
   return [];
 }
-
 
 /** Busca TODOS os torneios.
 export async function buscarTorneios(): Promise<ITorneio[]> {
