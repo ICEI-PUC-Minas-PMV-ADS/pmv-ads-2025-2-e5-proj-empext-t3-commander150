@@ -17,7 +17,8 @@ import CriarTorneio from "../pages/Torneio/criar";
 import HistoricoTorneios from "../pages/Torneio/historico";
 import TorneioRouter from "../pages/Torneio/TorneioRouter";
 import EmparelhamentoTorneio from "../pages/Torneio/emparelhamento";
-import PaginaMesaAtiva from "../pages/Mesa/mesa-ativa";
+import Intervalo from "../pages/Mesa/intervalo";
+import MesaAtiva from "../pages/Mesa/mesa-ativa";
 
 export default function AppRoutes() {
   return (
@@ -53,7 +54,8 @@ export default function AppRoutes() {
           <Route path="/historico/" element={<HistoricoTorneios />} />
           <Route path="/torneios/:id" element={<TorneioRouter />} />
           <Route path="/torneios/emparelhamento/" element={<EmparelhamentoTorneio/>} />
-          <Route path="/mesa-ativa/:rodadaId" element={<PaginaMesaAtiva />} />
+          <Route path="/mesa-ativa/:rodadaId" element={<MesaAtiva />} />
+          <Route path="/mesa-ativa/" element={<Intervalo />} />
         </Route>
       </Route>
 
