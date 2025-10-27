@@ -54,6 +54,24 @@
   font-weight: 400;
 }
 
+.teamHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.teamLabel {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.teamPlayers {
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+  width: 100%;
+}
+
 .team:last-child {
   margin-bottom: 0;
 }

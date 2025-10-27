@@ -389,18 +389,6 @@ const CriarTorneio: React.FC = () => {
                labelColor={corLabelInputs}
              />
            </div>
-
-           <div className={estilos.grupoInputs}>
-             <Input
-               placeholder="5"
-               value={quantidadeRodadas}
-               onChange={(e) => setQuantidadeRodadas(e.target.value)}
-               type="numero"
-               name="quantidade-rodadas"
-               label="Quantidade de Rodadas"
-               labelColor={corLabelInputs}
-             />
-           </div>
          </section>
 
          {/* Card 4: Regras do Torneio */}
