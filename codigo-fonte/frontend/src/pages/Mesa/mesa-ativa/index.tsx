@@ -38,17 +38,15 @@ const PaginaMesaAtiva = () => {
   const [vitoriasSuaDupla, setVitoriasSuaDupla] = useState('');
   const [vitoriasOponentes, setVitoriasOponentes] = useState('');
 
-  // Processar regras do torneio
-  const regrasPartida = torneio?.regras
-    ? torneio.regras.split('\n').filter(regra => regra.trim() !== '')
-    : [
-        'Formato Commander padrão',
-        'Time limit: 50 minutos por partida',
-        'Decks devem ter exatamente 100 cartas',
-        'Banlist oficial da Wizards',
-        'Vida inicial: 40 pontos por jogador',
-        'Comportamento respeitoso e obrigatório'
-      ];
+  // Definir regras do torneio como string
+  const regrasPartida = torneio?.regras || [
+      'Formato Commander padrão',
+      'Time limit: 50 minutos por partida',
+      'Decks devem ter exatamente 100 cartas',
+      'Banlist oficial da Wizards',
+      'Vida inicial: 40 pontos por jogador',
+      'Comportamento respeitoso e obrigatório'
+    ].join('\n');
 
   const rankingJogadores = [
     { id: '1', nome: 'Alexandre Shadows', position: 1, points: 12 },
