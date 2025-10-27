@@ -630,39 +630,52 @@ export const cancelarTorneio = async (id: number): Promise<{
 };
 
 /**
- * Desinscreve o jogador do torneio:
- * 1) Tenta action /inscricoes/{id}/desinscrever/
- * 2) Se falhar, checa se já ficou inativo (alguns backends respondem 500 mas aplicam a mudança)
- * 3) Se ainda ativo, tenta DELETE /inscricoes/{id}/
- * 4) Trata 404/410 no DELETE como sucesso (já removido)
+ * Desinscreve o jogador de um torneio:
+ * - Se torneio.status === 'Aberto'  -> HARD DELETE (linha some; pode reinscrever depois)
+ * - Se torneio.status === 'Em Andamento' -> SOFT DELETE (status='Cancelado', registra saída)
  */
 export async function desinscreverDoTorneio(torneioId: number): Promise<void> {
+  // 1) Buscar status do torneio
+  const torneio = await buscarTorneioPorId(torneioId);
   const inscricaoId = await getMinhaInscricaoId(torneioId);
 
+  if ((torneio?.status || '').toLowerCase() === 'aberto') {
+    // HARD DELETE (quando torneio status Aberto)
+    try {
+      await api.delete(`/torneios/inscricoes/${inscricaoId}/`, { withCredentials: true });
+      return;
+    } catch (err: any) {
+      const st = err?.response?.status;
+      if (st === 404 || st === 410) return; // já não existe -> trata como sucesso
+      // Como último recurso, tenta soft por compatibilidade (opcional)
+      try {
+        await api.post(`/torneios/inscricoes/${inscricaoId}/desinscrever/`, {}, { withCredentials: true });
+        return;
+      } catch (err2) {
+        throw err; // ver isso -- preserve o erro principal do DELETE
+      }
+    }
+  }
+
+  // SOFT DELETE (quando torneio status Em Andamento)
   try {
     await api.post(`/torneios/inscricoes/${inscricaoId}/desinscrever/`, {}, { withCredentials: true });
     return;
   } catch (err: any) {
-    console.warn("desinscrever(): action falhou", {
-      status: err?.response?.status,
-      data: err?.response?.data,
-    });
-  }
-
-  try {
-    const ativo = await isInscricaoAtivaPara(torneioId);
-    if (!ativo) return; // consideramos sucesso
-  } catch (_) {
-  }
-
-  //fallback DELETE
-  try {
-    await api.delete(`/torneios/inscricoes/${inscricaoId}/`, { withCredentials: true });
-    return;
-  } catch (err2: any) {
-    const st = err2?.response?.status;
-    if (st === 404 || st === 410) return; // já removido/inativo -> sucesso
-    console.error("desinscrever(): DELETE falhou", { status: st, data: err2?.response?.data });
-    throw err2;
+    // Verifica se já ficou inativo/cancelado no backend mesmo com erro
+    try {
+      const { data } = await api.get(`/torneios/inscricoes/${inscricaoId}/`, { withCredentials: true });
+      const ativo = data?.status && String(data.status).toLowerCase() !== 'cancelado';
+      if (!ativo) return; // já está cancelado -> sucesso
+    } catch {}
+    // fallback final: tenta DELETE (alguns backends tratam como remoção)
+    try {
+      await api.delete(`/torneios/inscricoes/${inscricaoId}/`, { withCredentials: true });
+      return;
+    } catch (err2: any) {
+      const st = err2?.response?.status;
+      if (st === 404 || st === 410) return; // já removido -> sucesso
+      throw err2;
+    }
   }
 }

@@ -5,6 +5,8 @@ from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.utils import timezone
+
 from django.db import transaction
 from django.db.models import Sum, Count, Q
 import random
@@ -1006,6 +1008,7 @@ class InscricaoViewSet(viewsets.ModelViewSet):
         
         # Soft delete: marca como cancelado
         inscricao.status = 'Cancelado'
+        inscricao.data_saida = timezone.now()
         inscricao.save(update_fields=['status'])
         
         message = "Desinscrição realizada com sucesso."

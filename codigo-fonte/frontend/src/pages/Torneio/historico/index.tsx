@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import Swal from "sweetalert2";
 import { FiUser, FiStar, FiCalendar } from "react-icons/fi";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
 import Button from "../../../components/Button";
 import ModalInscricaoJogador from "../../../components/ModalInscricaoJogador";
-import {buscarAgrupadoPorAba, buscarAgrupadoPorAbaLoja, desinscreverDoTorneio,} from "../../../services/torneioServico";
-
+import {
+    buscarAgrupadoPorAba,
+    buscarAgrupadoPorAbaLoja,
+    desinscreverDoTorneio,
+} from "../../../services/torneioServico";
+import Swal from "sweetalert2";
 import { useSessao } from "../../../contextos/AuthContexto";
 
 type Aba = "inscritos" | "andamento" | "historico";
@@ -22,10 +25,8 @@ const EmptyState: React.FC<{ aba: Aba }> = ({ aba }) => {
 };
 
 const HistoricoTorneios: React.FC = () => {
-
     const { usuario } = useSessao?.() ?? ({} as any);
-    const tipoBruto =
-        (usuario?.tipo ?? usuario?.perfil ?? usuario?.role ?? "").toString();
+    const tipoBruto = (usuario?.tipo ?? usuario?.perfil ?? usuario?.role ?? "").toString();
     const isLoja = tipoBruto.toUpperCase() === "LOJA";
 
     // Estado de página
@@ -37,11 +38,11 @@ const HistoricoTorneios: React.FC = () => {
     const [erro, setErro] = useState<string | null>(null);
     const [loadingAcao, setLoadingAcao] = useState<Record<number, boolean>>({});
 
-    // Estados para o modal de inscrição de jogador
+    // Estados do modal
     const [modalAberto, setModalAberto] = useState(false);
     const [torneioSelecionado, setTorneioSelecionado] = useState<{ id: number; nome: string } | null>(null);
 
-    // Carregamento inicial conforme o tipo (JOGADOR ou LOJA)
+    // Carregamento inicial
     const carregar = useCallback(async () => {
         setCarregando(true);
         setErro(null);
@@ -68,8 +69,7 @@ const HistoricoTorneios: React.FC = () => {
         carregar();
     }, [carregar]);
 
-
-    // Cabeçalho dinâmico
+    // Cabeçalho
     const tituloPagina = useMemo(() => {
         if (isLoja) {
             if (aba === "inscritos") return "Seus Torneios";
@@ -95,7 +95,7 @@ const HistoricoTorneios: React.FC = () => {
         return "Reviva os momentos épicos dos seus torneios passados";
     }, [aba, isLoja]);
 
-    // KPIs
+    // Estatísticas
     const estatisticas = useMemo(
         () => ({
             torneiosFuturos: inscritos.length,
@@ -111,73 +111,61 @@ const HistoricoTorneios: React.FC = () => {
         return historico;
     }, [aba, inscritos, andamento, historico]);
 
-    // Ação: desinscrever (apenas JOGADOR na aba "inscritos")
-    const onUnsubscribe = useCallback(async (torneioId: number, torneioNome: string) => {
+    // Ação de desinscrição
+    const onUnsubscribe = useCallback(async (torneioId: number, torneioNome?: string) => {
         const result = await Swal.fire({
-            title: 'Confirmar Desinscrição',
-            text: `Gostaria de desinscrever-se do torneio "${torneioNome}"?`,
-            icon: 'question',
+            title: `Gostaria de desinscrever-se do torneio ${torneioNome ? `"${torneioNome}"` : ""}?`,
+            icon: "question",
             showCancelButton: true,
-            confirmButtonText: 'Sim',
-            cancelButtonText: 'Não',
-            reverseButtons: true, // This puts "Sim" on the right and "Não" on the left
-            customClass: {
-                confirmButton: styles.swalConfirmButton,
-                cancelButton: styles.swalCancelButton
-            }
+            confirmButtonText: "Sim",
+            cancelButtonText: "Não",
+            reverseButtons: true,
+            confirmButtonColor: "#46AF87",
+            cancelButtonColor: "#6c757d",
+            focusCancel: true,
         });
 
-        // If user clicks "Não" or closes the dialog, do nothing
-        if (!result.isConfirmed) {
-            return;
-        }
+        if (!result.isConfirmed) return;
 
-        // If user clicks "Sim", proceed with unsubscription
         setLoadingAcao((p) => ({ ...p, [torneioId]: true }));
         try {
             await desinscreverDoTorneio(torneioId);
             setInscritos((prev) => prev.filter((t) => Number(t.id) !== Number(torneioId)));
 
-            // Optional: Show success message
-            Swal.fire({
-                title: 'Desinscrição realizada!',
-                text: `Você foi desinscrito do torneio "${torneioNome}".`,
-                icon: 'success',
-                confirmButtonText: 'OK'
+            await Swal.fire({
+                title: "Desinscrição concluída",
+                text: "Você foi desinscrito do torneio com sucesso.",
+                icon: "success",
+                confirmButtonText: "OK",
+                confirmButtonColor: "#46AF87",
             });
+            carregar();
         } catch (e: any) {
-            console.error("desinscrever(): erro", e?.response?.data || e);
-
-            // Show error message
-            Swal.fire({
-                title: 'Erro',
-                text: 'Não foi possível desinscrever-se do torneio.',
-                icon: 'error',
-                confirmButtonText: 'OK'
+            console.error("Erro ao desinscrever:", e?.response?.data || e);
+            await Swal.fire({
+                title: "Erro ao desinscrever",
+                text: "Não foi possível desinscrever-se do torneio. Tente novamente.",
+                icon: "error",
+                confirmButtonText: "OK",
+                confirmButtonColor: "#DC2626",
             });
         } finally {
             setLoadingAcao((p) => ({ ...p, [torneioId]: false }));
         }
-    }, []);
+    }, [carregar]);
 
-    // Função para abrir modal de inscrição de jogador
+    // Modal
     const handleAbrirModalInscricao = (torneioId: number, torneioNome: string) => {
         setTorneioSelecionado({ id: torneioId, nome: torneioNome });
         setModalAberto(true);
     };
-
-    // Função para fechar modal
     const handleFecharModal = () => {
         setModalAberto(false);
         setTorneioSelecionado(null);
     };
+    const handleSucessoInscricao = () => carregar();
 
-    // Função para recarregar torneios após inscrição bem-sucedida
-    const handleSucessoInscricao = () => {
-        carregar();
-    };
-
-    // Aqui mapeia torneio -> props do CardInfoTorneio
+    // Mapeamento de dados para o card
     const mapToCardInfo = (t: any) => {
         const dt = t.data_inicio ? new Date(t.data_inicio) : null;
         return {
@@ -203,8 +191,9 @@ const HistoricoTorneios: React.FC = () => {
         };
     };
 
-    // Slot de ação que injeta o Button do projeto
+    // Renderiza ações (botões)
     const renderActionFor = (t: any) => {
+        // ✅ Mostrar ações somente na ABA "inscritos" (Abertos)
         if (aba !== "inscritos") return null;
 
         const tid = Number(t.id);
@@ -227,7 +216,7 @@ const HistoricoTorneios: React.FC = () => {
             );
         }
 
-        // Se for JOGADOR, mostrar botão de desinscrever
+        // Se for JOGADOR, mostrar botão Desinscrever-se
         return (
             <Button
                 label={loadingAcao[tid] ? "Desinscrevendo..." : "Desinscrever-se"}
@@ -251,6 +240,7 @@ const HistoricoTorneios: React.FC = () => {
                 <h1 className={styles.titulo}>{tituloPagina}</h1>
                 <p className={styles.subtitulo}>{subtituloPagina}</p>
 
+                {/* KPIs */}
                 <div className={styles.cardsContainer} role="tablist">
                     <button
                         type="button"
@@ -301,6 +291,7 @@ const HistoricoTorneios: React.FC = () => {
                     </button>
                 </div>
 
+                {/* Lista */}
                 <section className={styles.secao} aria-live="polite">
                     <h2 className={styles.secaoTitulo}>
                         {aba === "inscritos"
