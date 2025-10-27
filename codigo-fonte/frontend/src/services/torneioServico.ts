@@ -311,25 +311,7 @@ export const proximaRodadaTorneio = async (id: number): Promise<{
   return resposta.data;
 };
 
-/**
- * Finaliza um torneio.
- * 
- * @param id - ID do torneio a ser finalizado
- * @returns Resposta da API com ranking final
- */
-export const finalizarTorneio = async (id: number): Promise<{
-  message: string;
-  ranking: Array<{
-    posicao: number;
-    jogador_id: number;
-    jogador_nome: string;
-    pontos: number;
-  }>;
-  total_rodadas: number;
-}> => {
-  const resposta = await api.post(`/torneios/torneios/${id}/finalizar/`);
-  return resposta.data;
-};
+
 
 /**
  * Busca jogadores sobressalentes de uma rodada específica.
@@ -528,6 +510,124 @@ async function getMinhaInscricaoId(torneioId: number): Promise<number> {
   if (!cand?.id) throw new Error("Não foi possível localizar sua inscrição ativa.");
   return Number(cand.id);
 }
+
+/**
+ * Funcionalidades para o novo sistema de emparelhamento de torneios
+ */
+
+// Função para avançar rodada (novo fluxo)
+export const proximaRodadaNovo = async (idTorneio: number) => {
+  const response = await api.post(`torneios/torneios/${idTorneio}/proxima_rodada/`);
+  return response.data;
+};
+
+// Função para obter dados de emparelhamento da rodada
+export const obterEmparelhamento = async (idRodada: number) => {
+  const response = await api.get(`torneios/rodadas/${idRodada}/emparelhamento/`);
+  return response.data;
+};
+
+// Função para emparelhar jogadores automaticamente
+export const emparelharAutomatico = async (
+  idRodada: number,
+  tipo: 'random' | 'swiss'
+) => {
+  const response = await api.post(`torneios/rodadas/${idRodada}/emparelhar_automatico/`, {
+    tipo: tipo
+  });
+  return response.data;
+};
+
+// Função para editar emparelhamento manualmente
+export const editarEmparelhamento = async (
+  idRodada: number,
+  acao: 'mover_jogador' | 'remover_mesa' | 'adicionar_mesa' | 'alterar_time',
+  jogadorId: number,
+  mesaId?: number,
+  novoTime?: 1 | 2
+) => {
+  const response = await api.post(`torneios/rodadas/${idRodada}/editar_emparelhamento/`, {
+    acao: acao,
+    mesa_id: mesaId,
+    jogador_id: jogadorId,
+    novo_time: novoTime
+  });
+  return response.data;
+};
+
+// Função para iniciar rodada emparelhada
+export const iniciarRodada = async (
+  idRodada: number,
+  forcarInicio: boolean = false
+) => {
+  const response = await api.post(`torneios/rodadas/${idRodada}/iniciar_rodada/`, {
+    forcar_inicio: forcarInicio
+  });
+  return response.data;
+};
+
+// Função para re-emparelhar uma rodada já emparelhada
+export const reemparelharRodada = async (idRodada: number) => {
+  const response = await api.post(`torneios/rodadas/${idRodada}/reemparelhar/`);
+  return response.data;
+};
+
+// Função para editar emparelhamento manualmente
+export const editarEmparelhamentoManual = async (
+  idRodada: number,
+  jogadorId: number,
+  novaMesaId?: number,
+  novoTime?: 1 | 2
+) => {
+  const acao = novaMesaId ? 'mover_jogador_para_mesa' : 'alterar_time_jogador';
+
+  const data: any = {
+    acao: acao,
+    jogador_id: jogadorId
+  };
+
+  if (novaMesaId) {
+    data.nova_mesa_id = novaMesaId;
+  }
+
+  if (novoTime) {
+    data.novo_time = novoTime;
+  }
+
+  const response = await api.post(`/torneios/rodadas/${idRodada}/editar_emparelhamento/`, data);
+  return response.data;
+};
+
+// Função para finalizar torneio (mantém compatibilidade)
+export const finalizarTorneio = async (id: number): Promise<{
+  message: string;
+  ranking: Array<{
+    posicao: number;
+    jogador_id: number;
+    jogador_nome: string;
+    pontos: number;
+  }>;
+  total_rodadas: number;
+}> => {
+  const resposta = await api.post(`/torneios/torneios/${id}/finalizar/`);
+  return resposta.data;
+};
+
+/**
+ * Cancela um torneio (marcando como cancelado, mantendo histórico)
+ *
+ * @param id - ID do torneio a ser cancelado
+ * @returns Resposta da API com confirmação do cancelamento
+ */
+export const cancelarTorneio = async (id: number): Promise<{
+  message: string;
+  torneio: ITorneio;
+}> => {
+  const resposta = await api.post(`/torneios/torneios/${id}/cancelar/`, {
+    confirmacao: true
+  });
+  return resposta.data;
+};
 
 /**
  * Desinscreve o jogador do torneio:

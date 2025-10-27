@@ -1,15 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Input from '../Input';
 import Button from '../Button';
 import styles from './styles.module.css';
 
     interface CardResultadoMesaProps {
     onSubmit: (victories: number, draws: number) => void;
+    initialVictories?: number;
+    initialDraws?: number;
+    victoriesLabel?: string;
+    drawsLabel?: string;
+    title?: string;
+    subtitle?: string;
     }
 
-    const CardResultadoMesa = ({ onSubmit }: CardResultadoMesaProps) => {
-    const [victories, setVictories] = useState('');
-    const [draws, setDraws] = useState('');
+    const CardResultadoMesa = ({
+        onSubmit,
+        initialVictories = 0,
+        initialDraws = 0,
+        victoriesLabel = "Vitórias da sua dupla",
+        drawsLabel = "Empates",
+        title = "Informar Resultado da Rodada",
+        subtitle = "Informe a quantas vitórias e empates sua dupla teve ao final da partida"
+    }: CardResultadoMesaProps) => {
+    const [victories, setVictories] = useState(initialVictories.toString());
+    const [draws, setDraws] = useState(initialDraws.toString());
+
+    useEffect(() => {
+        setVictories(initialVictories.toString());
+        setDraws(initialDraws.toString());
+    }, [initialVictories, initialDraws]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,16 +37,16 @@ import styles from './styles.module.css';
 
     return (
         <div className={styles.container}>
-        <h2 className={styles.title}>Informar Resultado da Rodada</h2>
-        <p className={styles.subtitle}>Informe a quantas vitórias e empates sua dupla teve ao final da partida</p>
-        
+        <h2 className={styles.title}>{title}</h2>
+        <p className={styles.subtitle}>{subtitle}</p>
+
         <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.inputsContainer}>
             <div className={styles.inputWrapper}>
                 <Input
                 type="text"
                 name="victories"
-                label="Vitórias da sua dupla"
+                label={victoriesLabel}
                 value={victories}
                 onChange={(e) => setVictories(e.target.value)}
                 backgroundColor="#1A2025"
@@ -40,7 +59,7 @@ import styles from './styles.module.css';
                 <Input
                 type="text"
                 name="draws"
-                label="Empates"
+                label={drawsLabel}
                 value={draws}
                 onChange={(e) => setDraws(e.target.value)}
                 backgroundColor="#1A2025"

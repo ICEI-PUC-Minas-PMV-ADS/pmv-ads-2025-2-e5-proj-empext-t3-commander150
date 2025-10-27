@@ -4,6 +4,15 @@ from django.utils import timezone
 from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador
 
 
+class IniciarRodadaSerializer(serializers.Serializer):
+    """Serializer para iniciar rodada emparelhada"""
+    forcar_inicio = serializers.BooleanField(
+        default=False,
+        required=False,
+        help_text="Força o início da rodada mesmo que algumas mesas não tenham 4 jogadores"
+    )
+
+
 # Os serializers são responsáveis por converter os objetos do Django (models)
 # em formatos que podem ser transmitidos pela web, como JSON.
 # Eles também fazem o caminho inverso: validam e convertem JSON em objetos.
