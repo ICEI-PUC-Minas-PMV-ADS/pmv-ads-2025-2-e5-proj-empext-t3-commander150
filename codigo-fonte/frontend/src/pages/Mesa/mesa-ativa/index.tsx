@@ -21,32 +21,21 @@ import CardInfoTorneio from '../../../components/CardInfoTorneio';
 import RegrasPartida from '../../../components/CardRegrasPartida';
 import CardRanking from '../../../components/CardRanking';
 import Input from '../../../components/Input';
-import { BsGrid3X3Gap } from 'react-icons/bs';
+import { BsGrid3X3Gap, BsCheckCircle, BsPauseCircle } from 'react-icons/bs';
 import { GiPodium } from 'react-icons/gi';
 import { FaDollarSign } from 'react-icons/fa';
 
 const PaginaMesaAtiva = () => {
   const { rodadaId } = useParams<{ rodadaId: string }>();
   const navigate = useNavigate();
-
   const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
   const [loading, setLoading] = useState(true);
   const [reportandoResultado, setReportandoResultado] = useState(false);
+  const [regras, setRegras] = useState<string>('');
 
-  // Estados para o formulário de resultado
   const [vitoriasSuaDupla, setVitoriasSuaDupla] = useState('');
   const [vitoriasOponentes, setVitoriasOponentes] = useState('');
-
-  // Definir regras do torneio como string
-  const regrasPartida = torneio?.regras || [
-      'Formato Commander padrão',
-      'Time limit: 50 minutos por partida',
-      'Decks devem ter exatamente 100 cartas',
-      'Banlist oficial da Wizards',
-      'Vida inicial: 40 pontos por jogador',
-      'Comportamento respeitoso e obrigatório'
-    ].join('\n');
 
   const rankingJogadores = [
     { id: '1', nome: 'Alexandre Shadows', position: 1, points: 12 },
@@ -55,7 +44,6 @@ const PaginaMesaAtiva = () => {
     { id: '4', nome: 'Pedro Flamecaster', position: 4, points: 6 },
   ];
 
-  // Formatar data do torneio
   const formatarData = (dataISO?: string) => {
     if (!dataISO) return 'N/A';
     const data = new Date(dataISO);
@@ -100,6 +88,7 @@ const PaginaMesaAtiva = () => {
         try {
           const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
           setTorneio(torneioData);
+          setRegras(torneioData.regras || "");
         } catch (error) {
           console.error('Erro ao carregar torneio:', error);
           // Não bloqueia a exibição da mesa se falhar ao buscar o torneio
@@ -213,7 +202,8 @@ const PaginaMesaAtiva = () => {
             <p className={styles.subtitulo}>{mesa.nome_torneio}</p>
           </div>
           <div className={styles.rodadaBadge}>
-            Rodada {mesa.numero_rodada}
+            <BsCheckCircle className={styles.statusIcon} />
+            Rodada {mesa.numero_rodada} - Ativo (Bye)
           </div>
         </div>
 
@@ -273,7 +263,7 @@ const PaginaMesaAtiva = () => {
             />
 
             {/* Regras da Partida */}
-            <RegrasPartida regras={regrasPartida} />
+            <RegrasPartida regras={regras} />
 
             {/* Ranking */}
             <CardRanking
@@ -298,7 +288,17 @@ const PaginaMesaAtiva = () => {
           <p className={styles.subtitulo}>{mesa.nome_torneio}</p>
         </div>
         <div className={styles.rodadaBadge}>
-          Rodada {mesa.numero_rodada}
+          {mesa.status_rodada.toLowerCase() === 'finalizada' ? (
+            <>
+              <BsPauseCircle className={styles.statusIcon} />
+              Rodada {mesa.numero_rodada} - Intervalo
+            </>
+          ) : (
+            <>
+              <BsCheckCircle className={styles.statusIcon} />
+              Rodada {mesa.numero_rodada} - Ativo
+            </>
+          )}
         </div>
       </div>
 
@@ -472,7 +472,7 @@ const PaginaMesaAtiva = () => {
           />
 
           {/* Regras da Partida */}
-          <RegrasPartida regras={regrasPartida} />
+          <RegrasPartida regras={regras} />
 
           {/* Ranking */}
           <CardRanking

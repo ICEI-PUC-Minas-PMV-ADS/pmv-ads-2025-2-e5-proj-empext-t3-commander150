@@ -162,7 +162,7 @@ const HistoricoTorneios: React.FC = () => {
                 : t.valor_incricao
                     ? `R$ ${String(t.valor_incricao).replace(".", ",")}`
                     : "—",
-            players: Number(t.qnt_inscritos ?? t.inscritos ?? 0),
+            players: t.qnt_vagas || 0,
             tournamentId: t.id,
         };
     };
