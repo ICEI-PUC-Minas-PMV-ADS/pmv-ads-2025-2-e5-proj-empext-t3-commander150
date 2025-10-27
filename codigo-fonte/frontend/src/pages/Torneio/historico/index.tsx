@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
+import Swal from "sweetalert2";
 import { FiUser, FiStar, FiCalendar } from "react-icons/fi";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
@@ -111,14 +112,49 @@ const HistoricoTorneios: React.FC = () => {
     }, [aba, inscritos, andamento, historico]);
 
     // Ação: desinscrever (apenas JOGADOR na aba "inscritos")
-    const onUnsubscribe = useCallback(async (torneioId: number) => {
+    const onUnsubscribe = useCallback(async (torneioId: number, torneioNome: string) => {
+        const result = await Swal.fire({
+            title: 'Confirmar Desinscrição',
+            text: `Gostaria de desinscrever-se do torneio "${torneioNome}"?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sim',
+            cancelButtonText: 'Não',
+            reverseButtons: true, // This puts "Sim" on the right and "Não" on the left
+            customClass: {
+                confirmButton: styles.swalConfirmButton,
+                cancelButton: styles.swalCancelButton
+            }
+        });
+
+        // If user clicks "Não" or closes the dialog, do nothing
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        // If user clicks "Sim", proceed with unsubscription
         setLoadingAcao((p) => ({ ...p, [torneioId]: true }));
         try {
             await desinscreverDoTorneio(torneioId);
             setInscritos((prev) => prev.filter((t) => Number(t.id) !== Number(torneioId)));
+
+            // Optional: Show success message
+            Swal.fire({
+                title: 'Desinscrição realizada!',
+                text: `Você foi desinscrito do torneio "${torneioNome}".`,
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
         } catch (e: any) {
             console.error("desinscrever(): erro", e?.response?.data || e);
-            setErro("Não foi possível desinscrever-se do torneio.");
+
+            // Show error message
+            Swal.fire({
+                title: 'Erro',
+                text: 'Não foi possível desinscrever-se do torneio.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         } finally {
             setLoadingAcao((p) => ({ ...p, [torneioId]: false }));
         }
@@ -162,7 +198,7 @@ const HistoricoTorneios: React.FC = () => {
                 : t.valor_incricao
                     ? `R$ ${String(t.valor_incricao).replace(".", ",")}`
                     : "—",
-            players: t.qnt_vagas || 0,
+            players: Number(t.qnt_inscritos ?? t.inscritos ?? 0),
             tournamentId: t.id,
         };
     };
@@ -170,9 +206,9 @@ const HistoricoTorneios: React.FC = () => {
     // Slot de ação que injeta o Button do projeto
     const renderActionFor = (t: any) => {
         if (aba !== "inscritos") return null;
-        
+
         const tid = Number(t.id);
-        
+
         // Se for LOJA, mostrar botão de inscrever jogador
         if (isLoja) {
             return (
@@ -190,14 +226,14 @@ const HistoricoTorneios: React.FC = () => {
                 />
             );
         }
-        
+
         // Se for JOGADOR, mostrar botão de desinscrever
         return (
             <Button
                 label={loadingAcao[tid] ? "Desinscrevendo..." : "Desinscrever-se"}
                 onClick={(e: any) => {
                     e.stopPropagation();
-                    onUnsubscribe(tid);
+                    onUnsubscribe(tid, t.nome);
                 }}
                 disabled={!!loadingAcao[tid]}
                 backgroundColor="var(--var-cor-primaria)"
