@@ -52,7 +52,7 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
           if (rodadaId) {
             navigate(`/mesa-ativa/${rodadaId}`);
           } else {
-            navigate("/mesa-ativa");
+            navigate(`/intervalo/${tournamentId}`);
           }
           return;
         }

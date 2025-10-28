@@ -20,6 +20,7 @@ export default function MesaAtiva() {
   const navigate = useNavigate();
   const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
+  const [torneioId, setTorneioId] = useState(Number);
   const [loading, setLoading] = useState(true);
   const [reportandoResultado, setReportandoResultado] = useState(false);
   const [regras, setRegras] = useState<string>('');
@@ -52,7 +53,7 @@ export default function MesaAtiva() {
   // Lógica para carregar mesa
   useEffect(() => {
     if (!rodadaId) {
-      navigate('/mesa-ativa/'); // Vai para intervalo
+      navigate(`/intervalo/${torneioId}`); // Vai para intervalo
       return;
     }
 
@@ -62,9 +63,18 @@ export default function MesaAtiva() {
         const mesaData = await buscarMinhaMesaNaRodada(parseInt(rodadaId));
         setMesa(mesaData);
 
+        try {
+          const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
+          setTorneio(torneioData);
+          setRegras(torneioData.regras || "");
+          setTorneioId( torneioData.id);
+          
+        } catch (error) {
+          console.error('Erro ao carregar torneio:', error);
+        }
         // Se a rodada já terminou, vai para intervalo
         if (mesaData.status_rodada.toLowerCase() === 'finalizada') {
-           navigate('/mesa-ativa/', { 
+           navigate(`/intervalo/${torneioId}`, {
             state: { mesa: mesaData } // Passa a mesa para o intervalo
           });
           return;
@@ -80,13 +90,7 @@ export default function MesaAtiva() {
         }
 
         // Buscar torneio
-        try {
-          const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
-          setTorneio(torneioData);
-          setRegras(torneioData.regras || "");
-        } catch (error) {
-          console.error('Erro ao carregar torneio:', error);
-        }
+        
       } catch (error) {
         console.error('Erro ao carregar mesa:', error);
         Swal.fire('Erro', 'Não foi possível carregar a mesa.', 'error');
@@ -141,11 +145,11 @@ export default function MesaAtiva() {
       });
 
       await Swal.fire('Sucesso', 'Resultado reportado com sucesso!', 'success');
-      navigate('/mesa-ativa/', { 
-        state: { 
+      navigate(`/intervalo/${torneio?.id}`, {
+        state: {
           mesa: mesaAtualizada,
           torneio: torneio
-        } 
+        }
       });
     } catch (error) {
       console.error('Erro ao reportar resultado:', error);

@@ -1,10 +1,12 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import styles from '../styles.module.css';
 import CardInfoTorneio from '../../../components/CardInfoTorneio';
 import RegrasPartida from '../../../components/CardRegrasPartida';
 import CardRanking from '../../../components/CardRanking';
 import { BsPauseCircle } from 'react-icons/bs';
 import type { IMesaAtiva, ITorneio } from '../../../tipos/tipos';
+import { useEffect, useState } from 'react';
+import { buscarJogadoresInscritos, buscarTorneioPorId, tratarErroTorneio } from '../../../services/torneioServico';
 
 // Dados mockados para futuro ranking
 const rankingJogadores = [
@@ -14,23 +16,17 @@ const rankingJogadores = [
   { id: '4', nome: 'Pedro Flamecaster', position: 4, points: 6 },
 ];
 
-const infoTorneioPadrao = {
-  nome: 'Torneio Atual',
-  data: '15/12/2024',
-  hora: '19:00',
-  local: 'Loja Central',
-  preco: 'Gratuito',
-  jogadores: 32,
-  regras: 'Aguarde as regras do próximo torneio.'
-};
 
 export default function Intervalo() {
-  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [torneio, setTorneio] = useState<ITorneio | null>(null);
+  //const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [regras, setRegras] = useState<string>('');
+  const [erro, setErro] = useState<string | null>(null);
   const location = useLocation();
+    
   
-  const mesa = location.state?.mesa as IMesaAtiva | undefined;
-  const torneio = location.state?.torneio as ITorneio | undefined;
-
   const formatarData = (dataISO?: string) => {
     if (!dataISO) return 'N/A';
     return new Date(dataISO).toLocaleDateString('pt-BR');
@@ -47,6 +43,36 @@ export default function Intervalo() {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
+  useEffect(() => {
+    const carregarTorneio = async () => {
+      try {
+        setLoading(true);
+        // const mesaData = await buscarMinhaMesaNaRodada(parseInt(rodadaId));
+        // setMesa(mesaData);
+        const torneioId = id ? parseInt(id) : 1;
+        console.log('InformacaoTorneio - Buscando torneio ID:', torneioId);
+        const [dadosTorneio] = await Promise.all([
+          buscarTorneioPorId(torneioId),
+          buscarJogadoresInscritos(torneioId)
+        ]);
+        setTorneio(dadosTorneio);
+        setRegras(dadosTorneio.regras || "");
+      } catch (e) {
+        console.error('InformacaoTorneio - Erro ao carregar torneio:', e);
+        setErro(tratarErroTorneio(e));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarTorneio();
+  }, [id]);
+  if (loading) return <p>Carregando...</p>;
+  if (erro) return <p>{erro}</p>;
+  const mesa = location.state?.mesa as IMesaAtiva | undefined;
+  const torneio1 = location.state?.torneio as ITorneio | undefined;
+
+
   return (
     <div className={styles.container}>
       {/* CABEÇALHO */}
@@ -54,7 +80,7 @@ export default function Intervalo() {
         <div>
           <h1 className={styles.titulo}>Intervalo</h1>
           <p className={styles.subtitulo}>
-            {mesa?.nome_torneio || infoTorneioPadrao.nome}
+            {torneio?.nome || torneio1?.nome}
           </p>
         </div>
         {mesa && (
@@ -135,16 +161,16 @@ export default function Intervalo() {
         <div className={styles.colunaDireita}>
           <CardInfoTorneio
             title="Informações do Torneio"
-            name={mesa?.nome_torneio || infoTorneioPadrao.nome}
-            date={torneio ? formatarData(torneio.data_inicio) : infoTorneioPadrao.data}
-            time={torneio ? formatarHora(torneio.data_inicio) : infoTorneioPadrao.hora}
-            location={torneio?.loja_nome || infoTorneioPadrao.local}
-            price={torneio ? formatarPreco(torneio.valor_incricao, torneio.incricao_gratuita) : infoTorneioPadrao.preco}
-            players={torneio?.qnt_vagas || infoTorneioPadrao.jogadores}
+            name={torneio?.nome|| torneio1?.nome || ""}
+            date={torneio ? formatarData(torneio.data_inicio) : formatarData(torneio1?.data_inicio)}
+            time={torneio ? formatarHora(torneio.data_inicio) : formatarHora(torneio1?.data_inicio)}
+            location={torneio?.loja_nome || ""}
+            price={torneio ? formatarPreco(torneio.valor_incricao, torneio.incricao_gratuita) : formatarPreco(torneio1?.valor_incricao, torneio1?.incricao_gratuita)}
+            players={torneio?.qnt_vagas || torneio1?.qnt_vagas || 0}
           />
 
           <RegrasPartida 
-            regras={torneio?.regras || infoTorneioPadrao.regras} 
+            regras={regras || torneio1?.regras ||"Erro ao carregar as regras."} 
           />
 
           <CardRanking
