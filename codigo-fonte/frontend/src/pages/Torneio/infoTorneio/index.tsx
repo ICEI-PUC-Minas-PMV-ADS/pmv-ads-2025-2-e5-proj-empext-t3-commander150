@@ -38,7 +38,7 @@ const InformacaoTorneio: React.FC = () => {
           buscarJogadoresInscritos(torneioId)
         ]);
         console.log('InformacaoTorneio - Torneio encontrado:', dadosTorneio);
-         setTournament(dadosTorneio);
+        setTournament(dadosTorneio);
         setRegrasEditadas(dadosTorneio.regras || "");
         setStatus(dadosTorneio.status as Status);
         setJogadoresInscritos(jogadores);

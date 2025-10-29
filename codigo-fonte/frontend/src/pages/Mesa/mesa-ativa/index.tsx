@@ -1,39 +1,29 @@
-/**
- * Página de Mesa Ativa
- *
- * RESPONSABILIDADES:
- * 1. Receber o ID da rodada via parâmetro da URL
- * 2. Buscar os dados da mesa onde o jogador está alocado
- * 3. Exibir informações da mesa: torneio, rodada, times, pontuação
- * 4. Permitir que o jogador reporte o resultado da partida
- */
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { buscarMinhaMesaNaRodada, reportarResultadoMesa } from '../../../services/mesaServico';
 import { buscarTorneioPorId } from '../../../services/torneioServico';
 import type { IMesaAtiva, ITorneio } from '../../../tipos/tipos';
-import styles from './styles.module.css';
+import styles from '../styles.module.css';
 import Swal from 'sweetalert2';
-import Button from '../../../components/Button';
 import { CardSuperior } from '../../../components/CardSuperior';
 import CardInfoTorneio from '../../../components/CardInfoTorneio';
 import RegrasPartida from '../../../components/CardRegrasPartida';
 import CardRanking from '../../../components/CardRanking';
 import Input from '../../../components/Input';
-import { BsGrid3X3Gap, BsCheckCircle, BsPauseCircle } from 'react-icons/bs';
+import Button from '../../../components/Button';
+import { BsGrid3X3Gap, BsCheckCircle } from 'react-icons/bs';
 import { GiPodium } from 'react-icons/gi';
 import { FaDollarSign } from 'react-icons/fa';
 
-const PaginaMesaAtiva = () => {
+export default function MesaAtiva() {
   const { rodadaId } = useParams<{ rodadaId: string }>();
   const navigate = useNavigate();
   const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
+  const [torneioId, setTorneioId] = useState(Number);
   const [loading, setLoading] = useState(true);
   const [reportandoResultado, setReportandoResultado] = useState(false);
   const [regras, setRegras] = useState<string>('');
-
   const [vitoriasSuaDupla, setVitoriasSuaDupla] = useState('');
   const [vitoriasOponentes, setVitoriasOponentes] = useState('');
 
@@ -46,14 +36,12 @@ const PaginaMesaAtiva = () => {
 
   const formatarData = (dataISO?: string) => {
     if (!dataISO) return 'N/A';
-    const data = new Date(dataISO);
-    return data.toLocaleDateString('pt-BR');
+    return new Date(dataISO).toLocaleDateString('pt-BR');
   };
 
   const formatarHora = (dataISO?: string) => {
     if (!dataISO) return 'N/A';
-    const data = new Date(dataISO);
-    return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return new Date(dataISO).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
 
   const formatarPreco = (valor?: number | null, gratuito?: boolean) => {
@@ -62,10 +50,10 @@ const PaginaMesaAtiva = () => {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
+  // Lógica para carregar mesa
   useEffect(() => {
     if (!rodadaId) {
-      Swal.fire('Erro', 'ID da rodada não fornecido', 'error');
-      navigate('/');
+      navigate(`/intervalo/${torneioId}`); // Vai para intervalo
       return;
     }
 
@@ -75,7 +63,24 @@ const PaginaMesaAtiva = () => {
         const mesaData = await buscarMinhaMesaNaRodada(parseInt(rodadaId));
         setMesa(mesaData);
 
-        // Define os valores iniciais baseados nos dados da API
+        try {
+          const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
+          setTorneio(torneioData);
+          setRegras(torneioData.regras || "");
+          setTorneioId( torneioData.id);
+          
+        } catch (error) {
+          console.error('Erro ao carregar torneio:', error);
+        }
+        // Se a rodada já terminou, vai para intervalo
+        if (mesaData.status_rodada.toLowerCase() === 'finalizada') {
+           navigate(`/intervalo/${torneioId}`, {
+            state: { mesa: mesaData } // Passa a mesa para o intervalo
+          });
+          return;
+        }
+
+        // Valores iniciais dos inputs
         if (mesaData.meu_time === 1) {
           setVitoriasSuaDupla(mesaData.pontuacao_time_1.toString());
           setVitoriasOponentes(mesaData.pontuacao_time_2.toString());
@@ -84,18 +89,11 @@ const PaginaMesaAtiva = () => {
           setVitoriasOponentes(mesaData.pontuacao_time_1.toString());
         }
 
-        // Buscar detalhes do torneio
-        try {
-          const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
-          setTorneio(torneioData);
-          setRegras(torneioData.regras || "");
-        } catch (error) {
-          console.error('Erro ao carregar torneio:', error);
-          // Não bloqueia a exibição da mesa se falhar ao buscar o torneio
-        }
+        // Buscar torneio
+        
       } catch (error) {
         console.error('Erro ao carregar mesa:', error);
-        Swal.fire('Erro', 'Não foi possível carregar a mesa. Você pode não estar inscrito nesta rodada.', 'error');
+        Swal.fire('Erro', 'Não foi possível carregar a mesa.', 'error');
         navigate('/');
       } finally {
         setLoading(false);
@@ -113,7 +111,7 @@ const PaginaMesaAtiva = () => {
       return;
     }
 
-    // Ajusta as pontuações baseado no time do jogador
+    // Sua lógica de reportar resultado (mantém a mesma)
     let pontuacaoTime1: number;
     let pontuacaoTime2: number;
 
@@ -125,189 +123,75 @@ const PaginaMesaAtiva = () => {
       pontuacaoTime2 = parseInt(vitoriasSuaDupla);
     }
 
-    // Determina o vencedor baseado nas pontuações
     let timeVencedor: number;
     if (pontuacaoTime1 > pontuacaoTime2) {
       timeVencedor = 1;
     } else if (pontuacaoTime2 > pontuacaoTime1) {
       timeVencedor = 2;
     } else {
-      timeVencedor = 0; // Empate
+      timeVencedor = 0;
     }
 
     try {
       setReportandoResultado(true);
-      await reportarResultadoMesa(
-        mesa.id,
-        pontuacaoTime1,
-        pontuacaoTime2,
-        timeVencedor
-      );
+      const mesaAtualizada = await reportarResultadoMesa(mesa.id, pontuacaoTime1, pontuacaoTime2, timeVencedor);
 
-      // Atualiza apenas as pontuações localmente, mantendo os dados dos times
       setMesa({
         ...mesa,
         pontuacao_time_1: pontuacaoTime1,
         pontuacao_time_2: pontuacaoTime2,
         time_vencedor: timeVencedor,
-        status_rodada: 'Finalizada' // Assume que a rodada foi finalizada
+        status_rodada: 'Finalizada'
       });
 
       await Swal.fire('Sucesso', 'Resultado reportado com sucesso!', 'success');
+      navigate(`/intervalo/${torneio?.id}`, {
+        state: {
+          mesa: mesaAtualizada,
+          torneio: torneio
+        }
+      });
     } catch (error) {
       console.error('Erro ao reportar resultado:', error);
-      Swal.fire('Erro', 'Não foi possível reportar o resultado. Verifique se a rodada está em andamento.', 'error');
+      Swal.fire('Erro', 'Não foi possível reportar o resultado.', 'error');
     } finally {
       setReportandoResultado(false);
     }
   };
 
   if (loading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Carregando mesa...</div>
-      </div>
-    );
+    return <div className={styles.container}><div className={styles.loading}>Carregando...</div></div>;
   }
 
   if (!mesa) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.error}>Mesa não encontrada</div>
-      </div>
-    );
+    return <div className={styles.container}><div className={styles.error}>Mesa não encontrada</div></div>;
   }
 
   const meuTime = mesa.meu_time === 1 ? mesa.time_1 : mesa.time_2;
   const timeAdversario = mesa.meu_time === 1 ? mesa.time_2 : mesa.time_1;
 
-  // Verificação de segurança
-  if (!meuTime || !timeAdversario) {
-    console.error('Times não encontrados na mesa:', mesa);
-    return (
-      <div className={styles.container}>
-        <div className={styles.error}>Erro ao carregar dados da mesa</div>
-      </div>
-    );
-  }
-
-  // Verificar se recebeu um bye (mesa 0)
-  if (mesa.numero_mesa === 0) {
-    return (
-      <div className={styles.container}>
-        {/* Cabeçalho */}
-        <div className={styles.header}>
-          <div>
-            <h1 className={styles.titulo}>Você recebeu um bye!</h1>
-            <p className={styles.subtitulo}>{mesa.nome_torneio}</p>
-          </div>
-          <div className={styles.rodadaBadge}>
-            <BsCheckCircle className={styles.statusIcon} />
-            Rodada {mesa.numero_rodada} - Ativo (Bye)
-          </div>
-        </div>
-
-        {/* Layout em Grid */}
-        <div className={styles.gridContainer}>
-          {/* Cards Superiores Esquerda */}
-          <div className={styles.cardsEsquerda}>
-            <CardSuperior
-              count="BYE"
-              label="Sua Mesa"
-              icon={BsGrid3X3Gap}
-              selected={false}
-            />
-            <CardSuperior
-              count={mesa.numero_rodada}
-              secondaryCount={torneio?.quantidade_rodadas || undefined}
-              label="Rodada"
-              icon={GiPodium}
-              selected={false}
-            />
-          </div>
-
-          {/* Cards Superiores Direita */}
-          <div className={styles.cardsDireita}>
-            <CardSuperior
-              count={torneio?.valor_incricao || 0}
-              label="Premiação"
-              icon={FaDollarSign}
-              selected={false}
-            />
-          </div>
-        </div>
-
-        {/* Layout em Grid - Conteúdo Principal */}
-        <div className={styles.gridContainer}>
-          {/* Coluna Esquerda */}
-          <div className={styles.colunaEsquerda}>
-            <div className={styles.intervaloCard}>
-              <h2 className={styles.intervaloTitulo}>Você recebeu um bye!</h2>
-              <p className={styles.intervaloTexto}>
-                Aproveite para tomar uma água enquanto aguarda a próxima rodada.
-              </p>
-            </div>
-          </div>
-
-          {/* Coluna Direita */}
-          <div className={styles.colunaDireita}>
-            {/* Informações do Torneio */}
-            <CardInfoTorneio
-              title="Informações do Torneio"
-              name={mesa.nome_torneio}
-              date={formatarData(torneio?.data_inicio)}
-              time={formatarHora(torneio?.data_inicio)}
-              location={torneio?.loja_nome || 'Loja não especificada'}
-              price={formatarPreco(torneio?.valor_incricao, torneio?.incricao_gratuita)}
-              players={torneio?.qnt_vagas || 0}
-            />
-
-            {/* Regras da Partida */}
-            <RegrasPartida regras={regras} />
-
-            {/* Ranking */}
-            <CardRanking
-              players={rankingJogadores}
-              title="Ranking"
-              maxItems={4}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  //  RENDERIZAÇÃO SIMPLES: Bye OU Mesa Ativa
   return (
     <div className={styles.container}>
-      {/* Cabeçalho */}
+      {/* CABEÇALHO (igual para ambos) */}
       <div className={styles.header}>
         <div>
           <h1 className={styles.titulo}>
-            {mesa.status_rodada.toLowerCase() === 'finalizada' ? 'Intervalo' : 'Mesa Ativa'}
+            {mesa.numero_mesa === 0 ? 'Você recebeu um bye!' : 'Mesa Ativa'}
           </h1>
           <p className={styles.subtitulo}>{mesa.nome_torneio}</p>
         </div>
         <div className={styles.rodadaBadge}>
-          {mesa.status_rodada.toLowerCase() === 'finalizada' ? (
-            <>
-              <BsPauseCircle className={styles.statusIcon} />
-              Rodada {mesa.numero_rodada} - Intervalo
-            </>
-          ) : (
-            <>
-              <BsCheckCircle className={styles.statusIcon} />
-              Rodada {mesa.numero_rodada} - Ativo
-            </>
-          )}
+          <BsCheckCircle className={styles.statusIcon} />
+          Rodada {mesa.numero_rodada} - {mesa.numero_mesa === 0 ? 'Bye' : 'Ativo'}
         </div>
       </div>
 
-      {/* Layout em Grid */}
+      {/* CARDS SUPERIORES (igual para ambos) */}
       <div className={styles.gridContainer}>
-        {/* Cards Superiores Esquerda */}
         <div className={styles.cardsEsquerda}>
           <CardSuperior
-            count={mesa.numero_mesa}
+            count={mesa.numero_mesa === 0 ? "BYE" : mesa.numero_mesa}
             label="Sua Mesa"
             icon={BsGrid3X3Gap}
             selected={false}
@@ -320,8 +204,6 @@ const PaginaMesaAtiva = () => {
             selected={false}
           />
         </div>
-
-        {/* Cards Superiores Direita */}
         <div className={styles.cardsDireita}>
           <CardSuperior
             count={torneio?.valor_incricao || 0}
@@ -332,58 +214,20 @@ const PaginaMesaAtiva = () => {
         </div>
       </div>
 
-      {/* Layout em Grid - Conteúdo Principal */}
+      {/* CONTEÚDO PRINCIPAL */}
       <div className={styles.gridContainer}>
-        {/* Coluna Esquerda */}
+        {/* COLUNA ESQUERDA - Conteúdo específico */}
         <div className={styles.colunaEsquerda}>
-          {mesa.status_rodada.toLowerCase() === 'finalizada' ? (
-            /* Mensagem de Intervalo */
+          {mesa.numero_mesa === 0 ? (
+            /* === TELA BYE === */
             <div className={styles.intervaloCard}>
-              <h2 className={styles.intervaloTitulo}>Estamos no Intervalo</h2>
+              <h2 className={styles.intervaloTitulo}>Você recebeu um bye!</h2>
               <p className={styles.intervaloTexto}>
-                A rodada {mesa.numero_rodada} foi finalizada. Aguarde o início da próxima rodada.
+                Aproveite para tomar uma água enquanto aguarda a próxima rodada.
               </p>
-
-              {/* Resultado da Partida */}
-              <div className={styles.resultadoIntervalo}>
-                <h3 className={styles.resultadoTitulo}>Resultado da Partida</h3>
-
-                <div className={styles.duplaResultado}>
-                  <div className={styles.duplaResultadoHeader}>
-                    <span className={styles.pontuacaoResultado}>
-                      Pontuação: {mesa.meu_time === 1 ? mesa.pontuacao_time_1 : mesa.pontuacao_time_2}
-                    </span>
-                    {mesa.time_vencedor === mesa.meu_time && (
-                      <span className={styles.vencedorTag}>Vencedor</span>
-                    )}
-                  </div>
-                  <span className={styles.duplaResultadoNomes}>
-                    {meuTime.map(j => j.username).join(' & ')}
-                  </span>
-                </div>
-
-                <div className={styles.vsResultado}>VS</div>
-
-                <div className={styles.duplaResultado}>
-                  <div className={styles.duplaResultadoHeader}>
-                    <span className={styles.pontuacaoResultado}>
-                      Pontuação: {mesa.meu_time === 1 ? mesa.pontuacao_time_2 : mesa.pontuacao_time_1}
-                    </span>
-                    {mesa.time_vencedor && mesa.time_vencedor !== mesa.meu_time && (
-                      <span className={styles.vencedorTag}>Vencedor</span>
-                    )}
-                  </div>
-                  <span className={styles.duplaResultadoNomes}>
-                    {timeAdversario.map(j => j.username).join(' & ')}
-                  </span>
-                </div>
-
-                {mesa.time_vencedor === 0 && (
-                  <div className={styles.empateTag}>Partida Empatada</div>
-                )}
-              </div>
             </div>
           ) : (
+            /* === TELA MESA ATIVA === */
             <>
               {/* Sua Partida */}
               <div className={styles.partidaCard}>
@@ -458,9 +302,8 @@ const PaginaMesaAtiva = () => {
           )}
         </div>
 
-        {/* Coluna Direita */}
+        {/* COLUNA DIREITA - Informações do torneio (igual para ambos) */}
         <div className={styles.colunaDireita}>
-          {/* Informações do Torneio */}
           <CardInfoTorneio
             title="Informações do Torneio"
             name={mesa.nome_torneio}
@@ -471,10 +314,8 @@ const PaginaMesaAtiva = () => {
             players={torneio?.qnt_vagas || 0}
           />
 
-          {/* Regras da Partida */}
           <RegrasPartida regras={regras} />
 
-          {/* Ranking */}
           <CardRanking
             players={rankingJogadores}
             title="Ranking"
@@ -484,6 +325,4 @@ const PaginaMesaAtiva = () => {
       </div>
     </div>
   );
-};
-
-export default PaginaMesaAtiva;
+}

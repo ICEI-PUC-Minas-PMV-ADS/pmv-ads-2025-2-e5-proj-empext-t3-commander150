@@ -316,6 +316,7 @@ const HistoricoTorneios: React.FC = () => {
                                         key={t.id}
                                         {...mapToCardInfo(t)}
                                         action={renderActionFor(t)}
+                                        abaAtual={aba}
                                     />
                                 ))}
                             </div>
