@@ -144,6 +144,7 @@ export interface IRodada {
   status: string; // "Aguardando", "Em andamento", "Finalizada"
   data_inicio?: string | null;
   data_fim?: string | null;
+  data_criacao?: string;
 }
 
 // Mesa de uma rodada (visão administrativa)

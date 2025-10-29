@@ -2,21 +2,22 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { buscarMinhaMesaNaRodada, reportarResultadoMesa } from '../../../services/mesaServico';
 import { buscarTorneioPorId } from '../../../services/torneioServico';
-import type { IMesaAtiva, ITorneio } from '../../../tipos/tipos';
+import type { IMesaAtiva, IRodada, ITorneio } from '../../../tipos/tipos';
 import styles from '../styles.module.css';
 import Swal from 'sweetalert2';
 import { CardSuperior } from '../../../components/CardSuperior';
 import CardInfoTorneio from '../../../components/CardInfoTorneio';
 import RegrasPartida from '../../../components/CardRegrasPartida';
-import CardRanking from '../../../components/CardRanking';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
-import { BsGrid3X3Gap, BsCheckCircle } from 'react-icons/bs';
+import { BsGrid3X3Gap } from 'react-icons/bs';
 import { GiPodium } from 'react-icons/gi';
 import { FaDollarSign } from 'react-icons/fa';
+import DropdownRodadas from '../../../components/DropdownRodadas';
+import CardRanking from '../../../components/CardRanking';
 
 export default function MesaAtiva() {
-  const { rodadaId } = useParams<{ rodadaId: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
@@ -26,14 +27,9 @@ export default function MesaAtiva() {
   const [regras, setRegras] = useState<string>('');
   const [vitoriasSuaDupla, setVitoriasSuaDupla] = useState('');
   const [vitoriasOponentes, setVitoriasOponentes] = useState('');
-
-  const rankingJogadores = [
-    { id: '1', nome: 'Alexandre Shadows', position: 1, points: 12 },
-    { id: '2', nome: 'Julia Frostmage', position: 2, points: 9 },
-    { id: '3', nome: 'Marina Stormcaller', position: 3, points: 7 },
-    { id: '4', nome: 'Pedro Flamecaster', position: 4, points: 6 },
-  ];
-
+  const [rodadaSelecionada, setRodadaSelecionada] = useState<IRodada | null>(null);
+  const [resultadoFinalSelecionado, setResultadoFinalSelecionado] = useState(false);
+  
   const formatarData = (dataISO?: string) => {
     if (!dataISO) return 'N/A';
     return new Date(dataISO).toLocaleDateString('pt-BR');
@@ -52,7 +48,7 @@ export default function MesaAtiva() {
 
   // Lógica para carregar mesa
   useEffect(() => {
-    if (!rodadaId) {
+    if (!id) {
       navigate(`/intervalo/${torneioId}`); // Vai para intervalo
       return;
     }
@@ -60,7 +56,7 @@ export default function MesaAtiva() {
     const carregarMesa = async () => {
       try {
         setLoading(true);
-        const mesaData = await buscarMinhaMesaNaRodada(parseInt(rodadaId));
+        const mesaData = await buscarMinhaMesaNaRodada(parseInt(id));
         setMesa(mesaData);
 
         try {
@@ -101,7 +97,7 @@ export default function MesaAtiva() {
     };
 
     carregarMesa();
-  }, [rodadaId, navigate]);
+  }, [id, navigate]);
 
   const handleReportarResultado = async () => {
     if (!mesa) return;
@@ -145,7 +141,7 @@ export default function MesaAtiva() {
       });
 
       await Swal.fire('Sucesso', 'Resultado reportado com sucesso!', 'success');
-      navigate(`/intervalo/${torneio?.id}`, {
+      navigate(`/intervalo/${torneioId}`, {
         state: {
           mesa: mesaAtualizada,
           torneio: torneio
@@ -159,6 +155,16 @@ export default function MesaAtiva() {
     }
   };
 
+  const handleSelecionarRodada = (rodada: any) => {
+    setRodadaSelecionada(rodada);
+    setResultadoFinalSelecionado(false);
+  };
+
+  const handleSelecionarResultadoFinal = async () => {
+    setResultadoFinalSelecionado(true);
+    setRodadaSelecionada(null);
+  };
+
   if (loading) {
     return <div className={styles.container}><div className={styles.loading}>Carregando...</div></div>;
   }
@@ -170,7 +176,7 @@ export default function MesaAtiva() {
   const meuTime = mesa.meu_time === 1 ? mesa.time_1 : mesa.time_2;
   const timeAdversario = mesa.meu_time === 1 ? mesa.time_2 : mesa.time_1;
 
-  //  RENDERIZAÇÃO SIMPLES: Bye OU Mesa Ativa
+  //  Bye OU Mesa Ativa
   return (
     <div className={styles.container}>
       {/* CABEÇALHO (igual para ambos) */}
@@ -182,8 +188,15 @@ export default function MesaAtiva() {
           <p className={styles.subtitulo}>{mesa.nome_torneio}</p>
         </div>
         <div className={styles.rodadaBadge}>
-          <BsCheckCircle className={styles.statusIcon} />
-          Rodada {mesa.numero_rodada} - {mesa.numero_mesa === 0 ? 'Bye' : 'Ativo'}
+          {/* Dropdown de Rodadas */}
+          <DropdownRodadas
+            tournamentId={torneio?.id}
+            rodadaSelecionada={rodadaSelecionada}
+            onSelecionarRodada={handleSelecionarRodada}
+            onSelecionarResultadoFinal={handleSelecionarResultadoFinal}
+            resultadoFinalSelecionado={resultadoFinalSelecionado}
+            tournamentStatus={torneio?.status}
+          />
         </div>
       </div>
 
@@ -316,11 +329,24 @@ export default function MesaAtiva() {
 
           <RegrasPartida regras={regras} />
 
+          {resultadoFinalSelecionado ? (
           <CardRanking
-            players={rankingJogadores}
-            title="Ranking"
-            maxItems={4}
+            tournamentId={torneio?.id}
+            isRankingFinal={true}
+            titulo="🏆 Ranking Final do Torneio"
           />
+        ) : rodadaSelecionada ? (
+          <CardRanking
+            tournamentId={torneio?.id}
+            rodadaId={rodadaSelecionada.id}
+            titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
+            limite={10}
+          />
+        ) : (
+          <div className={styles.mensagem}>
+            Selecione uma rodada para visualizar o ranking
+          </div>
+        )}
         </div>
       </div>
     </div>

@@ -54,7 +54,7 @@ export default function AppRoutes() {
           <Route path="/historico/" element={<HistoricoTorneios />} />
           <Route path="/torneios/:id" element={<TorneioRouter />} />
           <Route path="/torneios/emparelhamento/" element={<EmparelhamentoTorneio/>} />
-          <Route path="/mesa-ativa/:rodadaId" element={<MesaAtiva />} />
+          <Route path="/mesa-ativa/:id" element={<MesaAtiva />} />
           <Route path="/intervalo/:id" element={<Intervalo />} />
         </Route>
       </Route>

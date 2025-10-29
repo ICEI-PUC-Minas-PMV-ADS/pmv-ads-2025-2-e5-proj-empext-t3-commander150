@@ -2,19 +2,12 @@ import { useLocation, useParams } from 'react-router-dom';
 import styles from '../styles.module.css';
 import CardInfoTorneio from '../../../components/CardInfoTorneio';
 import RegrasPartida from '../../../components/CardRegrasPartida';
-import CardRanking from '../../../components/CardRanking';
 import { BsPauseCircle } from 'react-icons/bs';
-import type { IMesaAtiva, ITorneio } from '../../../tipos/tipos';
+import type { IMesaAtiva, IRodada, ITorneio } from '../../../tipos/tipos';
 import { useEffect, useState } from 'react';
 import { buscarJogadoresInscritos, buscarTorneioPorId, tratarErroTorneio } from '../../../services/torneioServico';
-
-// Dados mockados para futuro ranking
-const rankingJogadores = [
-  { id: '1', nome: 'Alexandre Shadows', position: 1, points: 12 },
-  { id: '2', nome: 'Julia Frostmage', position: 2, points: 9 },
-  { id: '3', nome: 'Marina Stormcaller', position: 3, points: 7 },
-  { id: '4', nome: 'Pedro Flamecaster', position: 4, points: 6 },
-];
+import DropdownRodadas from '../../../components/DropdownRodadas';
+import CardRanking from '../../../components/CardRanking';
 
 
 export default function Intervalo() {
@@ -25,8 +18,9 @@ export default function Intervalo() {
   const [regras, setRegras] = useState<string>('');
   const [erro, setErro] = useState<string | null>(null);
   const location = useLocation();
-    
-  
+  const [rodadaSelecionada, setRodadaSelecionada] = useState<IRodada | null>(null);
+  const [resultadoFinalSelecionado, setResultadoFinalSelecionado] = useState(false);
+
   const formatarData = (dataISO?: string) => {
     if (!dataISO) return 'N/A';
     return new Date(dataISO).toLocaleDateString('pt-BR');
@@ -43,6 +37,7 @@ export default function Intervalo() {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
+
   useEffect(() => {
     const carregarTorneio = async () => {
       try {
@@ -53,7 +48,7 @@ export default function Intervalo() {
         console.log('InformacaoTorneio - Buscando torneio ID:', torneioId);
         const [dadosTorneio] = await Promise.all([
           buscarTorneioPorId(torneioId),
-          buscarJogadoresInscritos(torneioId)
+          buscarJogadoresInscritos(torneioId),
         ]);
         setTorneio(dadosTorneio);
         setRegras(dadosTorneio.regras || "");
@@ -67,11 +62,23 @@ export default function Intervalo() {
 
     carregarTorneio();
   }, [id]);
+
+  const handleSelecionarRodada = (rodada: any) => {
+    setRodadaSelecionada(rodada);
+    setResultadoFinalSelecionado(false);
+  };
+
+  const handleSelecionarResultadoFinal = async () => {
+    setResultadoFinalSelecionado(true);
+    setRodadaSelecionada(null);
+  };
+
+
   if (loading) return <p>Carregando...</p>;
   if (erro) return <p>{erro}</p>;
   const mesa = location.state?.mesa as IMesaAtiva | undefined;
   const torneio1 = location.state?.torneio as ITorneio | undefined;
-
+  const tournament = torneio? torneio : torneio1;
 
   return (
     <div className={styles.container}>
@@ -80,8 +87,17 @@ export default function Intervalo() {
         <div>
           <h1 className={styles.titulo}>Intervalo</h1>
           <p className={styles.subtitulo}>
-            {torneio?.nome || torneio1?.nome}
+            {tournament?.nome}
           </p>
+          {/* Dropdown de Rodadas */}
+          <DropdownRodadas
+            tournamentId={tournament?.id}
+            rodadaSelecionada={rodadaSelecionada}
+            onSelecionarRodada={handleSelecionarRodada}
+            onSelecionarResultadoFinal={handleSelecionarResultadoFinal}
+            resultadoFinalSelecionado={resultadoFinalSelecionado}
+            tournamentStatus={tournament?.status}
+          />
         </div>
         {mesa && (
           <div className={styles.rodadaBadge}>
@@ -161,23 +177,41 @@ export default function Intervalo() {
         <div className={styles.colunaDireita}>
           <CardInfoTorneio
             title="Informações do Torneio"
-            name={torneio?.nome|| torneio1?.nome || ""}
-            date={torneio ? formatarData(torneio.data_inicio) : formatarData(torneio1?.data_inicio)}
-            time={torneio ? formatarHora(torneio.data_inicio) : formatarHora(torneio1?.data_inicio)}
-            location={torneio?.loja_nome || ""}
-            price={torneio ? formatarPreco(torneio.valor_incricao, torneio.incricao_gratuita) : formatarPreco(torneio1?.valor_incricao, torneio1?.incricao_gratuita)}
-            players={torneio?.qnt_vagas || torneio1?.qnt_vagas || 0}
+            name={tournament?.nome || ""}
+            date={tournament ? formatarData(tournament?.data_inicio) : ""}
+            time={tournament ? formatarHora(tournament?.data_inicio) : ""}
+            location={tournament?.loja_nome || ""}
+            price={tournament ? formatarPreco(tournament.valor_incricao, tournament.incricao_gratuita) : ""}
+            players={tournament?.qnt_vagas || 0}
           />
 
           <RegrasPartida 
             regras={regras || torneio1?.regras ||"Erro ao carregar as regras."} 
           />
 
-          <CardRanking
+          {/* <CardRanking
             players={rankingJogadores}
             title="Ranking Atual"
             maxItems={4}
+          /> */}
+        {resultadoFinalSelecionado ? (
+          <CardRanking
+            tournamentId={tournament?.id}
+            isRankingFinal={true}
+            titulo="🏆 Ranking Final do Torneio"
           />
+        ) : rodadaSelecionada ? (
+          <CardRanking
+            tournamentId={tournament?.id}
+            rodadaId={rodadaSelecionada.id}
+            titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
+            limite={10}
+          />
+        ) : (
+          <div className={styles.mensagem}>
+            Selecione uma rodada para visualizar o ranking
+          </div>
+        )}
         </div>
       </div>
     </div>

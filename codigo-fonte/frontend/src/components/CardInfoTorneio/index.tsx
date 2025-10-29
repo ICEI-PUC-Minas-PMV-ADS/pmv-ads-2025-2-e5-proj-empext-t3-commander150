@@ -6,6 +6,7 @@ import styles from "./style.module.css";
 import { verificarSessao } from "../../services/authServico";
 import { buscarTorneioPorId } from "../../services/torneioServico";
 import type { IUsuario } from "../../tipos/tipos";
+import { buscarRodadasDoTorneio } from "../../services/mesaServico";
 
 interface CardInfoTorneioProps {
   title: string;
@@ -46,14 +47,17 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
       if (usuario.tipo === "JOGADOR") {
         // ABA "EM ANDAMENTO" => vai para MESA ATIVA
         if (abaAtual === "andamento") {
-          const dadosTorneio = await buscarTorneioPorId(tournamentId);
-          const rodadaId = (dadosTorneio as any)?.rodada_atual?.id;
+          const dadosTorneio = await buscarRodadasDoTorneio(tournamentId);
+          // Encontrar a rodada ativa (não finalizada)
+          const rodadaAtiva = dadosTorneio.find(rodada => rodada.status.toLowerCase() !== 'finalizada');
+          const rodadaId = rodadaAtiva ? rodadaAtiva.id : null;
 
           if (rodadaId) {
             navigate(`/mesa-ativa/${rodadaId}`);
           } else {
             navigate(`/intervalo/${tournamentId}`);
           }
+
           return;
         }
 

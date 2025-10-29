@@ -1,0 +1,98 @@
+/* Dropdown de Rodadas */
+.dropdownContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--var-cor-branca);
+  background-color: var(--var-cor-rosa);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 250px;
+}
+
+.dropdownButton:hover {
+  background-color: #a06db8;
+}
+
+.dropdownButton svg {
+  transition: transform 0.3s ease;
+}
+
+.iconRotate {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: var(--var-cor-azul-fundo-section);
+  border: var(--var-borda-section);
+  border-radius: 12px;
+  min-width: 280px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dropdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--var-cor-branca);
+}
+
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+.dropdownItem:hover {
+  background: rgba(155, 128, 182, 0.2);
+}
+
+.itemAtivo {
+  background: rgba(155, 128, 182, 0.3);
+  font-weight: 600;
+}
+
+.statusRodada {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--var-cor-cinza-placeholder);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .dropdownContainer {
+    width: 100%;
+  }
+  
+  .dropdownButton {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .dropdownMenu {
+    right: 0;
+    left: 0;
+    min-width: auto;
+  }
+}
