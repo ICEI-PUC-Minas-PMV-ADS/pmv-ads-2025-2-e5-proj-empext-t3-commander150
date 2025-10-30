@@ -103,6 +103,58 @@ class MesaJogador(models.Model):
 
     class Meta:
         unique_together = ('id_mesa', 'id_usuario')
+        indexes = [
+            models.Index(fields=['id_usuario', 'id_mesa'], name='jogador_mesa_idx'),
+        ]
 
     def __str__(self):
         return f'{self.id_usuario.username} na {self.id_mesa} (Time {self.time})'
+
+
+class RankingParcial(models.Model):
+    """
+    Cache de métricas de ranking calculadas após cada rodada.
+    Armazena o ranking parcial de um jogador até uma rodada específica.
+    """
+    id_torneio = models.ForeignKey(Torneio, on_delete=models.CASCADE, related_name='rankings_parciais')
+    id_usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='rankings')
+    rodada_numero = models.IntegerField(help_text="Até qual rodada foi calculado")
+
+    # Métricas calculadas
+    pontos_totais = models.IntegerField(default=0, help_text="Pontos totais acumulados até a rodada")
+    mw_percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        help_text="Match Win Percentage (floor 33%)"
+    )
+    omw_percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        help_text="Opponent Match Win Percentage - força dos oponentes"
+    )
+    pmw_percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        help_text="Partner Match Win Percentage - força dos parceiros"
+    )
+    balanco = models.DecimalField(
+        max_digits=6,
+        decimal_places=4,
+        help_text="OMW% - PMW% (pode ser negativo)"
+    )
+
+    posicao = models.IntegerField(help_text="Posição no ranking nesta rodada")
+
+    # Metadados
+    data_calculo = models.DateTimeField(auto_now=True, help_text="Data do último cálculo")
+
+    class Meta:
+        unique_together = ('id_torneio', 'id_usuario', 'rodada_numero')
+        ordering = ['id_torneio', 'rodada_numero', 'posicao']
+        indexes = [
+            models.Index(fields=['id_torneio', 'rodada_numero'], name='torneio_rodada_idx'),
+            models.Index(fields=['id_torneio', 'rodada_numero', 'posicao'], name='ranking_lookup_idx'),
+        ]
+
+    def __str__(self):
+        return f'{self.id_usuario.username} - {self.posicao}º (Rodada {self.rodada_numero} - {self.id_torneio.nome})'

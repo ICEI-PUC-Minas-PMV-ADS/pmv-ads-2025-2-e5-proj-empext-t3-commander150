@@ -334,6 +334,7 @@ export default function MesaAtiva() {
             tournamentId={torneio?.id}
             isRankingFinal={true}
             titulo="🏆 Ranking Final do Torneio"
+            mostrarMetricasAvancadas={true}
           />
         ) : rodadaSelecionada ? (
           <CardRanking
@@ -341,6 +342,7 @@ export default function MesaAtiva() {
             rodadaId={rodadaSelecionada.id}
             titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
             limite={10}
+            mostrarMetricasAvancadas={true}
           />
         ) : (
           <div className={styles.mensagem}>

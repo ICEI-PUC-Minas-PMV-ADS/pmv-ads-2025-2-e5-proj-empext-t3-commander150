@@ -159,3 +159,23 @@ export interface IMesaRodada {
   time_vencedor: number | null; // 0=Empate, 1=Time 1, 2=Time 2, null=Não definido
   jogadores: IJogadorMesa[];
 }
+
+// ===== TIPOS PARA RANKING =====
+
+// Jogador no ranking (resposta da API)
+export interface IJogadorRanking {
+  posicao: number;
+  jogador_id: number;
+  jogador_nome: string;
+  pontos: number;
+  mw_percentage?: number;    // Match Win % - Aproveitamento individual
+  omw_percentage?: number;   // Opponent Match Win % - Força dos oponentes
+  pmw_percentage?: number;   // Partner Match Win % - Força dos parceiros
+  balanco?: number;          // OMW% - PMW% - Métrica de mérito individual
+}
+
+// Resposta da API de ranking
+export interface IRankingRodada {
+  rodada_numero: number;
+  ranking: IJogadorRanking[];
+}

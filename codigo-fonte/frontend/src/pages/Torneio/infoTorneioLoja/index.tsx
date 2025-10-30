@@ -22,6 +22,7 @@ import MesaCard from "../../../components/CardMesaParticipante";
 import Modal from "../../../components/Modal";
 import { useParams } from "react-router-dom";
 import Button from "../../../components/Button";
+import CardRanking from "../../../components/CardRanking";
 import Swal from 'sweetalert2';
 
 interface Mesa {
@@ -86,35 +87,6 @@ const InformacaoTorneioLoja: React.FC = () => {
   const [editPontuacaoEmpate, setEditPontuacaoEmpate] = useState("1");
   const [editPontuacaoBye, setEditPontuacaoBye] = useState("3");
   const [editQuantidadeRodadas, setEditQuantidadeRodadas] = useState("");
-  const [rankingParcial, setRankingParcial] = useState<Array<{
-    posicao: number;
-    jogador_id: number;
-    jogador_nome: string;
-    pontos: number;
-  }> | null>(null);
-  const [rankingDireita, setRankingDireita] = useState<Array<{
-    posicao: number;
-    jogador_id: number;
-    jogador_nome: string;
-    pontos: number;
-  }> | null>(null);
-  const [carregandoRankingDireita, setCarregandoRankingDireita] = useState(false);
-
-  // Carregar ranking para coluna direita
-  const carregarRankingDireita = async (rodadaId: number) => {
-    if (!tournament?.id) return;
-
-    try {
-      setCarregandoRankingDireita(true);
-      const response = await buscarRankingRodada(tournament.id, rodadaId);
-      setRankingDireita(response.ranking);
-    } catch (error) {
-      console.error('Erro ao carregar ranking da coluna direita:', error);
-      setRankingDireita(null);
-    } finally {
-      setCarregandoRankingDireita(false);
-    }
-  };
 
   const { id } = useParams<{ id: string }>();
   const urlParams = new URLSearchParams(window.location.search);
@@ -291,11 +263,6 @@ const InformacaoTorneioLoja: React.FC = () => {
           const rodadaInicial = rodadaEmAndamento || rodadasTorneio[0];
           setRodadaSelecionada(rodadaInicial);
           await carregarMesasDaRodada(rodadaInicial);
-
-          // Carregar ranking inicial para coluna direita
-          if (dadosTorneio.status === "Em Andamento" || dadosTorneio.status === "Finalizado") {
-            await carregarRankingDireita(rodadaInicial.id);
-          }
         }
 
       } catch (e) {
@@ -528,11 +495,6 @@ const InformacaoTorneioLoja: React.FC = () => {
     setDropdownAberto(false);
     setResultadoFinalSelecionado(false);
     await carregarMesasDaRodada(rodada);
-
-    // Carregar ranking para coluna direita
-    if (tournament?.status === "Em Andamento" || tournament?.status === "Finalizado") {
-      await carregarRankingDireita(rodada.id);
-    }
   };
 
   // Handler para selecionar resultado final
@@ -540,24 +502,13 @@ const InformacaoTorneioLoja: React.FC = () => {
     if (!tournament?.id || rodadas.length === 0) return;
 
     try {
-      setCarregandoMesas(true);
       setDropdownAberto(false);
       setResultadoFinalSelecionado(true);
-
-      // Buscar ranking da última rodada
-      const ultimaRodada = rodadas[rodadas.length - 1];
-      const response = await buscarRankingRodada(tournament.id, ultimaRodada.id);
-
-      setRankingParcial(response.ranking);
       setMesas([]);
       setSobressalentes([]);
-      // Limpar ranking da coluna direita quando visões resultado final
-      setRankingDireita(null);
     } catch (e: any) {
-      console.error('Erro ao carregar ranking final:', e);
+      console.error('Erro ao selecionar resultado final:', e);
       setResultadoFinalSelecionado(false);
-    } finally {
-      setCarregandoMesas(false);
     }
   };
 
@@ -1123,13 +1074,6 @@ const InformacaoTorneioLoja: React.FC = () => {
     }
   }, [preselectResult, rodadas, tournament]);
 
-  // Carregar ranking automaticamente quando rodada selecionada muda
-  useEffect(() => {
-    if (rodadaSelecionada && tournament && (tournament.status === "Em Andamento" || tournament.status === "Finalizado") && !resultadoFinalSelecionado) {
-      carregarRankingDireita(rodadaSelecionada.id);
-    }
-  }, [rodadaSelecionada, tournament, resultadoFinalSelecionado]);
-
   // Fechar dropdown ao clicar fora
   useEffect(() => {
     const handleClickFora = (e: MouseEvent) => {
@@ -1591,33 +1535,15 @@ const InformacaoTorneioLoja: React.FC = () => {
                 <div className={styles.mensagemVazia}>Nenhum jogador inscrito ainda.</div>
               )}
             </div>
-          ) : resultadoFinalSelecionado && rankingParcial ? (
+          ) : resultadoFinalSelecionado ? (
             /* Ranking Final - Quando resultado final é selecionado */
-            <div className={styles.mesasCard}>
-              <h2 className={styles.cardTitulo}>🏆 Ranking Final do Torneio</h2>
-              {carregandoMesas ? (
-                <div className={styles.loading}>Carregando ranking...</div>
-              ) : rankingParcial.length > 0 ? (
-                <div className={styles.rankingContainer}>
-                  {rankingParcial.map((jogador) => (
-                    <div key={jogador.jogador_id} className={styles.rankingItem}>
-                      <div className={styles.rankingPosicao}>
-                        {jogador.posicao === 1 && '🥇'}
-                        {jogador.posicao === 2 && '🥈'}
-                        {jogador.posicao === 3 && '🥉'}
-                        {jogador.posicao > 3 && <span>{jogador.posicao}º</span>}
-                      </div>
-                      <div className={styles.rankingInfo}>
-                        <span className={styles.rankingNome}>{jogador.jogador_nome}</span>
-                        <span className={styles.rankingPontos}>{jogador.pontos} pontos</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className={styles.mensagemVazia}>Nenhum ranking disponível.</div>
-              )}
-            </div>
+            <CardRanking
+              tournamentId={tournament.id}
+              isRankingFinal={true}
+              titulo="🏆 Ranking Final do Torneio"
+              subtitulo="Classificação final com todas as métricas"
+              mostrarMetricasAvancadas={true}
+            />
           ) : (
             /* Mesas Participantes - Para torneios em andamento */
             <>
@@ -1737,49 +1663,16 @@ const InformacaoTorneioLoja: React.FC = () => {
           {/* Regras da Partida */}
           <RegrasPartida regras={regrasPartida} />
 
-          {/* Ranking Parcial - Apenas para torneios em andamento ou finalizados */}
-          {(tournament.status === "Em Andamento" || tournament.status === "Finalizado") && !resultadoFinalSelecionado && (
-            <div className={styles.mesasCard}>
-              <h2 className={styles.cardTitulo}>🏆 Ranking Atual</h2>
-              {carregandoRankingDireita ? (
-                <div className={styles.loading}>Carregando ranking...</div>
-              ) : rankingDireita ? (
-                <div className={styles.rankingContainer}>
-                  <div style={{
-                    fontSize: '0.9rem',
-                    color: 'var(--var-cor-cinza-placeholder)',
-                    marginBottom: '1rem',
-                    fontWeight: 500
-                  }}>
-                    Rodada {rodadaSelecionada?.numero_rodada} - Pontuação acumulada
-                  </div>
-                  {rankingDireita.slice(0, 10).map((jogador) => (
-                    <div key={jogador.jogador_id} className={styles.rankingItem}>
-                      <div className={styles.rankingPosicao}>
-                        {jogador.posicao === 1 && '🥇'}
-                        {jogador.posicao === 2 && '🥈'}
-                        {jogador.posicao === 3 && '🥉'}
-                        {jogador.posicao > 3 && <span>{jogador.posicao}º</span>}
-                      </div>
-                      <div className={styles.rankingInfo}>
-                        <span className={styles.rankingNome}>{jogador.jogador_nome}</span>
-                        <span className={styles.rankingPontos}>{jogador.pontos} pontos</span>
-                      </div>
-                    </div>
-                  ))}
-                  {rankingDireita.length === 0 && (
-                    <div className={styles.mensagemVazia}>Nenhum ranking disponível.</div>
-                  )}
-                  {carregandoRankingDireita && (
-                    <div className={styles.loading}>Carregando ranking...</div>
-                  )}
-                </div>
-              ) : (
-                <div className={styles.mensagemVazia}>
-                  Selecione uma rodada para visualizar o ranking
-                </div>
-              )}
-            </div>
+          {/* Ranking - Usando componente CardRanking com métricas avançadas */}
+          {tournament.status !== "Aberto" && rodadaSelecionada && !resultadoFinalSelecionado && (
+            <CardRanking
+              tournamentId={tournament.id}
+              rodadaId={rodadaSelecionada.id}
+              titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
+              subtitulo="Pontuação acumulada com métricas avançadas"
+              limite={10}
+              mostrarMetricasAvancadas={true}
+            />
           )}
         </div>
       </div>

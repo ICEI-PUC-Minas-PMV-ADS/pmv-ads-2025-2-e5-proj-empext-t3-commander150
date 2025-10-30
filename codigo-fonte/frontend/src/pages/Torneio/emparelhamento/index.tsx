@@ -266,7 +266,15 @@ const EmparelhamentoTorneio: React.FC = () => {
       )}
 
       {/* Ranking */}
-      <CardRanking players={ranking} className={styles.CardRanking}/>
+      {torneio && (
+        <CardRanking
+          tournamentId={torneio.id}
+          rodadaId={rodada}
+          titulo="🏆 Ranking"
+          mostrarMetricasAvancadas={true}
+          className={styles.CardRanking}
+        />
+      )}
 
       {/* Mesas */}
       <section className={styles.cardMesa}>

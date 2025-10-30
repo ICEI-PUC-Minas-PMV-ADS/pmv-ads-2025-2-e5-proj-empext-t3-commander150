@@ -80,18 +80,102 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  gap: 0.5rem;
+}
+
+.rankingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .rankingNome {
   font-size: 1rem;
   font-weight: 600;
   color: var(--var-cor-branca);
-  margin-bottom: 0.25rem;
 }
 
 .rankingPontos {
   font-size: 0.9rem;
+  font-weight: 700;
   color: var(--var-cor-cinza-placeholder);
+}
+
+/* Métricas Avançadas */
+.metricas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(155, 128, 182, 0.2);
+}
+
+.metricaItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0.5rem;
+  background: rgba(155, 128, 182, 0.05);
+  border-radius: 4px;
+  cursor: help;
+  transition: background 0.2s ease;
+}
+
+.metricaItem:hover {
+  background: rgba(155, 128, 182, 0.15);
+}
+
+.metricaLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--var-cor-cinza-placeholder);
+  text-transform: uppercase;
+}
+
+.metricaValor {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--var-cor-branca);
+}
+
+/* Balanço com cores */
+.metricaBalanco {
+  grid-column: 1 / -1;
+  font-weight: 700;
+}
+
+.balancoPositivo {
+  background: rgba(34, 197, 94, 0.1) !important;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.balancoPositivo .metricaValor {
+  color: #4ade80;
+}
+
+.balancoNegativo {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.balancoNegativo .metricaValor {
+  color: #f87171;
+}
+
+.balancoNeutro {
+  background: rgba(250, 204, 21, 0.1) !important;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+}
+
+.balancoNeutro .metricaValor {
+  color: #fbbf24;
+}
+
+.iconeBalanco {
+  font-size: 0.9rem;
+  margin-right: 0.25rem;
+  font-weight: 900;
 }
 
 /* Medalhas para os primeiros colocados */
@@ -121,22 +205,39 @@
   .container {
     padding: 1rem;
   }
-  
+
   .rankingItem {
     padding: 0.75rem;
     gap: 0.75rem;
   }
-  
+
   .rankingPosicao {
     font-size: 1.5rem;
     min-width: 40px;
   }
-  
+
   .rankingNome {
     font-size: 0.9rem;
   }
-  
+
   .rankingPontos {
     font-size: 0.8rem;
+  }
+
+  /* Métricas em mobile - 1 coluna */
+  .metricas {
+    grid-template-columns: 1fr;
+  }
+
+  .metricaItem {
+    padding: 0.3rem 0.4rem;
+  }
+
+  .metricaLabel {
+    font-size: 0.7rem;
+  }
+
+  .metricaValor {
+    font-size: 0.75rem;
   }
 }

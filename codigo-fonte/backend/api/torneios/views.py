@@ -11,7 +11,7 @@ from django.db import transaction
 from django.db.models import Sum, Count, Q
 import random
 
-from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador
+from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador, RankingParcial
 from usuarios.models import Usuario
 from .permissoes import IsLojaOuAdmin, IsApenasLeitura, IsJogadorNaMesa
 from .serializers import (
@@ -19,6 +19,7 @@ from .serializers import (
     MesaSerializer, MesaDetailSerializer, ReportarResultadoSerializer,
     EditarJogadoresMesaSerializer, VisualizacaoMesaJogadorSerializer, InscricaoResponseSerializer, IniciarRodadaSerializer
 )
+from .ranking_utils import calcular_e_salvar_ranking_parcial
 
 
 # ViewSets fornecem uma implementação completa de CRUD (Create, Retrieve, Update, Destroy)
@@ -425,6 +426,15 @@ class TorneioViewSet(viewsets.ModelViewSet):
             rodada_atual.status = 'Finalizada'
             rodada_atual.save(update_fields=['status'])
 
+            # Calcula e salva ranking da rodada que acabou de finalizar
+            try:
+                calcular_e_salvar_ranking_parcial(torneio, rodada_atual.numero_rodada)
+            except Exception as e:
+                # Log do erro mas não bloqueia a criação da próxima rodada
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Erro ao calcular ranking da rodada {rodada_atual.numero_rodada}: {str(e)}")
+
             # Cria nova rodada no status "Emparelhamento" e inicia emparelhamento automático
             nova_rodada = Rodada.objects.create(
                 id_torneio=torneio,
@@ -578,34 +588,36 @@ class TorneioViewSet(viewsets.ModelViewSet):
             # Finaliza rodada atual
             rodada_atual.status = 'Finalizada'
             rodada_atual.save(update_fields=['status'])
-            
-            # Calcula pontuação final de todos os jogadores
-            jogadores_pontuacao = self._calcular_pontuacao_jogadores(torneio)
-            
-            # Gera ranking ordenado
+
+            # Calcula e salva ranking final com todas as métricas
+            ranking_calculado = calcular_e_salvar_ranking_parcial(torneio, rodada_atual.numero_rodada)
+
+            # Busca ranking do cache para retornar com todas as informações
+            ranking_cache = RankingParcial.objects.filter(
+                id_torneio=torneio,
+                rodada_numero=rodada_atual.numero_rodada
+            ).select_related('id_usuario').order_by('posicao')
+
+            # Formata ranking para resposta
             ranking = []
-            jogadores_ordenados = sorted(
-                jogadores_pontuacao.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )
-            
-            for posicao, (usuario_id, pontos) in enumerate(jogadores_ordenados, start=1):
-                from usuarios.models import Usuario
-                usuario = Usuario.objects.get(id=usuario_id)
+            for item in ranking_cache:
                 ranking.append({
-                    'posicao': posicao,
-                    'jogador_id': usuario_id,
-                    'jogador_nome': usuario.username,
-                    'pontos': pontos
+                    'posicao': item.posicao,
+                    'jogador_id': item.id_usuario.id,
+                    'jogador_nome': item.id_usuario.username,
+                    'pontos': item.pontos_totais,
+                    'mw_percentage': float(item.mw_percentage),
+                    'omw_percentage': float(item.omw_percentage),
+                    'pmw_percentage': float(item.pmw_percentage),
+                    'balanco': float(item.balanco)
                 })
-            
+
             # Muda status do torneio para 'Finalizado'
             torneio.status = 'Finalizado'
             torneio.save(update_fields=['status'])
-            
+
             total_rodadas = Rodada.objects.filter(id_torneio=torneio).count()
-        
+
         return Response({
             'message': 'Torneio finalizado com sucesso',
             'ranking': ranking,
@@ -712,6 +724,7 @@ class TorneioViewSet(viewsets.ModelViewSet):
     def ranking_rodada(self, request, pk=None):
         """
         Retorna o ranking parcial até uma rodada específica.
+        Usa cache de RankingParcial quando disponível, calcula sob demanda caso contrário.
         """
         torneio = self.get_object()
         rodada_id = request.query_params.get('rodada_id')
@@ -730,62 +743,105 @@ class TorneioViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Calcula pontuação até a rodada especificada
-        pontuacao = {}
-        inscricoes = Inscricao.objects.filter(
-            id_torneio=torneio
-        ).exclude(status='Cancelado')
-
-        for inscricao in inscricoes:
-            pontuacao[inscricao.id_usuario_id] = 0
-
-        # Percorre rodadas até a alvo
-        rodadas_até_alvo = Rodada.objects.filter(
+        # Verifica se ranking está em cache
+        ranking_cache = RankingParcial.objects.filter(
             id_torneio=torneio,
-            numero_rodada__lte=rodada_alvo.numero_rodada
-        ).order_by('numero_rodada')
+            rodada_numero=rodada_alvo.numero_rodada
+        ).select_related('id_usuario').order_by('posicao')
 
-        for rodada in rodadas_até_alvo:
-            jogadores_na_rodada = set()
-            mesas = Mesa.objects.filter(id_rodada=rodada)
+        if ranking_cache.exists():
+            # Usa cache existente (otimizado!)
+            ranking = []
+            for item in ranking_cache:
+                ranking.append({
+                    'posicao': item.posicao,
+                    'jogador_id': item.id_usuario.id,
+                    'jogador_nome': item.id_usuario.username,
+                    'pontos': item.pontos_totais,
+                    'mw_percentage': float(item.mw_percentage),
+                    'omw_percentage': float(item.omw_percentage),
+                    'pmw_percentage': float(item.pmw_percentage),
+                    'balanco': float(item.balanco)
+                })
+        else:
+            # Cache não existe - calcula sob demanda
+            if rodada_alvo.status == 'Finalizada':
+                # Rodada finalizada - calcula e salva no cache
+                calcular_e_salvar_ranking_parcial(torneio, rodada_alvo.numero_rodada)
 
-            for mesa in mesas:
-                jogadores_mesa = MesaJogador.objects.filter(id_mesa=mesa).select_related('id_usuario')
+                # Busca do cache recém criado
+                ranking_cache = RankingParcial.objects.filter(
+                    id_torneio=torneio,
+                    rodada_numero=rodada_alvo.numero_rodada
+                ).select_related('id_usuario').order_by('posicao')
 
-                for jogador_mesa in jogadores_mesa:
-                    jogador_id = jogador_mesa.id_usuario_id
-                    jogadores_na_rodada.add(jogador_id)
+                ranking = []
+                for item in ranking_cache:
+                    ranking.append({
+                        'posicao': item.posicao,
+                        'jogador_id': item.id_usuario.id,
+                        'jogador_nome': item.id_usuario.username,
+                        'pontos': item.pontos_totais,
+                        'mw_percentage': float(item.mw_percentage),
+                        'omw_percentage': float(item.omw_percentage),
+                        'pmw_percentage': float(item.pmw_percentage),
+                        'balanco': float(item.balanco)
+                    })
+            else:
+                # Rodada não finalizada - usa cálculo simples (fallback)
+                pontuacao = {}
+                inscricoes = Inscricao.objects.filter(
+                    id_torneio=torneio
+                ).exclude(status='Cancelado')
 
-                    # Só adiciona pontuação se o jogador ainda estiver ativo no torneio
-                    if jogador_id in pontuacao:
-                        if mesa.time_vencedor == 0:
-                            pontuacao[jogador_id] += torneio.pontuacao_empate
-                        elif mesa.time_vencedor == jogador_mesa.time:
-                            pontuacao[jogador_id] += torneio.pontuacao_vitoria
-                        else:
-                            pontuacao[jogador_id] += torneio.pontuacao_derrota
+                for inscricao in inscricoes:
+                    pontuacao[inscricao.id_usuario_id] = 0
 
-            for jogador_id in pontuacao.keys():
-                if jogador_id not in jogadores_na_rodada:
-                    pontuacao[jogador_id] += torneio.pontuacao_bye
+                rodadas_até_alvo = Rodada.objects.filter(
+                    id_torneio=torneio,
+                    numero_rodada__lte=rodada_alvo.numero_rodada,
+                    status='Finalizada'
+                ).order_by('numero_rodada')
 
-        # Gera ranking ordenado
-        ranking = []
-        jogadores_ordenados = sorted(
-            pontuacao.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
+                for rodada in rodadas_até_alvo:
+                    jogadores_na_rodada = set()
+                    mesas = Mesa.objects.filter(id_rodada=rodada)
 
-        for posicao, (usuario_id, pontos) in enumerate(jogadores_ordenados, start=1):
-            from usuarios.models import Usuario
-            usuario = Usuario.objects.get(id=usuario_id)
-            ranking.append({
-                'posicao': posicao,
-                'jogador_id': usuario_id,
-                'jogador_nome': usuario.username,
-                'pontos': pontos
-            })
+                    for mesa in mesas:
+                        jogadores_mesa = MesaJogador.objects.filter(id_mesa=mesa).select_related('id_usuario')
+
+                        for jogador_mesa in jogadores_mesa:
+                            jogador_id = jogador_mesa.id_usuario_id
+                            jogadores_na_rodada.add(jogador_id)
+
+                            if jogador_id in pontuacao:
+                                if mesa.time_vencedor == 0:
+                                    pontuacao[jogador_id] += torneio.pontuacao_empate
+                                elif mesa.time_vencedor == jogador_mesa.time:
+                                    pontuacao[jogador_id] += torneio.pontuacao_vitoria
+                                else:
+                                    pontuacao[jogador_id] += torneio.pontuacao_derrota
+
+                    for jogador_id in pontuacao.keys():
+                        if jogador_id not in jogadores_na_rodada:
+                            pontuacao[jogador_id] += torneio.pontuacao_bye
+
+                ranking = []
+                jogadores_ordenados = sorted(
+                    pontuacao.items(),
+                    key=lambda x: x[1],
+                    reverse=True
+                )
+
+                for posicao, (usuario_id, pontos) in enumerate(jogadores_ordenados, start=1):
+                    from usuarios.models import Usuario
+                    usuario = Usuario.objects.get(id=usuario_id)
+                    ranking.append({
+                        'posicao': posicao,
+                        'jogador_id': usuario_id,
+                        'jogador_nome': usuario.username,
+                        'pontos': pontos
+                    })
 
         return Response({
             'rodada_numero': rodada_alvo.numero_rodada,
