@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { buscarMinhaMesaNaRodada, reportarResultadoMesa } from '../../../services/mesaServico';
 import { buscarTorneioPorId } from '../../../services/torneioServico';
 import type { IMesaAtiva, IRodada, ITorneio } from '../../../tipos/tipos';
@@ -19,9 +19,9 @@ import CardRanking from '../../../components/CardRanking';
 export default function MesaAtiva() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
-  const [torneioId, setTorneioId] = useState(Number);
   const [loading, setLoading] = useState(true);
   const [reportandoResultado, setReportandoResultado] = useState(false);
   const [regras, setRegras] = useState<string>('');
@@ -46,30 +46,39 @@ export default function MesaAtiva() {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
+  const torneioId = location.state?.tournamentId
+
   // Lógica para carregar mesa
   useEffect(() => {
     if (!id) {
       navigate(`/intervalo/${torneioId}`); // Vai para intervalo
       return;
     }
-
+     
     const carregarMesa = async () => {
       try {
         setLoading(true);
         const mesaData = await buscarMinhaMesaNaRodada(parseInt(id));
+
+        if (!mesaData) {
+          navigate(`/intervalo/${torneioId}`);
+          return;
+        }
+
         setMesa(mesaData);
+        console.log('Mesa carregada:', mesaData);
 
         try {
           const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
+          console.log('Torneio carregado:', torneioData);
           setTorneio(torneioData);
           setRegras(torneioData.regras || "");
-          setTorneioId( torneioData.id);
           
         } catch (error) {
           console.error('Erro ao carregar torneio:', error);
         }
         // Se a rodada já terminou, vai para intervalo
-        if (mesaData.status_rodada.toLowerCase() === 'finalizada') {
+        if (mesaData?.status_rodada.toLowerCase() === 'finalizada') {
            navigate(`/intervalo/${torneioId}`, {
             state: { mesa: mesaData } // Passa a mesa para o intervalo
           });
@@ -84,13 +93,11 @@ export default function MesaAtiva() {
           setVitoriasSuaDupla(mesaData.pontuacao_time_2.toString());
           setVitoriasOponentes(mesaData.pontuacao_time_1.toString());
         }
-
-        // Buscar torneio
         
       } catch (error) {
         console.error('Erro ao carregar mesa:', error);
         Swal.fire('Erro', 'Não foi possível carregar a mesa.', 'error');
-        navigate('/');
+        navigate(`/intervalo/${torneioId}`);
       } finally {
         setLoading(false);
       }
@@ -231,15 +238,7 @@ export default function MesaAtiva() {
       <div className={styles.gridContainer}>
         {/* COLUNA ESQUERDA - Conteúdo específico */}
         <div className={styles.colunaEsquerda}>
-          {mesa.numero_mesa === 0 ? (
-            /* === TELA BYE === */
-            <div className={styles.intervaloCard}>
-              <h2 className={styles.intervaloTitulo}>Você recebeu um bye!</h2>
-              <p className={styles.intervaloTexto}>
-                Aproveite para tomar uma água enquanto aguarda a próxima rodada.
-              </p>
-            </div>
-          ) : (
+          {mesa ? (
             /* === TELA MESA ATIVA === */
             <>
               {/* Sua Partida */}
@@ -312,6 +311,15 @@ export default function MesaAtiva() {
                 />
               </div>
             </>
+            
+          ) : (
+            /* === TELA BYE === */
+            <div className={styles.intervaloCard}>
+              <h2 className={styles.intervaloTitulo}>Você recebeu um bye!</h2>
+              <p className={styles.intervaloTexto}>
+                Aproveite para tomar uma água enquanto aguarda a próxima rodada.
+              </p>
+            </div> 
           )}
         </div>
 
@@ -342,7 +350,7 @@ export default function MesaAtiva() {
             rodadaId={rodadaSelecionada.id}
             titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
             limite={10}
-            mostrarMetricasAvancadas={true}
+            mostrarMetricasAvancadas={false}
           />
         ) : (
           <div className={styles.mensagem}>
