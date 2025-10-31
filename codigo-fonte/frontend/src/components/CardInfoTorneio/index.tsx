@@ -33,7 +33,7 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
   className = "",
   tournamentId,
   action,
-  abaAtual = "inscritos", // valor padrão
+  abaAtual = "inscritos", 
 }) => {
   const navigate = useNavigate();
 
@@ -45,29 +45,52 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
 
       // Navegação baseada na ABA
       if (usuario.tipo === "JOGADOR") {
-        // ABA "EM ANDAMENTO" => vai para MESA ATIVA
+        // ABA "EM ANDAMENTO" => verifica se deve ir para MESA ATIVA ou INTERVALO
         if (abaAtual === "andamento") {
           const dadosTorneio = await buscarRodadasDoTorneio(tournamentId);
+          
           // Encontrar a rodada ativa (não finalizada)
-          const rodadaAtiva = dadosTorneio.find(rodada => rodada.status.toLowerCase() !== 'finalizada');
+          const rodadaAtiva = dadosTorneio.find(rodada => 
+            rodada.status.toLowerCase() !== 'finalizada'
+          );
           const rodadaId = rodadaAtiva ? rodadaAtiva.id : null;
 
-          if (rodadaId) {
-            navigate(`/mesa-ativa/${rodadaId}`);
+          if (rodadaId && rodadaAtiva) {
+            const statusRodada = rodadaAtiva.status?.toLowerCase() || '';~
+            console.log('Rodada ativa encontrada:', statusRodada);
+            const statusComMesaAtiva = ['ativa', 'em andamento', 'iniciada', 'bye'];
+            const statusEmPreparacao = ['emparelhamento', 'aguardando início', 'preparação', 'sortendo mesas'];
+            
+            if (statusComMesaAtiva.includes(statusRodada)) {
+              // Rodada ativa - navegar para mesa ativa
+              navigate(`/mesa-ativa/${rodadaId}`, {
+                state: { 
+                  tournamentId: tournamentId
+                }
+              });
+            } else if (statusEmPreparacao.includes(statusRodada)) {
+              // Rodada em preparação - navegar para intervalo
+              navigate(`/intervalo/${tournamentId}`);
+            } else {
+              // Status não reconhecido - fallback para intervalo
+              navigate(`/intervalo/${tournamentId}`);
+            }
           } else {
+            // Nenhuma rodada ativa encontrada - ir para intervalo
             navigate(`/intervalo/${tournamentId}`);
           }
-
           return;
         }
-
-        // ABA "INSCRITOS" ou "HISTÓRICO" => vai para DETALHES DO TORNEIO
-        if (abaAtual === "inscritos" || abaAtual === "historico") {
-          if (abaAtual === "historico" && title === "Concluído") {
-            navigate(`/torneios/${tournamentId}?preselect=result`);
-          } else {
-            navigate(`/torneios/${tournamentId}`);
-          }
+        
+        // ABA "HISTÓRICO" => vai para Intervalo onde tem o resultado final
+        if (abaAtual === "historico") {
+          navigate(`/intervalo/${tournamentId}`);
+          return;
+        }
+        
+        // ABA "INSCRITOS" => vai para DETALHES DO TORNEIO
+        if (abaAtual === "inscritos"){
+          navigate(`/torneios/${tournamentId}`);
           return;
         }
       }

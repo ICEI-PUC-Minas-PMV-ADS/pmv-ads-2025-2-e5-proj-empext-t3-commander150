@@ -195,7 +195,7 @@ const CardRanking: React.FC<RankingProps> = ({
                   </div>
 
                   {/* Métricas avançadas - só mostra se estiver habilitado E tiver dados */}
-                  {(mostrarMetricasAvancadas || temMetricasAvancadas) && jogador.mw_percentage !== undefined && (
+                  {(mostrarMetricasAvancadas && temMetricasAvancadas) && jogador.mw_percentage !== undefined && (
                     <div className={styles.metricas}>
                       <div className={styles.metricaItem} title="Match Win % - Seu aproveitamento individual">
                         <span className={styles.metricaLabel}>MW%:</span>

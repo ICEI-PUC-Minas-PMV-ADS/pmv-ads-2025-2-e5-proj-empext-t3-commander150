@@ -14,11 +14,19 @@ import type { IMesaAtiva, IRodada, IMesaRodada } from '../tipos/tipos';
  * @param rodadaId - ID da rodada
  * @returns Os dados da mesa onde o jogador está alocado
  */
-export const buscarMinhaMesaNaRodada = async (rodadaId: number): Promise<IMesaAtiva> => {
+export const buscarMinhaMesaNaRodada = async (rodadaId: number): Promise<IMesaAtiva | null> => {
+   try {
   const resposta = await api.get(`/torneios/mesas/minha_mesa_na_rodada/`, {
     params: { rodada_id: rodadaId }
   });
   return resposta.data;
+ } catch (error: any) {
+    if (error.response?.status === 404) {
+      // 404 significa que não tem mesa (BYE)
+      return null;
+    }
+    throw error;
+  }
 };
 
 /**

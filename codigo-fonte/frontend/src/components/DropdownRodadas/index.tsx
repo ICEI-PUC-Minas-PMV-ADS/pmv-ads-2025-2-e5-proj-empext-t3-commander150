@@ -27,6 +27,7 @@ const DropdownRodadas: React.FC<DropdownRodadasProps> = ({
   const [rodadas, setRodadas] = useState<IRodada[]>([]);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [rodadaInicialSelecionada, setRodadaInicialSelecionada] = useState(false);
 
   // Buscar rodadas do torneio
   const carregarRodadas = async () => {
@@ -37,6 +38,22 @@ const DropdownRodadas: React.FC<DropdownRodadasProps> = ({
       setErro(null);
       const rodadasData = await buscarRodadasDoTorneio(tournamentId);
       setRodadas(rodadasData);
+      
+      // Selecionar automaticamente a última rodada ou resultado final
+      if (rodadasData.length > 0 && !rodadaSelecionada && !rodadaInicialSelecionada) {
+        
+        // Se o torneio está finalizado, seleciona resultado final automaticamente
+        if (tournamentStatus === "Finalizado" && onSelecionarResultadoFinal) {
+          onSelecionarResultadoFinal();
+        } 
+        // Caso contrário, seleciona a última rodada
+        else if (rodadasData.length > 0) {
+          const ultimaRodada = rodadasData[rodadasData.length - 1];
+          onSelecionarRodada(ultimaRodada);
+        }
+        
+        setRodadaInicialSelecionada(true);
+      }
     } catch (error: any) {
       console.error('Erro ao carregar rodadas:', error);
       setErro('Erro ao carregar rodadas');
@@ -50,6 +67,11 @@ const DropdownRodadas: React.FC<DropdownRodadasProps> = ({
     if (tournamentId) {
       carregarRodadas();
     }
+  }, [tournamentId]);
+
+  // Resetar a flag quando o tournamentId mudar
+  useEffect(() => {
+    setRodadaInicialSelecionada(false);
   }, [tournamentId]);
 
   // Fechar dropdown ao clicar fora
@@ -83,28 +105,6 @@ const DropdownRodadas: React.FC<DropdownRodadasProps> = ({
     return statusMap[status] || status;
   };
 
-  // Função para selecionar rodada inicial automaticamente
-  const selecionarRodadaInicial = (rodadasData: IRodada[]) => {
-    if (rodadasData.length > 0) {
-      const rodadaEmAndamento = rodadasData.find(r => 
-        r.status?.toLowerCase() === 'em andamento'
-      );
-      const rodadaInicial = rodadaEmAndamento || rodadasData[0];
-      
-      // Só chama a callback se não houver rodada selecionada ainda
-      if (!rodadaSelecionada) {
-        onSelecionarRodada(rodadaInicial);
-      }
-    }
-  };
-
-  // Atualizar rodada inicial quando as rodadas forem carregadas
-  useEffect(() => {
-    if (rodadas.length > 0 && !rodadaSelecionada) {
-      selecionarRodadaInicial(rodadas);
-    }
-  }, [rodadas, rodadaSelecionada]);
-
   return (
     <div className={`${styles.dropdownContainer} ${className}`}>
       <button
@@ -116,7 +116,7 @@ const DropdownRodadas: React.FC<DropdownRodadasProps> = ({
           {carregando ? (
             'Carregando rodadas...'
           ) : resultadoFinalSelecionado ? (
-            'Resultado final'
+            '🏆 Resultado final'
           ) : rodadaSelecionada ? (
             `Rodada ${rodadaSelecionada.numero_rodada} de ${rodadas.length}`
           ) : rodadas.length > 0 ? (
@@ -147,17 +147,18 @@ const DropdownRodadas: React.FC<DropdownRodadasProps> = ({
               </span>
             </div>
           ))}
+          
           {tournamentStatus === "Finalizado" && onSelecionarResultadoFinal && rodadas.length > 0 && (
             <div
               className={`${styles.dropdownItem} ${
                 resultadoFinalSelecionado ? styles.itemAtivo : ''
-              }`}
+              } ${styles.resultadoFinalItem}`}
               onClick={() => {
                 onSelecionarResultadoFinal();
                 setDropdownAberto(false);
               }}
             >
-              <span>🏆 Resultado final</span>
+              <span className={styles.resultadoFinalText}>🏆 Resultado final</span>
               <span className={styles.statusRodada}>Final</span>
             </div>
           )}
