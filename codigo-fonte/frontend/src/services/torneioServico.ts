@@ -679,3 +679,114 @@ export async function desinscreverDoTorneio(torneioId: number): Promise<void> {
     }
   }
 }
+/**
+ * Usado pela LOJA no modal "Gerenciar Inscrições".
+ * Remove um jogador específico do torneio.
+ *
+ * Regras:
+ * - Se torneio.status === "Aberto"       -> HARD DELETE (DELETE inscrição)
+ * - Se torneio.status === "Em Andamento" -> SOFT DELETE (POST .../desinscrever/)
+ *
+ * @param torneioId    ID do torneio
+ * @param inscricaoId  ID da inscrição do jogador que será removido
+ */
+export async function removerJogadorDoTorneioComoLoja(
+    torneioId: number,
+    inscricaoId: number
+): Promise<void> {
+
+  // 1) Buscar status do torneio
+  const torneio = await buscarTorneioPorId(torneioId);
+
+  // Caso 1: torneio Aberto -> HARD DELETE
+  if ((torneio?.status || "").toLowerCase() === "aberto") {
+    try {
+      await api.delete(`/torneios/inscricoes/${inscricaoId}/`, {
+        withCredentials: true,
+      });
+      return;
+    } catch (err: any) {
+      const st = err?.response?.status;
+      if (st === 404 || st === 410) {
+        return;
+      }
+
+      // fallback opcional: tenta soft delete mesmo assim
+      try {
+        await api.post(
+            `/torneios/inscricoes/${inscricaoId}/desinscrever/`,
+            {},
+            { withCredentials: true }
+        );
+        return;
+      } catch (err2) {
+        throw err; // mantém o erro original do DELETE
+      }
+    }
+  }
+
+  // Caso 2: torneio Em Andamento (ou qualquer outro estado != Aberto) -> SOFT DELETE
+  try {
+    await api.post(
+        `/torneios/inscricoes/${inscricaoId}/desinscrever/`,
+        {},
+        { withCredentials: true }
+    );
+    return;
+  } catch (err: any) {
+
+    try {
+      const { data } = await api.get(
+          `/torneios/inscricoes/${inscricaoId}/`,
+          { withCredentials: true }
+      );
+
+      const aindaAtivo =
+          data?.status &&
+          String(data.status).toLowerCase() !== "cancelado"
+              ? true
+              : false;
+
+      // se já está cancelado, consideramos sucesso
+      if (!aindaAtivo) return;
+    } catch (_) {
+    }
+
+    // fallback final: tenta DELETE como último recurso
+    try {
+      await api.delete(`/torneios/inscricoes/${inscricaoId}/`, {
+        withCredentials: true,
+      });
+      return;
+    } catch (err2: any) {
+      const st = err2?.response?.status;
+      if (st === 404 || st === 410) {
+        return;
+      }
+      throw err2;
+    }
+  }
+}
+/**
+ * Lista todos os jogadores inscritos em um torneio específico.
+ * Retorna um array com as inscrições (usuário, email, status, etc).
+ */
+export async function listarInscricoesDoTorneio(idTorneio: number) {
+  const resposta = await api.get("/torneios/inscricoes/", {
+    params: {
+      id_torneio: idTorneio,
+      page_size: 200, // ajuste conforme paginação do backend
+    },
+    withCredentials: true,
+  });
+
+  // A API pode retornar { results: [...] } ou um array direto
+  if (Array.isArray(resposta.data?.results)) {
+    return resposta.data.results;
+  }
+  if (Array.isArray(resposta.data)) {
+    return resposta.data;
+  }
+  return [];
+}
+

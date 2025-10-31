@@ -216,3 +216,130 @@
     font-size: 0.75rem;
   }
 }
+/* ====== Gerenciar Inscrições (LOJA) ====== */
+
+.headerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.modalTitulo {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.scrollArea {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.infoText {
+  color: #cccccc;
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.listaWrapper {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.linhaJogador {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.linhaJogador + .linhaJogador {
+  margin-top: 0.5rem;
+}
+
+.nomeJogador {
+  font-weight: 500;
+  color: #fff;
+  max-width: 70%;
+  word-break: break-word;
+  font-size: 0.95rem;
+}
+
+/* Toggle switch reaproveitável */
+.switchWrapper {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+}
+
+.switchWrapper input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background-color: #555;
+  border-radius: 24px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+/* Quando marcado (ativo = inscrito) */
+.switchWrapper input:checked + .slider {
+  background-color: #46AF87;
+}
+
+/* knob vai pra direita quando ativo */
+.switchWrapper input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* estado desabilitado */
+.switchWrapper input:disabled + .slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.footerRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  gap: 0.5rem;
+}
+
+.actionSecondary {
+  background: var(--var-cor-primaria);
+  color: var(--var-cor-branca);
+  border: 1px solid var(--var-cor-rosa);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}

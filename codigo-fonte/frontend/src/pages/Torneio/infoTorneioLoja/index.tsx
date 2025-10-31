@@ -19,6 +19,7 @@ import { FiGift, FiChevronDown, FiPlay, FiSkipForward, FiCheckCircle, FiShare2, 
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
 import RegrasPartida from "../../../components/CardRegrasPartida";
 import MesaCard from "../../../components/CardMesaParticipante";
+import ModalGerenciarInscricoes from "../../../components/ModalGerenciarInscricoes";
 import Modal from "../../../components/Modal";
 import { useParams } from "react-router-dom";
 import Button from "../../../components/Button";
@@ -72,6 +73,7 @@ const InformacaoTorneioLoja: React.FC = () => {
   const [modalEditarAberto, setModalEditarAberto] = useState(false);
   const [editandoTorneio, setEditandoTorneio] = useState(false);
   const [cancelandoTorneio, setCancelandoTorneio] = useState(false);
+  const [mostrarModalInscricoes, setMostrarModalInscricoes] = useState(false);
 
   // Estados para campos do formulário de edição
   const [editNome, setEditNome] = useState("");
@@ -648,6 +650,12 @@ const InformacaoTorneioLoja: React.FC = () => {
       setIniciandoTorneio(false);
     }
   };
+
+  // Handler para gerenciar jogadores inscritos em um torneio
+  const handleGerenciarInscricoes = () => {
+    setMostrarModalInscricoes(true);
+  };
+
 
   // Handler para avançar para próxima rodada (MÉTODO NOVO)
   const handleAvancarRodadaNovo = async () => {
@@ -1386,6 +1394,16 @@ const InformacaoTorneioLoja: React.FC = () => {
                 paddingHorizontal="24px"
                 fontSize="14px"
               />
+              <Button
+                 label="Gerenciar Inscrições"
+                 onClick={handleGerenciarInscricoes}
+                 width="auto"
+                 height="44px"
+                 paddingHorizontal="20px"
+                 fontSize="14px"
+                 backgroundColor="#ffc107"
+              />
+
             </>
           )}
 
@@ -1457,6 +1475,15 @@ const InformacaoTorneioLoja: React.FC = () => {
                 paddingHorizontal="10px"
                 fontSize="14px"
                 backgroundColor="#DC2626"
+              />
+              <Button
+                label="Gerenciar Inscrições"
+                onClick={handleGerenciarInscricoes}
+                width="auto"
+                height="44px"
+                paddingHorizontal="20px"
+                fontSize="14px"
+                backgroundColor="#ffc107"
               />
             </>
           )}
@@ -1676,6 +1703,14 @@ const InformacaoTorneioLoja: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal Gerenciar Inscrições (LOJA) */}
+      {mostrarModalInscricoes && tournament?.id && (
+          <ModalGerenciarInscricoes
+              torneioId={tournament.id}
+              onClose={() => setMostrarModalInscricoes(false)}
+          />
+      )}
 
       {/* Modal de Edição */}
       {modalEditarAberto && (
