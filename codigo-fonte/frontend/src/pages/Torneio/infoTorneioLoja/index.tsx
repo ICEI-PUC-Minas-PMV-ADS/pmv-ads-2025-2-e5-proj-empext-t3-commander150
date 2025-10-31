@@ -15,11 +15,12 @@ import { buscarRodadasDoTorneio, buscarMesasDaRodada } from "../../../services/m
 import styles from "./styles.module.css";
 import modalStyles from "./modalEditarStyles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
-import { FiGift, FiChevronDown, FiPlay, FiSkipForward, FiCheckCircle, FiShare2, FiEdit } from "react-icons/fi";
+import { FiGift, FiChevronDown, FiPlay, FiSkipForward, FiCheckCircle, FiShare2, FiEdit, FiTrash2, FiX } from "react-icons/fi";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
 import RegrasPartida from "../../../components/CardRegrasPartida";
 import MesaCard from "../../../components/CardMesaParticipante";
 import ModalGerenciarInscricoes from "../../../components/ModalGerenciarInscricoes";
+import { removerJogadorDoTorneioComoLoja } from "../../../services/torneioServico";
 import Modal from "../../../components/Modal";
 import { useParams } from "react-router-dom";
 import Button from "../../../components/Button";
@@ -655,6 +656,43 @@ const InformacaoTorneioLoja: React.FC = () => {
   const handleGerenciarInscricoes = () => {
     setMostrarModalInscricoes(true);
   };
+
+  // handler para hard delete de um jogador inscrito (LOJA)
+  const handleRemoverInscricaoAberto = async (inscricaoId: number, username: string) => {
+    if (!tournament?.id) return;
+
+    const result = await Swal.fire({
+      title: `Remover ${username}?`,
+      text: "Essa ação vai remover este jogador do torneio. O jogador poderá se inscrever novamente se desejar.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sim",
+      cancelButtonText: "Não",
+      reverseButtons: true,
+      confirmButtonColor: "#DC2626",
+      cancelButtonColor: "#6c757d",
+      focusCancel: true,
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await removerJogadorDoTorneioComoLoja(tournament.id, inscricaoId);
+
+      // Atualiza o estado local removendo esse jogador da lista
+      setJogadoresInscritos(prev =>
+          prev.filter(j => j.id !== inscricaoId)
+      );
+    } catch (e: any) {
+      Swal.fire({
+        title: "Erro",
+        text: "Não foi possível remover o jogador.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
 
 
   // Handler para avançar para próxima rodada (MÉTODO NOVO)
@@ -1394,16 +1432,6 @@ const InformacaoTorneioLoja: React.FC = () => {
                 paddingHorizontal="24px"
                 fontSize="14px"
               />
-              <Button
-                 label="Gerenciar Inscrições"
-                 onClick={handleGerenciarInscricoes}
-                 width="auto"
-                 height="44px"
-                 paddingHorizontal="20px"
-                 fontSize="14px"
-                 backgroundColor="#17a2b8"
-              />
-
             </>
           )}
 
@@ -1550,14 +1578,25 @@ const InformacaoTorneioLoja: React.FC = () => {
                 {jogadoresInscritos.length} {jogadoresInscritos.length === 1 ? 'jogador' : 'jogadores'}
               </span>
               {jogadoresInscritos.length > 0 ? (
-                <ul className={styles.playerList}>
-                  {jogadoresInscritos.map((player, index) => (
-                    <li key={index} className={styles.playerItem}>
-                      <span className={styles.numeroJogador}>{index + 1}. </span>
-                      <span className={styles.nomeJogador}>{player.username}</span>
-                    </li>
-                  ))}
-                </ul>
+                  <ul className={styles.playerList}>
+                    {jogadoresInscritos.map((player, index) => (
+                        <li key={player.id} className={styles.playerItem}>
+                          <div className={styles.playerInfoLeft}>
+                            <span className={styles.numeroJogador}>{index + 1}.</span>
+                            <span className={styles.nomeJogador}>{player.username}</span>
+                          </div>
+
+                          <button
+                              className={styles.removePlayerBtn}
+                              onClick={() => handleRemoverInscricaoAberto(player.id, player.username)}
+                              title="Remover jogador"
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
+                        </li>
+                    ))}
+                  </ul>
+
               ) : (
                 <div className={styles.mensagemVazia}>Nenhum jogador inscrito ainda.</div>
               )}

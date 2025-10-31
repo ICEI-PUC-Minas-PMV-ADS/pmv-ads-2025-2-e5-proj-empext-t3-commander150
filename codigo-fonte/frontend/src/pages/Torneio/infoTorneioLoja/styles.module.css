@@ -8,9 +8,46 @@
 .playerItem {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0.75rem;
+  border-radius: 6px;
   border-bottom: 1px solid #eee;
   transition: background 0.2s ease;
+}
+
+/* para o ícone de hard delete */
+.playerItem + .playerItem {
+  margin-top: 8px;
+}
+
+/* para o ícone de hard delete */
+.playerInfoLeft {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+}
+
+/* para o ícone de hard delete */
+.removePlayerBtn {
+  background: var(--var-cor-azul-fundo-section);
+  border: 1px solid #718096;
+  color: #718096;
+  border-radius: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* para o ícone de hard delete */
+.removePlayerBtn:hover {
+  background: #DC2626;
+  color: #fff;
+  border-color: #DC2626;
 }
 
 .infoJogadores{
