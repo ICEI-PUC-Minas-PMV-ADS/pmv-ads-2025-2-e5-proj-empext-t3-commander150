@@ -39,14 +39,19 @@ const DropdownRodadas: React.FC<DropdownRodadasProps> = ({
       const rodadasData = await buscarRodadasDoTorneio(tournamentId);
       setRodadas(rodadasData);
       
-      // Selecionar rodada inicial apenas na primeira vez
-      if (rodadasData.length > 0 && !rodadaSelecionada && !rodadaInicialSelecionada && !resultadoFinalSelecionado) {
-        const rodadaEmAndamento = rodadasData.find(r => 
-          r.status?.toLowerCase() === 'em andamento'
-        );
-        const rodadaInicial = rodadaEmAndamento || rodadasData[0];
+      // Selecionar automaticamente a última rodada ou resultado final
+      if (rodadasData.length > 0 && !rodadaSelecionada && !rodadaInicialSelecionada) {
         
-        onSelecionarRodada(rodadaInicial);
+        // Se o torneio está finalizado, seleciona resultado final automaticamente
+        if (tournamentStatus === "Finalizado" && onSelecionarResultadoFinal) {
+          onSelecionarResultadoFinal();
+        } 
+        // Caso contrário, seleciona a última rodada
+        else if (rodadasData.length > 0) {
+          const ultimaRodada = rodadasData[rodadasData.length - 1];
+          onSelecionarRodada(ultimaRodada);
+        }
+        
         setRodadaInicialSelecionada(true);
       }
     } catch (error: any) {

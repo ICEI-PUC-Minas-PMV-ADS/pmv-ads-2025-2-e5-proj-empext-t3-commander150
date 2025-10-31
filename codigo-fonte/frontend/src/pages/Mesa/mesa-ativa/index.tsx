@@ -29,7 +29,8 @@ export default function MesaAtiva() {
   const [vitoriasOponentes, setVitoriasOponentes] = useState('');
   const [rodadaSelecionada, setRodadaSelecionada] = useState<IRodada | null>(null);
   const [resultadoFinalSelecionado, setResultadoFinalSelecionado] = useState(false);
-  
+  const [ultimoStatus, setUltimoStatus] = useState<string>('');
+
   const formatarData = (dataISO?: string) => {
     if (!dataISO) return 'N/A';
     return new Date(dataISO).toLocaleDateString('pt-BR');
@@ -48,10 +49,65 @@ export default function MesaAtiva() {
 
   const torneioId = location.state?.tournamentId
 
-  // Lógica para carregar mesa
+  // Função simplificada para verificar status
+  const verificarStatus = async () => {
+    if (!id) return;
+
+    try {
+      const mesaData = await buscarMinhaMesaNaRodada(parseInt(id));
+      
+      if (mesaData) {
+        const statusAtual = `${mesaData.status_rodada}-${mesaData.time_vencedor}`;
+        
+        // Se mudou o status, atualiza e mostra alerta
+        if (statusAtual !== ultimoStatus && ultimoStatus !== '') {
+          setMesa(mesaData);
+          setUltimoStatus(statusAtual);
+          
+          // Se a rodada foi finalizada, redireciona para intervalo
+          if (mesaData.status_rodada.toLowerCase() === 'finalizada') {
+            Swal.fire({
+              title: '🏁 Rodada Finalizada!',
+              text: 'A rodada foi finalizada pelo organizador',
+              icon: 'info',
+              confirmButtonText: 'Ver Resultado',
+              timer: 5000
+            }).then(() => {
+              navigate(`/intervalo/${torneioId}`, {
+                state: { mesa: mesaData }
+              });
+            });
+          } else {
+            Swal.fire({
+              title: '🔄 Status Atualizado!',
+              text: 'Houve uma atualização na sua mesa',
+              icon: 'success',
+              confirmButtonText: 'OK',
+              timer: 3000,
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false
+            });
+          }
+        }
+        
+        setUltimoStatus(statusAtual);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status:', error);
+    }
+  };
+
+  // Webhook simplificado - polling a cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(verificarStatus, 30000);
+    return () => clearInterval(interval);
+  }, [id, ultimoStatus]);
+
+  //carrega a mesa
   useEffect(() => {
     if (!id) {
-      navigate(`/intervalo/${torneioId}`); // Vai para intervalo
+      navigate(`/intervalo/${torneioId}`);
       return;
     }
      
@@ -60,27 +116,27 @@ export default function MesaAtiva() {
         setLoading(true);
         const mesaData = await buscarMinhaMesaNaRodada(parseInt(id));
 
+        //se estiver no bye, redireciona para intervalo
         if (!mesaData) {
           navigate(`/intervalo/${torneioId}`);
           return;
         }
-
         setMesa(mesaData);
-        console.log('Mesa carregada:', mesaData);
+
+        setUltimoStatus(`${mesaData.status_rodada}-${mesaData.time_vencedor}`);
 
         try {
           const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
-          console.log('Torneio carregado:', torneioData);
           setTorneio(torneioData);
           setRegras(torneioData.regras || "");
           
         } catch (error) {
           console.error('Erro ao carregar torneio:', error);
         }
-        // Se a rodada já terminou, vai para intervalo
+
         if (mesaData?.status_rodada.toLowerCase() === 'finalizada') {
-           navigate(`/intervalo/${torneioId}`, {
-            state: { mesa: mesaData } // Passa a mesa para o intervalo
+          navigate(`/intervalo/${torneioId}`, {
+            state: { mesa: mesaData }
           });
           return;
         }
@@ -114,7 +170,7 @@ export default function MesaAtiva() {
       return;
     }
 
-    // Sua lógica de reportar resultado (mantém a mesma)
+    // Reportar resultado
     let pontuacaoTime1: number;
     let pontuacaoTime2: number;
 
@@ -183,7 +239,6 @@ export default function MesaAtiva() {
   const meuTime = mesa.meu_time === 1 ? mesa.time_1 : mesa.time_2;
   const timeAdversario = mesa.meu_time === 1 ? mesa.time_2 : mesa.time_1;
 
-  //  Bye OU Mesa Ativa
   return (
     <div className={styles.container}>
       {/* CABEÇALHO (igual para ambos) */}
@@ -192,10 +247,11 @@ export default function MesaAtiva() {
           <h1 className={styles.titulo}>
             {mesa.numero_mesa === 0 ? 'Você recebeu um bye!' : 'Mesa Ativa'}
           </h1>
-          <p className={styles.subtitulo}>{mesa.nome_torneio}</p>
+          <p className={styles.subtitulo}>
+            {mesa.nome_torneio}
+          </p>
         </div>
         <div className={styles.rodadaBadge}>
-          {/* Dropdown de Rodadas */}
           <DropdownRodadas
             tournamentId={torneio?.id}
             rodadaSelecionada={rodadaSelecionada}
@@ -206,8 +262,6 @@ export default function MesaAtiva() {
           />
         </div>
       </div>
-
-      {/* CARDS SUPERIORES (igual para ambos) */}
       <div className={styles.gridContainer}>
         <div className={styles.cardsEsquerda}>
           <CardSuperior
@@ -239,7 +293,6 @@ export default function MesaAtiva() {
         {/* COLUNA ESQUERDA - Conteúdo específico */}
         <div className={styles.colunaEsquerda}>
           {mesa ? (
-            /* === TELA MESA ATIVA === */
             <>
               {/* Sua Partida */}
               <div className={styles.partidaCard}>
@@ -313,7 +366,6 @@ export default function MesaAtiva() {
             </>
             
           ) : (
-            /* === TELA BYE === */
             <div className={styles.intervaloCard}>
               <h2 className={styles.intervaloTitulo}>Você recebeu um bye!</h2>
               <p className={styles.intervaloTexto}>
@@ -323,7 +375,7 @@ export default function MesaAtiva() {
           )}
         </div>
 
-        {/* COLUNA DIREITA - Informações do torneio (igual para ambos) */}
+        {/* COLUNA DIREITA - Informações do torneio */}
         <div className={styles.colunaDireita}>
           <CardInfoTorneio
             title="Informações do Torneio"

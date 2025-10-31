@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styles from '../styles.module.css';
 import CardInfoTorneio from '../../../components/CardInfoTorneio';
 import RegrasPartida from '../../../components/CardRegrasPartida';
@@ -8,9 +8,11 @@ import { buscarJogadoresInscritos, buscarTorneioPorId, tratarErroTorneio } from 
 import { buscarMinhaMesaNaRodada, buscarRodadasDoTorneio } from '../../../services/mesaServico';
 import DropdownRodadas from '../../../components/DropdownRodadas';
 import CardRanking from '../../../components/CardRanking';
+import Swal from 'sweetalert2';
 
 export default function Intervalo() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
   const [loading, setLoading] = useState(true);
   const [regras, setRegras] = useState<string>('');
@@ -19,6 +21,7 @@ export default function Intervalo() {
   const [resultadoFinalSelecionado, setResultadoFinalSelecionado] = useState(false);
   const [selectedMesa, setSelectedMesa] = useState<IMesaAtiva | null>(null);
   const [loadingMesa, setLoadingMesa] = useState(false);
+  const [ultimoStatus, setUltimoStatus] = useState<string>('');
 
   const formatarData = (dataISO?: string) => {
     if (!dataISO) return 'N/A';
@@ -36,7 +39,59 @@ export default function Intervalo() {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  // Buscar dados do torneio - seguindo a lógica do primeiro arquivo
+  // Verificar status
+  const verificarStatus = async () => {
+    if (!rodadaSelecionada && !resultadoFinalSelecionado) return;
+
+    try {
+      let mesaData: IMesaAtiva | null = null;
+      
+      if (resultadoFinalSelecionado && torneio?.id) {
+        const rodadas = await buscarRodadasDoTorneio(torneio.id);
+        if (rodadas.length > 0) {
+          const ultimaRodada = rodadas[rodadas.length - 1];
+          mesaData = await buscarMinhaMesaNaRodada(ultimaRodada.id);
+        }
+      } else if (rodadaSelecionada) {
+        mesaData = await buscarMinhaMesaNaRodada(rodadaSelecionada.id);
+      }
+
+      if (mesaData) {
+        const statusAtual = `${mesaData.status_rodada}-${mesaData.time_vencedor}`;
+        
+        // Se mudou o status, atualiza e mostra alerta
+        if (statusAtual !== ultimoStatus && ultimoStatus !== '') {
+          setSelectedMesa(mesaData);
+          setUltimoStatus(statusAtual);
+          
+          Swal.fire({
+            title: '🎉 Status Atualizado!',
+            text: 'O status da sua partida foi atualizado',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 3000,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false
+          });
+        
+        navigate("/historico/");
+        }
+
+        setUltimoStatus(statusAtual);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status:', error);
+    }
+  };
+
+  // Webhook simplificado - polling a cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(verificarStatus, 30000);
+    return () => clearInterval(interval);
+  }, [rodadaSelecionada, resultadoFinalSelecionado, torneio?.id, ultimoStatus]);
+
+  // Buscar dados do torneio
   useEffect(() => {
     const carregarTorneio = async () => {
       try {
@@ -62,7 +117,7 @@ export default function Intervalo() {
     carregarTorneio();
   }, [id]);
 
-  // Busca a mesa quando muda a rodadaSelecionada
+  // Buscar dados mesa
   useEffect(() => {
     const carregarMesa = async () => {
       if (!rodadaSelecionada && !resultadoFinalSelecionado) {
@@ -70,14 +125,28 @@ export default function Intervalo() {
         return;
       }
 
-      if (!rodadaSelecionada) return;
-
       try {
         setLoadingMesa(true);
-        const mesaData = await buscarMinhaMesaNaRodada(rodadaSelecionada.id);
+        let mesaData: IMesaAtiva | null = null;
+        
+        if (resultadoFinalSelecionado && torneio?.id) {
+          const rodadas = await buscarRodadasDoTorneio(torneio.id);
+          if (rodadas.length > 0) {
+            const ultimaRodada = rodadas[rodadas.length - 1];
+            mesaData = await buscarMinhaMesaNaRodada(ultimaRodada.id);
+          }
+        } else if (rodadaSelecionada) {
+          mesaData = await buscarMinhaMesaNaRodada(rodadaSelecionada.id);
+        }
+
         setSelectedMesa(mesaData);
+        
+        // Define status inicial
+        if (mesaData) {
+          setUltimoStatus(`${mesaData.status_rodada}-${mesaData.time_vencedor}`);
+        }
       } catch (error) {
-        console.error('Erro ao carregar mesa da rodada:', error);
+        console.error('Erro ao carregar mesa:', error);
         setSelectedMesa(null);
       } finally {
         setLoadingMesa(false);
@@ -85,36 +154,19 @@ export default function Intervalo() {
     };
 
     carregarMesa();
-  }, [rodadaSelecionada, resultadoFinalSelecionado]);
+  }, [rodadaSelecionada, resultadoFinalSelecionado, torneio?.id]);
 
   const handleSelecionarRodada = (rodada: IRodada) => {
     setRodadaSelecionada(rodada);
     setResultadoFinalSelecionado(false);
+    setUltimoStatus(''); // Reseta para não notificar na primeira carga
   };
 
-  const handleSelecionarResultadoFinal = async () => {
-    if (!torneio?.id) return;
-    
-    try {
-      setLoadingMesa(true);
-      const rodadas = await buscarRodadasDoTorneio(torneio.id);
-      if (rodadas.length > 0) {
-        const ultimaRodada = rodadas[rodadas.length - 1];
-        const mesaData = await buscarMinhaMesaNaRodada(ultimaRodada.id);
-        setSelectedMesa(mesaData);
-      }
-      setResultadoFinalSelecionado(true);
-      setRodadaSelecionada(null);
-    } catch (error) {
-      console.error('Erro ao carregar mesa para resultado final:', error);
-      setSelectedMesa(null);
-      setResultadoFinalSelecionado(true);
-      setRodadaSelecionada(null);
-    } finally {
-      setLoadingMesa(false);
-    }
+  const handleSelecionarResultadoFinal = () => {
+    setResultadoFinalSelecionado(true);
+    setRodadaSelecionada(null);
+    setUltimoStatus(''); // Reseta para não notificar na primeira carga
   };
-  console.log('Selected Mesa:', selectedMesa);
 
   if (loading) return <p>Carregando...</p>;
   if (erro) return <p>{erro}</p>;
@@ -140,13 +192,10 @@ export default function Intervalo() {
           />
         </div>
       </div>
-
-      {/* CONTEÚDO PRINCIPAL */}
       <div className={styles.gridContainer}>
         {/* COLUNA ESQUERDA - Conteúdo principal baseado na seleção */}
         <div className={styles.colunaEsquerda}>
           {resultadoFinalSelecionado ? (
-            /* RESULTADO FINAL - Ranking fica na esquerda */
             <CardRanking
               tournamentId={torneio?.id}
               isRankingFinal={true}
@@ -158,27 +207,23 @@ export default function Intervalo() {
               <p>Carregando resultado...</p>
             </div>
           ) : !selectedMesa ? (
-              /* BYE */
-              <div className={styles.intervaloCard}>
-                <h2 className={styles.intervaloTitulo}> Bye </h2>
-                <p className={styles.intervaloTexto}>
-                Você recebeu um bye nesta rodada.
-                </p>
-              </div>
+            <div className={styles.intervaloCard}>
+              <h2 className={styles.intervaloTitulo}> Você recebeu um bye nesta rodada. </h2>
+              <p className={styles.intervaloTexto}>
+                Aproveite para tomar uma água enquanto aguarda a próxima rodada.
+              </p>
+            </div>
           ) : selectedMesa && selectedMesa.status_rodada.toLowerCase() === 'finalizada' ? (
-            /* RESULTADO DE RODADA - Resultado da partida fica na esquerda */
             <div className={styles.intervaloCard}>
               <h2 className={styles.intervaloTitulo}>Resultado da Rodada {selectedMesa.numero_rodada}</h2>
               <p className={styles.intervaloTexto}>
                 A rodada foi finalizada.
               </p>
 
-              {/* Resultado da Partida */}
               <div className={styles.resultadoIntervalo}>
                 <h3 className={styles.resultadoTitulo}>Resultado da Partida</h3>
 
                 {selectedMesa.numero_mesa === 0 ? (
-                  /* BYE */
                   <div className={styles.byeResultado}>
                     Você recebeu um bye nesta rodada.
                   </div>
@@ -214,7 +259,6 @@ export default function Intervalo() {
               </div>
             </div>
           ) : selectedMesa && selectedMesa.status_rodada.toLowerCase() !== 'finalizada' ? (
-            /* Rodada ainda ativa */
             <div className={styles.intervaloCard}>
               <h2 className={styles.intervaloTitulo}>Rodada {selectedMesa.numero_rodada} em Andamento</h2>
               <p className={styles.intervaloTexto}>
@@ -222,7 +266,6 @@ export default function Intervalo() {
               </p>
             </div>
           ) : (
-            /* Nada selecionado */
             <div className={styles.intervaloCard}>
               <h2 className={styles.intervaloTitulo}>Modo Intervalo</h2>
               <p className={styles.intervaloTexto}>
@@ -234,7 +277,6 @@ export default function Intervalo() {
 
         {/* COLUNA DIREITA - Informações fixas do torneio + conteúdo condicional */}
         <div className={styles.colunaDireita}>
-          {/* Informações fixas do torneio */}
           <CardInfoTorneio
             title="Informações do Torneio"
             name={torneio?.nome || ""}
@@ -249,14 +291,11 @@ export default function Intervalo() {
             regras={regras || "Erro ao carregar as regras."} 
           />
 
-          {/* Conteúdo condicional da coluna direita */}
           {resultadoFinalSelecionado ? (
-            /* Quando resultado final está selecionado, mostra informações adicionais ou vazio */
             <div className={styles.mensagem}>
-              {/* Pode adicionar algum conteúdo adicional aqui se necessário */}
+              {/* Quando resultado final está selecionado, mostra informações adicionais ou vazio  */}
             </div>
           ) : rodadaSelecionada ? (
-            /* Quando rodada está selecionada, mostra ranking da rodada na direita */
             <CardRanking
               tournamentId={torneio?.id}
               rodadaId={rodadaSelecionada.id}
@@ -265,7 +304,6 @@ export default function Intervalo() {
               mostrarMetricasAvancadas={false}
             />
           ) : (
-            /* Nada selecionado */
             <div className={styles.mensagem}>
               Selecione uma rodada para visualizar o ranking
             </div>
