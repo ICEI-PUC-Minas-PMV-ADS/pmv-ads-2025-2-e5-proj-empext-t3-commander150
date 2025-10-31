@@ -1401,7 +1401,7 @@ const InformacaoTorneioLoja: React.FC = () => {
                  height="44px"
                  paddingHorizontal="20px"
                  fontSize="14px"
-                 backgroundColor="#ffc107"
+                 backgroundColor="#17a2b8"
               />
 
             </>
@@ -1483,7 +1483,7 @@ const InformacaoTorneioLoja: React.FC = () => {
                 height="44px"
                 paddingHorizontal="20px"
                 fontSize="14px"
-                backgroundColor="#ffc107"
+                backgroundColor="#17a2b8"
               />
             </>
           )}

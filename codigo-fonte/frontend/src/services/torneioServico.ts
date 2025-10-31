@@ -742,10 +742,8 @@ export async function removerJogadorDoTorneioComoLoja(
       );
 
       const aindaAtivo =
-          data?.status &&
-          String(data.status).toLowerCase() !== "cancelado"
-              ? true
-              : false;
+          !!(data?.status &&
+              String(data.status).toLowerCase() !== "cancelado");
 
       // se já está cancelado, consideramos sucesso
       if (!aindaAtivo) return;
