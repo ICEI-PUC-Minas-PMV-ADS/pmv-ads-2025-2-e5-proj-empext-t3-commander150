@@ -46,8 +46,6 @@ staticfiles/
 # ---- System ----
 .DS_Store
 Thumbs.db
-/api/torneios/migrations/
-/api/usuarios/migrations/
 
 .idea/.gitignore
 .idea/misc.xml
