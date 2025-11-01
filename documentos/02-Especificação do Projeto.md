@@ -40,7 +40,7 @@ Para mais informações, consulte os microfundamentos Fundamentos de Engenharia 
 |RF-002| O usuário deve conseguir recuperar a senha | ALTA |
 |RF-003| O sistema deve redirecionar os usuários para a interface correspondente ao seu nível de permissão | ALTA |
 |RF-004| O jogador pode se inscrever no começo do torneio | ALTA |
-|RF-005| O jogador pode se desinscrever entre as rodadas do torneio | ALTA |
+|RF-005| O jogador pode ser desinscrito pela loja ~se desinscrever~ entre as rodadas do torneio | ALTA |
 |RF-006| A loja pode inscrever e desinscrever jogadores no começo e entre as rodadas do torneio | ALTA |
 |RF-007| O usuário deve visualizar as mesas e o score da rodada | ALTA |
 |RF-008| O usuário pode reportar o resultado da partida | ALTA |
