@@ -1077,6 +1077,38 @@ class InscricaoViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
 
 
+    @action(detail=True, methods=['post'])
+    def reativar(self, request, pk=None):
+        """
+        reativa (reinscreve) um jogador que estava com status 'Cancelado'. Pode ser chamado apenas pela loja ou administrador.
+        """
+        inscricao = self.get_object()
+
+        # se já está ativo
+        if inscricao.status == 'Inscrito':
+            return Response(
+                {"detail": "Esta inscrição já está ativa."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # bloqueia reativação se o torneio estiver finalizado
+        if inscricao.id_torneio.status == 'Finalizado':
+            return Response(
+                {"detail": "Não é possível reativar inscrições de jogadores em torneios finalizados."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # atualiza a inscrição
+        inscricao.status = 'Inscrito'
+        inscricao.data_saida = None  # limpa p data de saída no soft delete
+        inscricao.save(update_fields=['status', 'data_saida'])
+
+        return Response({
+            "message": "Inscrição reativada com sucesso.",
+            "inscricao": InscricaoSerializer(inscricao).data
+        }, status=status.HTTP_200_OK)
+
+
 class RodadaViewSet(viewsets.ModelViewSet):
     """
     Endpoint para visualizar e gerenciar as rodadas de um torneio.

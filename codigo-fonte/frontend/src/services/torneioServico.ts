@@ -481,7 +481,7 @@ function getTorneioIdFromInscricao(it: any): number | null {
   return null;
 }
 
-/** Retorna TRUE se o usuário ainda está ativo no torneio. */
+/* Retorna TRUE se o usuário ainda está ativo no torneio.
 async function isInscricaoAtivaPara(torneioId: number): Promise<boolean> {
   const { data } = await api.get("/torneios/inscricoes/", {
     params: { id_torneio: torneioId, page: 1, page_size: 50 },
@@ -494,6 +494,7 @@ async function isInscricaoAtivaPara(torneioId: number): Promise<boolean> {
     return Number(tid) === Number(torneioId) && ativo;
   });
 }
+*/
 
 /** Localiza a inscrição do usuário logado PARA aquele torneio. */
 async function getMinhaInscricaoId(torneioId: number): Promise<number> {
@@ -786,5 +787,44 @@ export async function listarInscricoesDoTorneio(idTorneio: number) {
     return resposta.data;
   }
   return [];
+}
+
+/**
+ * (LOJA) Reativa ou reinscreve um jogador no torneio Em Andamento.
+ *
+ * Cenário: Se a inscrição ainda existe, mas está Cancelado:
+ *    tenta-se reativar via POST /torneios/inscricoes/{id}/reativar/
+ *
+ * IMPORTANTE:
+ * Para recriar, precisamos saber o id_usuario desse jogador.
+ * Então o front precisa armazenar também id_usuario na lista.
+ */
+export async function reativarJogadorNoTorneioComoLoja(
+    torneioId: number,
+    inscricaoId: number,
+    idUsuario?: number
+): Promise<void> {
+  try {
+    await api.post(
+        `/torneios/inscricoes/${inscricaoId}/reativar/`,
+        {},
+        { withCredentials: true }
+    );
+    return;
+  } catch (err: any) {
+    const st = err?.response?.status;
+    if (st !== 404 && st !== 410) {
+      // outro erro desconhecido -> falha
+      throw err;
+    }
+  }
+  await api.post(
+      `/torneios/inscricoes/`,
+      {
+        id_torneio: torneioId,
+        id_usuario: idUsuario,
+      },
+      { withCredentials: true }
+  );
 }
 

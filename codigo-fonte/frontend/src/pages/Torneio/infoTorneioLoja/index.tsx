@@ -1747,9 +1747,11 @@ const InformacaoTorneioLoja: React.FC = () => {
       {mostrarModalInscricoes && tournament?.id && (
           <ModalGerenciarInscricoes
               torneioId={tournament.id}
+              torneioStatus={tournament.status}
               onClose={() => setMostrarModalInscricoes(false)}
           />
       )}
+
 
       {/* Modal de Edição */}
       {modalEditarAberto && (
