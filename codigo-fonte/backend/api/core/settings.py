@@ -14,6 +14,7 @@ env = environ.Env(
     EMAIL_PASSWORD=(str, None),
     EMAIL_USER=(str, None),
     CORS_ALLOWED_ORIGINS=(list, []),
+    CSRF_TRUSTED_ORIGINS=(list, [])
     ALLOWED_HOSTS=(list, []),
 )
 
@@ -54,7 +55,7 @@ CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
 CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
 # Configurações de sessão
 SESSION_COOKIE_PATH = '/api/v1/'
