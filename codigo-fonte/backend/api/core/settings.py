@@ -14,7 +14,7 @@ env = environ.Env(
     EMAIL_PASSWORD=(str, None),
     EMAIL_USER=(str, None),
     CORS_ALLOWED_ORIGINS=(list, []),
-    CSRF_TRUSTED_ORIGINS=(list, [])
+    CSRF_TRUSTED_ORIGINS=(list, []),
     ALLOWED_HOSTS=(list, []),
 )
 
