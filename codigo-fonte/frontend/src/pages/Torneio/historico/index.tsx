@@ -53,8 +53,8 @@ const HistoricoTorneios: React.FC = () => {
                 setAndamento(andamento || []);
                 setHistorico(historico || []);
             } else {
-                const { inscritos, andamento, historico } = await buscarAgrupadoPorAba();
-                setInscritos(inscritos || []);
+                const { abertos, andamento, historico } = await buscarAgrupadoPorAba();
+                setInscritos(abertos || []);
                 setAndamento(andamento || []);
                 setHistorico(historico || []);
             }

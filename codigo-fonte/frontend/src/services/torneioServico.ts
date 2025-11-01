@@ -404,22 +404,50 @@ export async function buscarTorneios(): Promise<ITorneio[]> {
 export async function buscarAgrupadoPorAba() {
   const [inscricoes, torneiosResponse] = await Promise.all([
     buscarInscricoes(),
-    buscarTorneios(), // <- retorna IListaTorneios
+    buscarTorneios(), // retorna IListaTorneios (paginado)
   ]);
 
+  // normaliza a lista de torneios vindos da API (paginado ou array)
   const torneios: ITorneio[] = Array.isArray((torneiosResponse as any)?.results)
       ? (torneiosResponse as any).results
-      : (Array.isArray(torneiosResponse as any) ? (torneiosResponse as any) : []);
+      : (Array.isArray(torneiosResponse as any)
+          ? (torneiosResponse as any)
+          : []);
 
+  // pega só os torneios que o jogador realmente está inscrito
   const idsInscritos = new Set(inscricoes.map((i) => i.id_torneio));
-  const inscritos = torneios.filter((t) => idsInscritos.has(t.id));
+  const meusTorneios = torneios.filter((t) => idsInscritos.has(t.id));
 
-  const norm = (s?: string) => (s ?? "").toString().trim().toLowerCase();
-  const andamento = inscritos.filter((t) => norm(t.status) === "em andamento");
-  const historico  = inscritos.filter((t) => norm(t.status) === "finalizado");
+  // função pra normalizar o status vindo do backend
+  const norm = (s?: string) =>
+      (s ?? "")
+          .toString()
+          .trim()
+          .toLowerCase()
+          // alguns backends mandam "em_andamento", etc.
+          .replace(/[_\s]+/g, " ");
 
-  return { inscritos, andamento, historico };
+  // regras de agrupamento:
+  const abertos = meusTorneios.filter(
+      (t) => ["aberto", "em aberto", "open"].includes(norm(t.status))
+  );
+
+  const andamento = meusTorneios.filter(
+      (t) =>
+          ["em andamento", "andamento", "running"].includes(norm(t.status))
+  );
+
+  const historico = meusTorneios.filter(
+      (t) =>
+          ["finalizado", "concluido", "concluído", "encerrado", "closed"].includes(
+              norm(t.status)
+          )
+  );
+
+  // devolvemos os 3 blocos claramente
+  return { abertos, andamento, historico };
 }
+
 
 /** Helper DRF: varre todas as páginas usando `next` (paginado ou array simples) */
 async function fetchAllPaginated<T>(path: string): Promise<T[]> {
