@@ -19,7 +19,7 @@ interface CardInfoTorneioProps {
   className?: string;
   tournamentId?: number;
   action?: React.ReactNode;
-  abaAtual?: "inscritos" | "andamento" | "historico";
+  abaAtual?: "inscritos" | "abertos" | "andamento" | "historico";
 }
 
 const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
@@ -88,8 +88,8 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
           return;
         }
         
-        // ABA "INSCRITOS" => vai para DETALHES DO TORNEIO
-        if (abaAtual === "inscritos"){
+        // ABA "Abertos" => vai para DETALHES DO TORNEIO
+        if (abaAtual === "abertos"){
           navigate(`/torneios/${tournamentId}`);
           return;
         }
