@@ -26,7 +26,7 @@ from .models import Torneio, Rodada, Mesa, MesaJogador, Inscricao, RankingParcia
 
 # Constante para arredondamento decimal
 QUATRO_CASAS = Decimal('0.0001')
-FLOOR_MW = Decimal('0.3300')  # 33% floor (padrão Magic)
+FLOOR_MW = Decimal('0.0100')  # 1% floor (máxima precisão, evita divisão por zero)
 
 
 def construir_historico_ate_rodada(torneio: Torneio, rodada_numero: int) -> Dict:
@@ -182,7 +182,7 @@ def calcular_mw_ajustado(
         torneio: Instância do torneio
 
     Returns:
-        float: MW% ajustado (com floor de 33%)
+        float: MW% ajustado (com floor de 1%)
         None: Se não houver rodadas válidas (ignorar do cálculo)
     """
     pontos_validos = 0
@@ -209,7 +209,7 @@ def calcular_mw_ajustado(
 
     pontos_maximos = rodadas_validas * torneio.pontuacao_vitoria
     mw = pontos_validos / pontos_maximos if pontos_maximos > 0 else 0
-    return max(mw, 0.33)  # Aplicar floor
+    return max(mw, 0.01)  # Aplicar floor de 1%
 
 
 def calcular_metricas_jogador(
@@ -243,7 +243,7 @@ def calcular_metricas_jogador(
     num_rodadas = dados['num_rodadas_jogadas'][jogador_id]
     pontos_maximos = num_rodadas * torneio.pontuacao_vitoria
     mw = pontos_totais / pontos_maximos if pontos_maximos > 0 else 0
-    mw = max(mw, 0.33)  # Floor
+    mw = max(mw, 0.01)  # Floor de 1%
 
     # 3. Coletar oponentes e parceiros únicos
     oponentes_unicos = set()
@@ -274,7 +274,7 @@ def calcular_metricas_jogador(
             omw_soma += mw_ajustado
             omw_count += 1
 
-    omw = omw_soma / omw_count if omw_count > 0 else 0.33
+    omw = omw_soma / omw_count if omw_count > 0 else 0.01
 
     # 5. PMW% (força dos parceiros)
     pmw_soma = 0
@@ -286,7 +286,7 @@ def calcular_metricas_jogador(
             pmw_soma += mw_ajustado
             pmw_count += 1
 
-    pmw = pmw_soma / pmw_count if pmw_count > 0 else 0.33
+    pmw = pmw_soma / pmw_count if pmw_count > 0 else 0.01
 
     # 6. Balanço
     balanco = omw - pmw
