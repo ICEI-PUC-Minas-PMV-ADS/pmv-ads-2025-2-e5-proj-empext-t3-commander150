@@ -50,4 +50,4 @@ const AdminTeste = () => {
   );
 };
 
-export default LojaTeste;
+export default AdminTeste;

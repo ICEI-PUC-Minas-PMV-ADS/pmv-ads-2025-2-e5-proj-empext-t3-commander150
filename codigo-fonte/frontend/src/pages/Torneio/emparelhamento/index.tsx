@@ -286,10 +286,13 @@ const EmparelhamentoTorneio: React.FC = () => {
             mesas.map((m) => (
               <MesaCard
                 key={m.id}
+                mesaId={m.id}
                 numeroMesa={m.numero_mesa}
                 time1={m.time1}
                 time2={m.time2}
                 status={m.status}
+                pontuacaoTime1={0}
+                pontuacaoTime2={0}
               />
             ))
           ) : (

@@ -12,10 +12,10 @@ export default function ExemplosCardSuperior() {
       <CardSuperior count={12} label="Histórico" icon={FiCalendar} />
       <CardSuperior count={1} label="Em Andamento" icon={FiStar} />
 
-      {/* Amarelos (isActive) */}
-      <CardSuperior count={1} label="Em Andamento" icon={FiStar} isActive />
-      <CardSuperior count={3} label="Torneios Futuros" icon={FiUsers} isActive />
-      <CardSuperior count={12} label="Histórico" icon={FiCalendar} isActive />
+      {/* Amarelos (selected) */}
+      <CardSuperior count={1} label="Em Andamento" icon={FiStar} selected />
+      <CardSuperior count={3} label="Torneios Futuros" icon={FiUsers} selected />
+      <CardSuperior count={12} label="Histórico" icon={FiCalendar} selected />
     </div>
   );
 }

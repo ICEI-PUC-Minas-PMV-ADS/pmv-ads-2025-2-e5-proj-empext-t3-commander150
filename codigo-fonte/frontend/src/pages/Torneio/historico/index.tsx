@@ -203,14 +203,11 @@ const HistoricoTorneios: React.FC = () => {
             return (
                 <Button
                     label="+ Inscrever Jogador"
-                    onClick={(e: any) => {
-                        e.stopPropagation();
+                    onClick={() => {
                         handleAbrirModalInscricao(tid, t.nome);
                     }}
                     backgroundColor="var(--var-cor-primaria)"
                     textColor="var(--var-cor-branca)"
-                    borderColor="var(--var-cor-rosa)"
-                    hoverColor="var(--var-cor-rosa)"
                     className={styles.btnInscrever}
                 />
             );
@@ -220,15 +217,12 @@ const HistoricoTorneios: React.FC = () => {
         return (
             <Button
                 label={loadingAcao[tid] ? "Desinscrevendo..." : "Desinscrever-se"}
-                onClick={(e: any) => {
-                    e.stopPropagation();
+                onClick={() => {
                     onUnsubscribe(tid, t.nome);
                 }}
                 disabled={!!loadingAcao[tid]}
                 backgroundColor="var(--var-cor-primaria)"
                 textColor="var(--var-cor-branca)"
-                borderColor="var(--var-cor-rosa)"
-                hoverColor="var(--var-cor-rosa)"
                 className={styles.btnDesinscrever}
             />
         );

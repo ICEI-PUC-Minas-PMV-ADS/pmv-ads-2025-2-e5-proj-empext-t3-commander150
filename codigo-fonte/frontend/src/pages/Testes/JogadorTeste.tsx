@@ -40,10 +40,12 @@ const JogadorTeste = () => {
     <br />
     <div style={{ alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
       <CardTorneio
+        id={1}
         imagem="./img_teste_card_torneio.jpg"
         titulo="Campeonato Teste Card Torneio"
         data="18.08.23"
         hora="19:00"
+        dataOriginal="2023-08-18T19:00:00"
         tags={[
           { texto: "Futebol", corFundo: "#10B981" },
           { texto: "5v5", corFundo: "#3B82F6" },
