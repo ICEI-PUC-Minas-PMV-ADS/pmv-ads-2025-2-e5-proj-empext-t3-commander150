@@ -4,7 +4,6 @@ import { FaMoneyBillWave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import styles from "./style.module.css";
 import { verificarSessao } from "../../services/authServico";
-import { buscarTorneioPorId } from "../../services/torneioServico";
 import type { IUsuario } from "../../tipos/tipos";
 import { buscarRodadasDoTorneio } from "../../services/mesaServico";
 
