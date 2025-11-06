@@ -92,6 +92,8 @@ class TorneioViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
     permission_classes = [IsLojaOuAdmin | IsApenasLeitura]
 
+
+
     def get_queryset(self):
         """
         Retorna lista de torneios com filtros apropriados.
@@ -414,12 +416,12 @@ class TorneioViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Validação: Não exceder número máximo de rodadas
-        if torneio.quantidade_rodadas and rodada_atual.numero_rodada >= torneio.quantidade_rodadas:
-            return Response(
-                {"detail": f"Número máximo de rodadas ({torneio.quantidade_rodadas}) atingido. Use o endpoint de finalizar torneio."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # # Validação: Não exceder número máximo de rodadas
+        # if torneio.quantidade_rodadas and rodada_atual.numero_rodada >= torneio.quantidade_rodadas:
+        #     return Response(
+        #         {"detail": f"Número máximo de rodadas ({torneio.quantidade_rodadas}) atingido. Use o endpoint de finalizar torneio."},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
         
         with transaction.atomic():
             # Finaliza rodada atual

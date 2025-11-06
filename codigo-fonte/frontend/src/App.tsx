@@ -37,12 +37,12 @@ function App() {
   const [torneioSelecionado, setTorneioSelecionado] = useState<{ id: number; nome: string } | null>(null);
 
   // Função para formatar data
-  const formatarData = (data: string) => {
-    return new Date(data).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit'
-    });
+    const formatarData = (data: string) => {
+    const date = new Date(data);
+    const dia = date.getDate().toString().padStart(2, '0');
+    const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+    const ano = date.getFullYear().toString().slice(-2);
+    return `${dia}.${mes}.${ano}`;
   };
 
   // Função para formatar hora
@@ -206,7 +206,7 @@ function App() {
                 titulo={torneio.nome}
                 data={formatarData(torneio.data_inicio)}
                 hora={formatarHora(torneio.data_inicio)}
-                 dataOriginal={formatarData(torneio.data_inicio)}
+                dataOriginal={torneio.data_inicio}
                 tags={obterTagsTorneio(torneio)}
                 loja={torneio.loja_nome}
                 status={torneio.status}

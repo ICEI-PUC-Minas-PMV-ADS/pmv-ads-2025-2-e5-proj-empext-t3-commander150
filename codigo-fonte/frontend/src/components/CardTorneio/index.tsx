@@ -41,11 +41,11 @@ const CardTorneio = ({
   const navigate = useNavigate();
 
   // Função para verificar se o torneio já aconteceu
-  const torneioJaOcorreu = () => {
-    const dataTorneio = new Date(dataOriginal);
-    const dataAtual = new Date();
-    return dataTorneio < dataAtual;
-  };
+  // const torneioJaOcorreu = () => {
+  //   const dataTorneio = new Date(dataOriginal);
+  //   const dataAtual = new Date();
+  //   return dataTorneio < dataAtual;
+  // };
 
   // Função para mostrar alerta de torneio já realizado
   const mostrarAlertaTorneioPassado = () => {
@@ -66,10 +66,10 @@ const CardTorneio = ({
     }
 
     // Verifica se o torneio já aconteceu
-    if (torneioJaOcorreu()) {
-      mostrarAlertaTorneioPassado();
-      return;
-    }
+    // if (torneioJaOcorreu()) {
+    //   mostrarAlertaTorneioPassado();
+    //   return;
+    // }
     
     if (usuario) {
       navigate(`/inscricao-torneio/${id}`);
@@ -84,10 +84,10 @@ const CardTorneio = ({
     e.stopPropagation();
     
     // Verifica se o torneio já aconteceu antes de inscrever
-    if (torneioJaOcorreu()) {
-      mostrarAlertaTorneioPassado();
-      return;
-    }
+    // if (torneioJaOcorreu()) {
+    //   mostrarAlertaTorneioPassado();
+    //   return;
+    // }
     
     if (onInscreverJogador) {
       onInscreverJogador();
@@ -102,11 +102,13 @@ const CardTorneio = ({
         <div className={styles.degrade}></div>
         
         {/* Badge se torneio já aconteceu */}
+        {/*
         {torneioJaOcorreu() && (
           <div className={styles.badgeExpirado}>
             Realizado
           </div>
         )}
+        */}
       </div>
 
       {/* Conteúdo abaixo da imagem */}
@@ -135,9 +137,9 @@ const CardTorneio = ({
           <button 
             className={styles.btnInscrever}
             onClick={handleInscreverJogador}
-            disabled={torneioJaOcorreu()} // Desabilita se torneio já aconteceu
+            // disabled={false} // Desabilita se torneio já aconteceu
           >
-            {torneioJaOcorreu() ? 'Torneio Realizado' : '+ Inscrever Jogador'}
+            {'+ Inscrever Jogador'}
           </button>
         )}
       </div>

@@ -55,7 +55,7 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
           const rodadaId = rodadaAtiva ? rodadaAtiva.id : null;
 
           if (rodadaId && rodadaAtiva) {
-            const statusRodada = rodadaAtiva.status?.toLowerCase() || '';~
+            const statusRodada = rodadaAtiva.status?.toLowerCase() || '';
             console.log('Rodada ativa encontrada:', statusRodada);
             const statusComMesaAtiva = ['ativa', 'em andamento', 'iniciada', 'bye'];
             const statusEmPreparacao = ['emparelhamento', 'aguardando início', 'preparação', 'sortendo mesas'];
