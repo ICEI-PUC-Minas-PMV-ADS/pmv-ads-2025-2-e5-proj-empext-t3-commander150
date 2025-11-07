@@ -95,7 +95,7 @@ const DropdownRodadas: React.FC<DropdownRodadasProps> = ({
   const formatarStatus = (status: string) => {
     const statusMap: { [key: string]: string } = {
       'Aguardando_Emparelhamento': 'Aguardando',
-      'Emparelhamento': 'Emparelhada',
+      'Emparelhamento': 'Emparelhamento',
       'Em Andamento': 'Em Andamento',
       'Finalizada': 'Finalizada',
       'em_andamento': 'Em Andamento',

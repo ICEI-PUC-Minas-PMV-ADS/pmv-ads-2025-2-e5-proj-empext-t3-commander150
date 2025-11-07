@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { FiUser, FiStar, FiCalendar } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import { CardSuperior } from "../../../components/CardSuperior";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
@@ -12,6 +13,9 @@ import {
 } from "../../../services/torneioServico";
 import Swal from "sweetalert2";
 import { useSessao } from "../../../contextos/AuthContexto";
+import { verificarSessao } from "../../../services/authServico";
+import type { IUsuario } from "../../../tipos/tipos";
+import { buscarRodadasDoTorneio } from "../../../services/mesaServico";
 
 type Aba = "inscritos" | "andamento" | "historico";
 
@@ -26,6 +30,7 @@ const EmptyState: React.FC<{ aba: Aba }> = ({ aba }) => {
 
 const HistoricoTorneios: React.FC = () => {
     const { usuario } = useSessao?.() ?? ({} as any);
+    const navigate = useNavigate();
     const tipoBruto = (usuario?.tipo ?? usuario?.perfil ?? usuario?.role ?? "").toString();
     const isLoja = tipoBruto.toUpperCase() === "LOJA";
 
@@ -42,6 +47,66 @@ const HistoricoTorneios: React.FC = () => {
     const [modalAberto, setModalAberto] = useState(false);
     const [torneioSelecionado, setTorneioSelecionado] = useState<{ id: number; nome: string } | null>(null);
 
+    const handleCardClick = useCallback(async (tournamentId: number) => {
+    if (!tournamentId) return;
+
+    try {
+        const usuario: IUsuario = await verificarSessao();
+
+        // Navegação baseada na ABA
+        if (usuario.tipo === "JOGADOR") {
+            // ABA "EM ANDAMENTO" => verifica se deve ir para MESA ATIVA ou INTERVALO
+            if (aba === "andamento") {
+                const dadosTorneio = await buscarRodadasDoTorneio(tournamentId);
+                const rodadaAtiva = dadosTorneio.find(rodada => rodada.status.toLowerCase() !== 'finalizada');
+                const rodadaId = rodadaAtiva ? rodadaAtiva.id : null;
+
+                if (rodadaId && rodadaAtiva) {
+                    const statusRodada = rodadaAtiva.status?.toLowerCase() || '';
+                    console.log('Rodada ativa encontrada:', statusRodada);
+                    const statusComMesaAtiva = ['ativa', 'em andamento', 'iniciada', 'bye'];
+                    const statusEmPreparacao = ['emparelhamento', 'aguardando início', 'preparação', 'sortendo mesas'];
+                    
+                    if (statusComMesaAtiva.includes(statusRodada)) {
+                        // Rodada ativa - navegar para intervalo com mesa ativa
+                        navigate(`/intervalo/${tournamentId}`, {
+                            state: { 
+                                abrirMesaAtiva: true,
+                                rodadaId: rodadaId
+                            }
+                        });
+                    } else if (statusEmPreparacao.includes(statusRodada)) {
+                        navigate(`/intervalo/${tournamentId}`);
+                    } else {
+                        navigate(`/intervalo/${tournamentId}`);
+                    }
+                } else {
+                    // Nenhuma rodada ativa encontrada - ir para intervalo
+                    navigate(`/intervalo/${tournamentId}`);
+                }
+                return;
+            }
+        
+            if (aba === "historico") {
+                navigate(`/intervalo/${tournamentId}`);
+                return;
+            }
+            
+            // ABA "Abertos" => vai para DETALHES DO TORNEIO
+            if (aba === "inscritos"){ 
+                navigate(`/torneios/${tournamentId}`);
+                return;
+            }
+            // ABA "Inscritos" (default) => vai para DETALHES DO TORNEIO
+            navigate(`/torneios/${tournamentId}`);
+        }
+    
+        navigate(`/torneios/${tournamentId}`);
+
+    } catch (error) {
+        console.error("Erro ao processar navegação:", error);
+    }
+}, [aba, navigate]);
     // Carregamento inicial
     const carregar = useCallback(async () => {
         setCarregando(true);
@@ -201,6 +266,7 @@ const HistoricoTorneios: React.FC = () => {
         // Se for LOJA, mostrar botão de inscrever jogador
         if (isLoja) {
             return (
+                 <div onClick={(e) => e.stopPropagation()}> {/* Div que para a propagação */}
                 <Button
                     label="+ Inscrever Jogador"
                     onClick={() => {
@@ -210,6 +276,7 @@ const HistoricoTorneios: React.FC = () => {
                     textColor="var(--var-cor-branca)"
                     className={styles.btnInscrever}
                 />
+            </div>
             );
         }
 
@@ -310,7 +377,7 @@ const HistoricoTorneios: React.FC = () => {
                                         key={t.id}
                                         {...mapToCardInfo(t)}
                                         action={renderActionFor(t)}
-                                        abaAtual={aba}
+                                        onClick={() => handleCardClick(t.id)} // Passa a função de clique
                                     />
                                 ))}
                             </div>

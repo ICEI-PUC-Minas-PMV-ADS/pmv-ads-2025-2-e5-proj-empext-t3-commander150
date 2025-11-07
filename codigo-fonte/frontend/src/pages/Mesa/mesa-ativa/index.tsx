@@ -1,25 +1,32 @@
+// components/MesaAtivaComponent.tsx
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { buscarMinhaMesaNaRodada, reportarResultadoMesa } from '../../../services/mesaServico';
 import { buscarTorneioPorId } from '../../../services/torneioServico';
-import type { IMesaAtiva, IRodada, ITorneio } from '../../../tipos/tipos';
+import type { IMesaAtiva, ITorneio } from '../../../tipos/tipos';
 import styles from '../styles.module.css';
 import Swal from 'sweetalert2';
 import { CardSuperior } from '../../../components/CardSuperior';
-import CardInfoTorneio from '../../../components/CardInfoTorneio';
-import RegrasPartida from '../../../components/CardRegrasPartida';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { BsGrid3X3Gap } from 'react-icons/bs';
 import { GiPodium } from 'react-icons/gi';
 import { FaDollarSign } from 'react-icons/fa';
-import DropdownRodadas from '../../../components/DropdownRodadas';
-import CardRanking from '../../../components/CardRanking';
 
-export default function MesaAtiva() {
-  const { id } = useParams<{ id: string }>();
+interface MesaAtivaProps {
+  rodadaId: number;
+  torneioId: number;
+  onMesaFinalizada?: (mesa: IMesaAtiva) => void;
+  onVoltarParaIntervalo?: () => void;
+}
+
+export default function MesaAtivaComponent({ 
+  rodadaId, 
+  torneioId, 
+  onMesaFinalizada,
+  onVoltarParaIntervalo 
+}: MesaAtivaProps) {
   const navigate = useNavigate();
-  const location = useLocation();
   const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,44 +34,20 @@ export default function MesaAtiva() {
   const [regras, setRegras] = useState<string>('');
   const [vitoriasSuaDupla, setVitoriasSuaDupla] = useState('');
   const [vitoriasOponentes, setVitoriasOponentes] = useState('');
-  const [rodadaSelecionada, setRodadaSelecionada] = useState<IRodada | null>(null);
-  const [resultadoFinalSelecionado, setResultadoFinalSelecionado] = useState(false);
   const [ultimoStatus, setUltimoStatus] = useState<string>('');
 
-  const formatarData = (dataISO?: string) => {
-    if (!dataISO) return 'N/A';
-    return new Date(dataISO).toLocaleDateString('pt-BR');
-  };
-
-  const formatarHora = (dataISO?: string) => {
-    if (!dataISO) return 'N/A';
-    return new Date(dataISO).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatarPreco = (valor?: number | null, gratuito?: boolean) => {
-    if (gratuito) return 'Gratuito';
-    if (!valor) return 'R$ 0,00';
-    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  };
-
-  const torneioId = location.state?.tournamentId
-
-  // Função simplificada para verificar status
+  // Função para verificar status (igual da sua implementação)
   const verificarStatus = async () => {
-    if (!id) return;
-
     try {
-      const mesaData = await buscarMinhaMesaNaRodada(parseInt(id));
+      const mesaData = await buscarMinhaMesaNaRodada(rodadaId);
       
       if (mesaData) {
         const statusAtual = `${mesaData.status_rodada}-${mesaData.time_vencedor}`;
         
-        // Se mudou o status, atualiza e mostra alerta
         if (statusAtual !== ultimoStatus && ultimoStatus !== '') {
           setMesa(mesaData);
           setUltimoStatus(statusAtual);
           
-          // Se a rodada foi finalizada, redireciona para intervalo
           if (mesaData.status_rodada.toLowerCase() === 'finalizada') {
             Swal.fire({
               title: '🏁 Rodada Finalizada!',
@@ -73,9 +56,7 @@ export default function MesaAtiva() {
               confirmButtonText: 'Ver Resultado',
               timer: 5000
             }).then(() => {
-              navigate(`/intervalo/${torneioId}`, {
-                state: { mesa: mesaData }
-              });
+              onMesaFinalizada?.(mesaData);
             });
           } else {
             Swal.fire({
@@ -98,46 +79,39 @@ export default function MesaAtiva() {
     }
   };
 
-  // Webhook simplificado - polling a cada 30 segundos
+  // Webhook simplificado
   useEffect(() => {
     const interval = setInterval(verificarStatus, 30000);
     return () => clearInterval(interval);
-  }, [id, ultimoStatus]);
+  }, [rodadaId, ultimoStatus]);
 
-  //carrega a mesa
+  // Carregar mesa
   useEffect(() => {
-    if (!id) {
-      navigate(`/intervalo/${torneioId}`);
-      return;
-    }
-     
     const carregarMesa = async () => {
       try {
         setLoading(true);
-        const mesaData = await buscarMinhaMesaNaRodada(parseInt(id));
+        const mesaData = await buscarMinhaMesaNaRodada(rodadaId);
 
-        //se estiver no bye, redireciona para intervalo
+        // Se estiver no bye, chama callback para voltar ao intervalo
         if (!mesaData) {
-          navigate(`/intervalo/${torneioId}`);
+          onVoltarParaIntervalo?.();
           return;
         }
-        setMesa(mesaData);
 
+        setMesa(mesaData);
         setUltimoStatus(`${mesaData.status_rodada}-${mesaData.time_vencedor}`);
 
         try {
-          const torneioData = await buscarTorneioPorId(mesaData.id_torneio);
+          const torneioData = await buscarTorneioPorId(torneioId);
           setTorneio(torneioData);
           setRegras(torneioData.regras || "");
-          
         } catch (error) {
           console.error('Erro ao carregar torneio:', error);
         }
 
+        // Se a mesa já está finalizada, chama callback
         if (mesaData?.status_rodada.toLowerCase() === 'finalizada') {
-          navigate(`/intervalo/${torneioId}`, {
-            state: { mesa: mesaData }
-          });
+          onMesaFinalizada?.(mesaData);
           return;
         }
 
@@ -153,14 +127,14 @@ export default function MesaAtiva() {
       } catch (error) {
         console.error('Erro ao carregar mesa:', error);
         Swal.fire('Erro', 'Não foi possível carregar a mesa.', 'error');
-        navigate(`/intervalo/${torneioId}`);
+        onVoltarParaIntervalo?.();
       } finally {
         setLoading(false);
       }
     };
 
     carregarMesa();
-  }, [id, navigate]);
+  }, [rodadaId, torneioId, onMesaFinalizada, onVoltarParaIntervalo]);
 
   const handleReportarResultado = async () => {
     if (!mesa) return;
@@ -170,7 +144,6 @@ export default function MesaAtiva() {
       return;
     }
 
-    // Reportar resultado
     let pontuacaoTime1: number;
     let pontuacaoTime2: number;
 
@@ -204,28 +177,13 @@ export default function MesaAtiva() {
       });
 
       await Swal.fire('Sucesso', 'Resultado reportado com sucesso!', 'success');
-      navigate(`/intervalo/${torneioId}`, {
-        state: {
-          mesa: mesaAtualizada,
-          torneio: torneio
-        }
-      });
+      onMesaFinalizada?.(mesaAtualizada);
     } catch (error) {
       console.error('Erro ao reportar resultado:', error);
       Swal.fire('Erro', 'Não foi possível reportar o resultado.', 'error');
     } finally {
       setReportandoResultado(false);
     }
-  };
-
-  const handleSelecionarRodada = (rodada: any) => {
-    setRodadaSelecionada(rodada);
-    setResultadoFinalSelecionado(false);
-  };
-
-  const handleSelecionarResultadoFinal = async () => {
-    setResultadoFinalSelecionado(true);
-    setRodadaSelecionada(null);
   };
 
   if (loading) {
@@ -241,7 +199,7 @@ export default function MesaAtiva() {
 
   return (
     <div className={styles.container}>
-      {/* CABEÇALHO (igual para ambos) */}
+      {/* CABEÇALHO */}
       <div className={styles.header}>
         <div>
           <h1 className={styles.titulo}>
@@ -251,17 +209,8 @@ export default function MesaAtiva() {
             {mesa.nome_torneio}
           </p>
         </div>
-        <div className={styles.rodadaBadge}>
-          <DropdownRodadas
-            tournamentId={torneio?.id}
-            rodadaSelecionada={rodadaSelecionada}
-            onSelecionarRodada={handleSelecionarRodada}
-            onSelecionarResultadoFinal={handleSelecionarResultadoFinal}
-            resultadoFinalSelecionado={resultadoFinalSelecionado}
-            tournamentStatus={torneio?.status}
-          />
-        </div>
       </div>
+
       <div className={styles.gridContainer}>
         <div className={styles.cardsEsquerda}>
           <CardSuperior
@@ -290,125 +239,84 @@ export default function MesaAtiva() {
 
       {/* CONTEÚDO PRINCIPAL */}
       <div className={styles.gridContainer}>
-        {/* COLUNA ESQUERDA - Conteúdo específico */}
         <div className={styles.colunaEsquerda}>
-          {mesa ? (
-            <>
-              {/* Sua Partida */}
-              <div className={styles.partidaCard}>
-                <h2 className={styles.cardTitulo}>Sua Partida - Mesa {mesa.numero_mesa}</h2>
-                <p className={styles.statusPartida}>Partida em andamento</p>
+          {/* Sua Partida */}
+          <div className={styles.partidaCard}>
+            <h2 className={styles.cardTitulo}>Sua Partida - Mesa {mesa.numero_mesa}</h2>
+            <p className={styles.statusPartida}>Partida em andamento</p>
 
-                <div className={styles.dupla}>
-                  <div className={styles.duplaHeader}>
-                    <span className={styles.duplaNomes}>
-                      {meuTime.map(j => j.username).join(' & ')}
-                    </span>
-                    <span className={styles.duplaTag}>Sua Dupla</span>
-                  </div>
-                </div>
-
-                <div className={styles.vs}>VS</div>
-
-                <div className={styles.dupla}>
-                  <div className={styles.duplaHeader}>
-                    <span className={styles.duplaNomes}>
-                      {timeAdversario.map(j => j.username).join(' & ')}
-                    </span>
-                    <span className={styles.duplaTagAdversario}>Dupla Adversária</span>
-                  </div>
-                </div>
+            <div className={styles.dupla}>
+              <div className={styles.duplaHeader}>
+                <span className={styles.duplaNomes}>
+                  {meuTime.map(j => j.username).join(' & ')}
+                </span>
+                <span className={styles.duplaTag}>Sua Dupla</span>
               </div>
+            </div>
 
-              {/* Informar Resultado */}
-              <div className={styles.resultadoCard}>
-                <h2 className={styles.cardTitulo}>Informar Resultado da Rodada</h2>
-                <p className={styles.instrucao}>
-                  Informe a quantas vitórias e empates sua dupla teve ao final da partida
-                </p>
+            <div className={styles.vs}>VS</div>
 
-                <div className={styles.inputsResultado}>
-                  <div className={styles.inputGroup}>
-                    <p className={styles.inputLabel}>Sua Dupla</p>
-                    <Input
-                      type="numero"
-                      name="vitorias_sua_dupla"
-                      label="Vitórias"
-                      value={vitoriasSuaDupla}
-                      onChange={(e) => setVitoriasSuaDupla(e.target.value)}
-                      backgroundColor="var(--var-cor-azul-fundo-section)"
-                      textColor="var(--var-cor-branca)"
-                      labelColor="var(--var-cor-branca)"
-                    />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <p className={styles.inputLabel}>Dupla Adversária</p>
-                    <Input
-                      type="numero"
-                      name="vitorias_oponentes"
-                      label="Vitórias"
-                      value={vitoriasOponentes}
-                      onChange={(e) => setVitoriasOponentes(e.target.value)}
-                      backgroundColor="var(--var-cor-azul-fundo-section)"
-                      textColor="var(--var-cor-branca)"
-                      labelColor="var(--var-cor-branca)"
-                    />
-                  </div>
-                </div>
+            <div className={styles.dupla}>
+              <div className={styles.duplaHeader}>
+                <span className={styles.duplaNomes}>
+                  {timeAdversario.map(j => j.username).join(' & ')}
+                </span>
+                <span className={styles.duplaTagAdversario}>Dupla Adversária</span>
+              </div>
+            </div>
+          </div>
 
-                <Button
-                  label="Confirmar Resultado"
-                  type="button"
-                  onClick={handleReportarResultado}
-                  disabled={reportandoResultado}
+          {/* Informar Resultado */}
+          <div className={styles.resultadoCard}>
+            <h2 className={styles.cardTitulo}>Informar Resultado da Rodada</h2>
+            <p className={styles.instrucao}>
+              Informe a quantas vitórias e empates sua dupla teve ao final da partida
+            </p>
+
+            <div className={styles.inputsResultado}>
+              <div className={styles.inputGroup}>
+                <p className={styles.inputLabel}>Sua Dupla</p>
+                <Input
+                  type="numero"
+                  name="vitorias_sua_dupla"
+                  label="Vitórias"
+                  value={vitoriasSuaDupla}
+                  onChange={(e) => setVitoriasSuaDupla(e.target.value)}
+                  backgroundColor="var(--var-cor-azul-fundo-section)"
+                  textColor="var(--var-cor-branca)"
+                  labelColor="var(--var-cor-branca)"
                 />
               </div>
-            </>
-            
-          ) : (
-            <div className={styles.intervaloCard}>
-              <h2 className={styles.intervaloTitulo}>Você recebeu um bye!</h2>
-              <p className={styles.intervaloTexto}>
-                Aproveite para tomar uma água enquanto aguarda a próxima rodada.
-              </p>
-            </div> 
-          )}
-        </div>
+              <div className={styles.inputGroup}>
+                <p className={styles.inputLabel}>Dupla Adversária</p>
+                <Input
+                  type="numero"
+                  name="vitorias_oponentes"
+                  label="Vitórias"
+                  value={vitoriasOponentes}
+                  onChange={(e) => setVitoriasOponentes(e.target.value)}
+                  backgroundColor="var(--var-cor-azul-fundo-section)"
+                  textColor="var(--var-cor-branca)"
+                  labelColor="var(--var-cor-branca)"
+                />
+              </div>
+            </div>
 
-        {/* COLUNA DIREITA - Informações do torneio */}
-        <div className={styles.colunaDireita}>
-          <CardInfoTorneio
-            title="Informações do Torneio"
-            name={mesa.nome_torneio}
-            date={formatarData(torneio?.data_inicio)}
-            time={formatarHora(torneio?.data_inicio)}
-            location={torneio?.loja_nome || 'Loja não especificada'}
-            price={formatarPreco(torneio?.valor_incricao, torneio?.incricao_gratuita)}
-            players={torneio?.qnt_vagas || 0}
-          />
+            <Button
+              label="Confirmar Resultado"
+              type="button"
+              onClick={handleReportarResultado}
+              disabled={reportandoResultado}
+            />
 
-          <RegrasPartida regras={regras} />
-
-          {resultadoFinalSelecionado ? (
-          <CardRanking
-            tournamentId={torneio?.id}
-            isRankingFinal={true}
-            titulo="🏆 Ranking Final do Torneio"
-            mostrarMetricasAvancadas={true}
-          />
-        ) : rodadaSelecionada ? (
-          <CardRanking
-            tournamentId={torneio?.id}
-            rodadaId={rodadaSelecionada.id}
-            titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
-            limite={10}
-            mostrarMetricasAvancadas={false}
-          />
-        ) : (
-          <div className={styles.mensagem}>
-            Selecione uma rodada para visualizar o ranking
+            {/* Botão para voltar ao intervalo */}
+            <Button
+              label="Voltar"
+              type="button"
+              onClick={onVoltarParaIntervalo}
+              backgroundColor="var(--var-cor-secundaria)"
+            />
           </div>
-        )}
         </div>
       </div>
     </div>
