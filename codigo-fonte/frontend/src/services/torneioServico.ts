@@ -525,7 +525,7 @@ async function isInscricaoAtivaPara(torneioId: number): Promise<boolean> {
 */
 
 /** Localiza a inscrição do usuário logado PARA aquele torneio. */
-async function getMinhaInscricaoId(torneioId: number): Promise<number> {
+export async function getMinhaInscricaoId(torneioId: number): Promise<number> {
   const { data } = await api.get("/torneios/inscricoes/", {
     params: { id_torneio: torneioId, page: 1, page_size: 50 },
     withCredentials: true,
