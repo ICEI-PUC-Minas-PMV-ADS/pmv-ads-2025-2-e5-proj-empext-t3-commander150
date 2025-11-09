@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import estilos from "./styles.module.css";
 
 import Input from "../../../components/Input";
@@ -16,6 +17,8 @@ import type { ITorneioCriacao } from "../../../tipos/tipos";
 import Swal from 'sweetalert2';
 
 const CriarTorneio: React.FC = () => {
+  const navigate = useNavigate();
+
   // Estados para informações básicas
   const [nomeTorneio, setNomeTorneio] = useState("");
   const [dataHoraTorneio, setDataHoraTorneio] = useState("");
@@ -149,6 +152,9 @@ const CriarTorneio: React.FC = () => {
         setPontuacaoEmpate("1");
         setPontuacaoBye("3");
         setQuantidadeRodadas("");
+
+        // Redirecionar para página inicial
+        navigate("/");
       });
 
     } catch (error) {
