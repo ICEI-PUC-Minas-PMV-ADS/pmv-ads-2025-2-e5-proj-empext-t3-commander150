@@ -2059,6 +2059,7 @@ const InformacaoTorneioLoja: React.FC = () => {
         )}
 
         {/*modal para inscrever um jogador; ele cadastra e depois inscreve-o no torneio*/}
+        {/*F5 manual para permitir que a loja inscreva +1 jogador sem precisar que se recarregue a página a cada vez*/}
         {showModalInscricao && tournament && (
             <ModalInscricaoJogador
                 torneioId={tournament.id}
