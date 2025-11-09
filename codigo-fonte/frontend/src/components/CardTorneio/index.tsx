@@ -4,6 +4,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import Swal from 'sweetalert2';
+import { getMinhaInscricaoId } from "../../services/torneioServico";
 
 interface TagProps {
   texto: string;
@@ -58,10 +59,31 @@ const CardTorneio = ({
     });
   };
 
+  // Função para verificar se o usuário está inscrito no torneio
+  const verificarInscricao = async (torneioId: number): Promise<boolean> => {
+    try {
+      await getMinhaInscricaoId(torneioId);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   // Função para lidar com o clique no card
-  const handleClick = () => {
+  const handleClick = async () => {
     // Se for loja, não navega ao clicar no card
     if (usuario?.tipo === 'LOJA') {
+      return;
+    }
+
+    // Se for jogador, verificar inscrição e navegar adequadamente
+    if (usuario?.tipo === 'JOGADOR') {
+      const estaInscrito = await verificarInscricao(id);
+      if (estaInscrito) {
+        navigate(`/torneios/${id}`);
+      } else {
+        navigate(`/inscricao-torneio/${id}`);
+      }
       return;
     }
 
@@ -70,7 +92,7 @@ const CardTorneio = ({
     //   mostrarAlertaTorneioPassado();
     //   return;
     // }
-    
+
     if (usuario) {
       navigate(`/inscricao-torneio/${id}`);
     } else {
