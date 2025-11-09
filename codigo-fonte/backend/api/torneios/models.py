@@ -2,9 +2,6 @@ from django.conf import settings
 from django.db import models
 
 
-# É a melhor prática usar 'settings.AUTH_USER_MODEL' para referenciar
-# o modelo de usuário do projeto. Isso torna o app mais reutilizável.
-
 class Torneio(models.Model):
     """
     Armazena as informações principais de um torneio.
@@ -20,7 +17,7 @@ class Torneio(models.Model):
     descricao = models.TextField(blank=True, null=True, help_text="Descrição detalhada do torneio")
     status = models.CharField(max_length=50, default='Aberto', help_text="Ex: Aberto, Em Andamento, Finalizado")
     regras = models.TextField(help_text="Regras específicas do torneio")
-    banner = models.ImageField(upload_to='torneios/banners/', blank=True, null=True, help_text="Banner do torneio")
+    banner = models.CharField(max_length=255, blank=True, null=True, help_text="Nome do arquivo do banner (ex: b1.png, b2.png)")
     vagas_limitadas = models.BooleanField(default=True, help_text="Se o torneio tem limite de vagas")
     qnt_vagas = models.PositiveIntegerField(blank=True, null=True, help_text="Quantidade de vagas disponíveis")
     incricao_gratuita = models.BooleanField(default=True, help_text="Se a inscrição é gratuita")

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import estilos from "./App.module.css";
 
 // Importar imagens de banner
+// Toda nova inclusão de banner deve ser adicionada aqui
 import b1 from "./assets/b1.png";
 import b2 from "./assets/b2.png";
 import b3 from "./assets/b3.png";
@@ -31,6 +32,7 @@ const CONFIG = {
 } as const;
 
 // Mapeamento de banners do backend para imagens locais
+// Toda nova inclusão de banner deve ser adicionada aqui
 const IMAGENS_BANNER: Record<string, string> = {
   "b1.png": b1,
   "b2.png": b2,
@@ -185,8 +187,11 @@ const obterImagemBanner = (banner: string | null): string => {
     ];
   }
 
-  const nomeArquivo = banner.split('/').pop() || '';
-  return IMAGENS_BANNER[nomeArquivo] || banner;
+  // Procura o nome do arquivo (ex: "b2.png") no mapa
+  const imagemLocal = IMAGENS_BANNER[banner];
+
+  // Retorna a imagem local se encontrar, ou uma padrão caso não encontre
+  return imagemLocal || CONFIG.BANNERS_PADRAO[0];
 };
 
 /**
