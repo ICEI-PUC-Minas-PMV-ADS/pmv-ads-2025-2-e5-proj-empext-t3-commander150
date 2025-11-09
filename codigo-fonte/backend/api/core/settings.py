@@ -11,6 +11,7 @@ env = environ.Env(
     DB_USER=(str, 'postgres'),
     DB_PASSWORD=(str, 'password'),
     DB_HOST=(str, 'localhost'),
+    DATABASE_URL=(str, "postgres://postgres:123@localhost:5432/commander150"),
     EMAIL_PASSWORD=(str, None),
     EMAIL_USER=(str, None),
     CORS_ALLOWED_ORIGINS=(list, []),
@@ -29,17 +30,22 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
-# Configuração do banco de dados
+# Configuração do banco de dados padrão Neon
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),  # Nome do banco de dados
-        'USER': env('DB_USER'),  # Usuário do PostgreSQL
-        'PASSWORD': env('DB_PASSWORD'),  # Senha
-        'HOST': env('DB_HOST'),  # Host
-        'PORT': '5432',  # Porta padrão do PostgreSQL
-    }
+    'default': env.db('DATABASE_URL')
 }
+
+# Configuração do banco de dados
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': env('DB_NAME'),  # Nome do banco de dados
+#         'USER': env('DB_USER'),  # Usuário do PostgreSQL
+#         'PASSWORD': env('DB_PASSWORD'),  # Senha
+#         'HOST': env('DB_HOST'),  # Host
+#         'PORT': '5432',  # Porta padrão do PostgreSQL
+#     }
+# }
 
 # Configuração do envio de emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
