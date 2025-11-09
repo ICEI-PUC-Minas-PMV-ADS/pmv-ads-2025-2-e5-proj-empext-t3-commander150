@@ -21,6 +21,7 @@ import RegrasPartida from "../../../components/CardRegrasPartida";
 import MesaCard from "../../../components/CardMesaParticipante";
 import ModalGerenciarInscricoes from "../../../components/ModalGerenciarInscricoes";
 import { removerJogadorDoTorneioComoLoja } from "../../../services/torneioServico";
+import ModalInscricaoJogador from "../../../components/ModalInscricaoJogador";
 import Modal from "../../../components/Modal";
 import { useParams } from "react-router-dom";
 import Button from "../../../components/Button";
@@ -65,6 +66,13 @@ const InformacaoTorneioLoja: React.FC = () => {
   const [dropdownAberto, setDropdownAberto] = useState(false);
   const [carregandoMesas, setCarregandoMesas] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null);
+
+  const [showModalInscricao, setShowModalInscricao] = useState(false);
+  const abrirModalInscricao = () => setShowModalInscricao(true);
+  const fecharModalInscricaoEAatualizar = async () => {
+    setShowModalInscricao(false);
+  };
+
   const [iniciandoTorneio, setIniciandoTorneio] = useState(false);
   const [avancandoRodada, setAvancandoRodada] = useState(false);
   const [finalizandoTorneio, setFinalizandoTorneio] = useState(false);
@@ -132,12 +140,12 @@ const InformacaoTorneioLoja: React.FC = () => {
 
       // Formatar nomes dos times
       const time1 = jogadoresTime1.length > 0
-        ? jogadoresTime1.map(j => j.username).join(' & ')
-        : 'Aguardando jogadores';
+          ? jogadoresTime1.map(j => j.username).join(' & ')
+          : 'Aguardando jogadores';
 
       const time2 = jogadoresTime2.length > 0
-        ? jogadoresTime2.map(j => j.username).join(' & ')
-        : 'Aguardando jogadores';
+          ? jogadoresTime2.map(j => j.username).join(' & ')
+          : 'Aguardando jogadores';
 
       // Nova lógica de status
       let status: "Finalizado" | "Em andamento" | "Revisar dados";
@@ -261,7 +269,7 @@ const InformacaoTorneioLoja: React.FC = () => {
         // Selecionar automaticamente a rodada em andamento, ou a primeira se não houver
         if (rodadasTorneio.length > 0) {
           const rodadaEmAndamento = rodadasTorneio.find(r =>
-            r.status?.toLowerCase() === 'em andamento'
+              r.status?.toLowerCase() === 'em andamento'
           );
           const rodadaInicial = rodadaEmAndamento || rodadasTorneio[0];
           setRodadaSelecionada(rodadaInicial);
@@ -281,13 +289,13 @@ const InformacaoTorneioLoja: React.FC = () => {
 
   // Definir regras do torneio como string
   const regrasPartida = tournament?.regras || [
-      'Formato Commander padrão',
-      'Time limit: 50 minutos por partida',
-      'Decks devem ter exatamente 100 cartas',
-      'Banlist oficial da Wizards',
-      'Vida inicial: 40 pontos por jogador',
-      'Comportamento respeitoso é obrigatório'
-    ].join('\n');
+    'Formato Commander padrão',
+    'Time limit: 50 minutos por partida',
+    'Decks devem ter exatamente 100 cartas',
+    'Banlist oficial da Wizards',
+    'Vida inicial: 40 pontos por jogador',
+    'Comportamento respeitoso é obrigatório'
+  ].join('\n');
 
   const getStatusLabel = () => {
     if (tournament?.status === "Cancelado") {
@@ -344,9 +352,9 @@ const InformacaoTorneioLoja: React.FC = () => {
     setEditRegras(tournament.regras || "");
     setEditModalidadeInscricao(tournament.incricao_gratuita ? "gratuito" : "pago");
     setEditValorInscricao(
-      tournament.valor_incricao && typeof tournament.valor_incricao === 'number'
-        ? `R$ ${tournament.valor_incricao.toFixed(2).replace('.', ',')}`
-        : "R$ 0,00"
+        tournament.valor_incricao && typeof tournament.valor_incricao === 'number'
+            ? `R$ ${tournament.valor_incricao.toFixed(2).replace('.', ',')}`
+            : "R$ 0,00"
     );
     setEditVagasLimitadas(tournament.vagas_limitadas ? "limitadas" : "ilimitadas");
     setEditCapacidadeMaxima(tournament.qnt_vagas ? tournament.qnt_vagas.toString() : "");
@@ -639,7 +647,7 @@ const InformacaoTorneioLoja: React.FC = () => {
     } catch (e: any) {
       console.error('Erro ao iniciar torneio:', e);
       const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
-      
+
       await Swal.fire({
         title: 'Erro!',
         text: mensagemErro,
@@ -1019,7 +1027,7 @@ const InformacaoTorneioLoja: React.FC = () => {
     } catch (e: any) {
       console.error('Erro ao avançar rodada:', e);
       const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
-      
+
       await Swal.fire({
         title: 'Erro!',
         text: mensagemErro,
@@ -1062,13 +1070,13 @@ const InformacaoTorneioLoja: React.FC = () => {
 
       // Formatar ranking para exibição em HTML
       const rankingHtml = resultado.ranking
-        .map(r => `
+          .map(r => `
           <div style="display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee;">
             <span><strong>${r.posicao}º</strong> - ${r.jogador_nome}</span>
             <span><strong>${r.pontos}</strong> pontos</span>
           </div>
         `)
-        .join('');
+          .join('');
 
       await Swal.fire({
         title: 'Torneio Finalizado!',
@@ -1100,7 +1108,7 @@ const InformacaoTorneioLoja: React.FC = () => {
     } catch (e: any) {
       console.error('Erro ao finalizar torneio:', e);
       const mensagemErro = e.response?.data?.detail || tratarErroTorneio(e);
-      
+
       await Swal.fire({
         title: 'Erro!',
         text: mensagemErro,
@@ -1164,10 +1172,10 @@ const InformacaoTorneioLoja: React.FC = () => {
 
   // Handler para editar emparelhamento de uma mesa específica
   const handleEditarEmparelhamentoMesa = async (
-    mesaId: number,
-    jogadorId?: number,
-    novaMesaId?: number,
-    novoTime?: 1 | 2
+      mesaId: number,
+      jogadorId?: number,
+      novaMesaId?: number,
+      novoTime?: 1 | 2
   ) => {
     // Se recebeu um novoTime diretamente, significa que foi clicado o botão do time
     if (novoTime && !jogadorId) {
@@ -1226,7 +1234,7 @@ const InformacaoTorneioLoja: React.FC = () => {
       title: 'Selecionar Jogador',
       input: 'select',
       inputOptions: Object.fromEntries(
-        jogadoresOptions.map(j => [j.id, `${j.name} (Time ${j.team})`])
+          jogadoresOptions.map(j => [j.id, `${j.name} (Time ${j.team})`])
       ),
       inputPlaceholder: 'Selecione um jogador',
       showCancelButton: true,
@@ -1291,7 +1299,7 @@ const InformacaoTorneioLoja: React.FC = () => {
       title: 'Selecionar Jogador',
       input: 'select',
       inputOptions: Object.fromEntries(
-        jogadoresOptions.map(j => [j.id, `${j.name} (Time ${j.team} → Time ${j.newTeam})`])
+          jogadoresOptions.map(j => [j.id, `${j.name} (Time ${j.team} → Time ${j.newTeam})`])
       ),
       inputPlaceholder: 'Selecione um jogador para alterar o time',
       showCancelButton: true,
@@ -1331,7 +1339,7 @@ const InformacaoTorneioLoja: React.FC = () => {
       title: `Selecionar Jogador para Time ${timeDesejado}`,
       input: 'select',
       inputOptions: Object.fromEntries(
-        jogadoresInscritos.map(j => [j.id_usuario, j.username])
+          jogadoresInscritos.map(j => [j.id_usuario, j.username])
       ),
       inputPlaceholder: 'Selecione um jogador',
       showCancelButton: true,
@@ -1350,9 +1358,9 @@ const InformacaoTorneioLoja: React.FC = () => {
       await editarEmparelhamentoManual(rodadaSelecionada!.id, jogadorId, undefined, timeDesejado);
 
       await Swal.fire(
-        'Sucesso!',
-        `${jogadorNome} foi definido para o Time ${timeDesejado}!`,
-        'success'
+          'Sucesso!',
+          `${jogadorNome} foi definido para o Time ${timeDesejado}!`,
+          'success'
       );
 
       // Recarregar mesas
@@ -1370,677 +1378,697 @@ const InformacaoTorneioLoja: React.FC = () => {
   if (!tournament) return <div className={styles.error}>Nenhum torneio encontrado.</div>;
 
   return (
-    <div className={styles.container}>
-      {/* Mensagens de feedback */}
-      {mensagemSucesso && (
-        <div className={styles.mensagemSucesso}>
-          {mensagemSucesso}
-        </div>
-      )}
+      <div className={styles.container}>
+        {/* Mensagens de feedback */}
+        {mensagemSucesso && (
+            <div className={styles.mensagemSucesso}>
+              {mensagemSucesso}
+            </div>
+        )}
 
-      {erro && (
-        <div className={styles.mensagemErro}>
-          {erro}
-        </div>
-      )}
+        {erro && (
+            <div className={styles.mensagemErro}>
+              {erro}
+            </div>
+        )}
 
-      {/* Cabeçalho */}
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.titulo}>Torneio {getStatusLabel().toLowerCase()}</h1>
-          <p className={styles.subtitulo}>{tournament.nome}</p>
-        </div>
+        {/* Cabeçalho */}
+        <div className={styles.header}>
+          <div>
+            <h1 className={styles.titulo}>Torneio {getStatusLabel().toLowerCase()}</h1>
+            <p className={styles.subtitulo}>{tournament.nome}</p>
+          </div>
 
-        <div className={styles.headerActions}>
-          {/* Botão Iniciar Torneio e Compartilhar - Aparece apenas quando status é "Aberto" */}
-          {tournament.status === "Aberto" && (
-            <>
-              <Button
-                label="Editar"
-                onClick={abrirModalEdicao}
-                width="auto"
-                height="44px"
-                paddingHorizontal="20px"
-                fontSize="14px"
-                backgroundColor="#6c757d"
-              />
-              <Button
-                label="Compartilhar"
-                onClick={compartilharTorneio}
-                width="auto"
-                height="44px"
-                paddingHorizontal="20px"
-                fontSize="14px"
-                backgroundColor="#9b80b6"
-              />
-              <Button
-                label={cancelandoTorneio ? "Cancelando..." : "Cancelar Torneio"}
-                onClick={handleCancelarTorneio}
-                disabled={cancelandoTorneio}
-                width="auto"
-                height="44px"
-                paddingHorizontal="20px"
-                fontSize="14px"
-                backgroundColor="#dc3545"
-              />
-              <Button
-                label="Iniciar Torneio"
-                onClick={handleIniciarTorneio}
-                disabled={iniciandoTorneio}
-                width="auto"
-                height="44px"
-                paddingHorizontal="24px"
-                fontSize="14px"
-              />
-            </>
-          )}
-
-          {/* Botões para torneio "Em Andamento" */}
-          {tournament.status === "Em Andamento" && (
-            <>
-              {/* Se há rodada atual "Em Andamento" */}
-              {rodadaSelecionada?.status === "Em Andamento" && (
-                <Button
-                  label="Avançar Rodada"
-                  onClick={handleAvancarRodadaNovo}
-                  disabled={avancandoRodada}
-                  width="auto"
-                  height="44px"
-                  paddingHorizontal="24px"
-                  fontSize="14px"
-                  backgroundColor="#46AF87"
-                />
-              )}
-
-              {/* Se há rodada atual "Aguardando_Emparelhamento" */}
-              {rodadaSelecionada?.status === "Aguardando_Emparelhamento" && (
-                <Button
-                  label="Emparelhar Auto"
-                  onClick={handleEmparelharAutomatico}
-                  disabled={emparelhando}
-                  width="auto"
-                  height="44px"
-                  paddingHorizontal="24px"
-                  fontSize="14px"
-                  backgroundColor="#9b80b6"
-                />
-              )}
-
-              {/* Se há rodada atual "Emparelhamento" */}
-              {(rodadaSelecionada?.status === "Emparelhamento") && (
+          <div className={styles.headerActions}>
+            {/* Botão Iniciar Torneio e Compartilhar - Aparece apenas quando status é "Aberto" */}
+            {tournament.status === "Aberto" && (
                 <>
-                  {/* Botão Re-emparelhar - para ambos os status de emparelhamento */}
                   <Button
-                    label="Re-emparelhar"
-                    onClick={handleReemparelharRodada}
-                    disabled={emparelhando}
-                    width="auto"
-                    height="44px"
-                    paddingHorizontal="10px"
-                    fontSize="14px"
-                    backgroundColor="#f39c12"
+                      label="Inscrever Jogador"
+                      onClick={abrirModalInscricao}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="20px"
+                      fontSize="14px"
+                      backgroundColor="#46AF87"
                   />
-
                   <Button
-                    label="Iniciar Rodada"
-                    onClick={handleIniciarRodada}
-                    disabled={iniciandoRodada}
-                    width="auto"
-                    height="44px"
-                    paddingHorizontal="10px"
-                    fontSize="14px"
-                    backgroundColor="#46AF87"
+                      label="Editar"
+                      onClick={abrirModalEdicao}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="20px"
+                      fontSize="14px"
+                      backgroundColor="#6c757d"
+                  />
+                  <Button
+                      label="Compartilhar"
+                      onClick={compartilharTorneio}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="20px"
+                      fontSize="14px"
+                      backgroundColor="#9b80b6"
+                  />
+                  <Button
+                      label={cancelandoTorneio ? "Cancelando..." : "Cancelar Torneio"}
+                      onClick={handleCancelarTorneio}
+                      disabled={cancelandoTorneio}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="20px"
+                      fontSize="14px"
+                      backgroundColor="#dc3545"
+                  />
+                  <Button
+                      label="Iniciar Torneio"
+                      onClick={handleIniciarTorneio}
+                      disabled={iniciandoTorneio}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="24px"
+                      fontSize="14px"
                   />
                 </>
-              )}
+            )}
 
-              <Button
-                label="Finalizar Torneio"
-                onClick={handleFinalizarTorneio}
-                disabled={finalizandoTorneio}
-                width="auto"
-                height="44px"
-                paddingHorizontal="10px"
-                fontSize="14px"
-                backgroundColor="#DC2626"
-              />
-              <Button
-                label="Gerenciar Inscrições"
-                onClick={handleGerenciarInscricoes}
-                width="auto"
-                height="44px"
-                paddingHorizontal="20px"
-                fontSize="14px"
-                backgroundColor="#17a2b8"
-              />
-            </>
-          )}
+            {/* Botões para torneio "Em Andamento" */}
+            {tournament.status === "Em Andamento" && (
+                <>
+                  {/* Se há rodada atual "Em Andamento" */}
+                  {rodadaSelecionada?.status === "Em Andamento" && (
+                      <Button
+                          label="Avançar Rodada"
+                          onClick={handleAvancarRodadaNovo}
+                          disabled={avancandoRodada}
+                          width="auto"
+                          height="44px"
+                          paddingHorizontal="24px"
+                          fontSize="14px"
+                          backgroundColor="#46AF87"
+                      />
+                  )}
 
-          {/* Dropdown de Rodadas - Aparece apenas para torneios em andamento ou finalizados */}
-          {tournament.status !== "Aberto" && (
-            <div className={styles.rodadaDropdownContainer}>
-            <button
-              className={styles.rodadaDropdownButton}
-              onClick={() => setDropdownAberto(!dropdownAberto)}
-            >
+                  {/* Se há rodada atual "Aguardando_Emparelhamento" */}
+                  {rodadaSelecionada?.status === "Aguardando_Emparelhamento" && (
+                      <Button
+                          label="Emparelhar Auto"
+                          onClick={handleEmparelharAutomatico}
+                          disabled={emparelhando}
+                          width="auto"
+                          height="44px"
+                          paddingHorizontal="24px"
+                          fontSize="14px"
+                          backgroundColor="#9b80b6"
+                      />
+                  )}
+
+                  {/* Se há rodada atual "Emparelhamento" */}
+                  {(rodadaSelecionada?.status === "Emparelhamento") && (
+                      <>
+                        {/* Botão Re-emparelhar - para ambos os status de emparelhamento */}
+                        <Button
+                            label="Re-emparelhar"
+                            onClick={handleReemparelharRodada}
+                            disabled={emparelhando}
+                            width="auto"
+                            height="44px"
+                            paddingHorizontal="10px"
+                            fontSize="14px"
+                            backgroundColor="#f39c12"
+                        />
+
+                        <Button
+                            label="Iniciar Rodada"
+                            onClick={handleIniciarRodada}
+                            disabled={iniciandoRodada}
+                            width="auto"
+                            height="44px"
+                            paddingHorizontal="10px"
+                            fontSize="14px"
+                            backgroundColor="#46AF87"
+                        />
+                      </>
+                  )}
+
+                  <Button
+                      label="Finalizar Torneio"
+                      onClick={handleFinalizarTorneio}
+                      disabled={finalizandoTorneio}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="10px"
+                      fontSize="14px"
+                      backgroundColor="#DC2626"
+                  />
+                  <Button
+                      label="Gerenciar Inscrições"
+                      onClick={handleGerenciarInscricoes}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="20px"
+                      fontSize="14px"
+                      backgroundColor="#17a2b8"
+                  />
+                </>
+            )}
+
+            {/* Dropdown de Rodadas - Aparece apenas para torneios em andamento ou finalizados */}
+            {tournament.status !== "Aberto" && (
+                <div className={styles.rodadaDropdownContainer}>
+                  <button
+                      className={styles.rodadaDropdownButton}
+                      onClick={() => setDropdownAberto(!dropdownAberto)}
+                  >
               <span>
                 {resultadoFinalSelecionado
-                  ? 'Resultado final'
-                  : rodadaSelecionada
-                  ? `Rodada ${rodadaSelecionada.numero_rodada} de ${rodadas.length}`
-                  : 'Selecione uma rodada'}
+                    ? 'Resultado final'
+                    : rodadaSelecionada
+                        ? `Rodada ${rodadaSelecionada.numero_rodada} de ${rodadas.length}`
+                        : 'Selecione uma rodada'}
               </span>
-              <FiChevronDown className={dropdownAberto ? styles.iconRotate : ''} />
-            </button>
+                    <FiChevronDown className={dropdownAberto ? styles.iconRotate : ''} />
+                  </button>
 
-            {dropdownAberto && (
-              <div className={styles.rodadaDropdownMenu}>
-                {rodadas.map((rodada) => (
-                  <div
-                    key={rodada.id}
-                    className={`${styles.rodadaDropdownItem} ${
-                      rodadaSelecionada?.id === rodada.id && !resultadoFinalSelecionado ? styles.rodadaAtiva : ''
-                    }`}
-                    onClick={() => handleSelecionarRodada(rodada)}
-                  >
-                    <span>Rodada {rodada.numero_rodada}</span>
-                    <span className={styles.rodadaStatus}>{rodada.status}</span>
-                  </div>
-                ))}
-                {tournament.status === "Finalizado" && (
-                  <div
-                    className={`${styles.rodadaDropdownItem} ${
-                      resultadoFinalSelecionado ? styles.rodadaAtiva : ''
-                    }`}
-                    onClick={() => handleSelecionarResultadoFinal()}
-                  >
-                    <span>🏆 Resultado final</span>
-                    <span className={styles.rodadaStatus}>Final</span>
-                  </div>
-                )}
-              </div>
+                  {dropdownAberto && (
+                      <div className={styles.rodadaDropdownMenu}>
+                        {rodadas.map((rodada) => (
+                            <div
+                                key={rodada.id}
+                                className={`${styles.rodadaDropdownItem} ${
+                                    rodadaSelecionada?.id === rodada.id && !resultadoFinalSelecionado ? styles.rodadaAtiva : ''
+                                }`}
+                                onClick={() => handleSelecionarRodada(rodada)}
+                            >
+                              <span>Rodada {rodada.numero_rodada}</span>
+                              <span className={styles.rodadaStatus}>{rodada.status}</span>
+                            </div>
+                        ))}
+                        {tournament.status === "Finalizado" && (
+                            <div
+                                className={`${styles.rodadaDropdownItem} ${
+                                    resultadoFinalSelecionado ? styles.rodadaAtiva : ''
+                                }`}
+                                onClick={() => handleSelecionarResultadoFinal()}
+                            >
+                              <span>🏆 Resultado final</span>
+                              <span className={styles.rodadaStatus}>Final</span>
+                            </div>
+                        )}
+                      </div>
+                  )}
+                </div>
             )}
-            </div>
-          )}
+          </div>
         </div>
-      </div>
 
-      {/* Layout em Grid */}
-      <div className={styles.gridContainer}>
-        {/* Coluna Esquerda - Mesas e Sobressalentes */}
-        <div className={styles.colunaEsquerda}>
-          {/* Condicional: Exibe Mesas para torneios em andamento ou Jogadores Inscritos para torneios abertos */}
-          {tournament.status === "Aberto" ? (
-            /* Jogadores Inscritos - Para torneios abertos */
-            <div className={styles.mesasCard}>
-              <h2 className={styles.cardTitulo}>Usuários inscritos</h2>
-              <span className={styles.infoJogadores}>
+        {/* Layout em Grid */}
+        <div className={styles.gridContainer}>
+          {/* Coluna Esquerda - Mesas e Sobressalentes */}
+          <div className={styles.colunaEsquerda}>
+            {/* Condicional: Exibe Mesas para torneios em andamento ou Jogadores Inscritos para torneios abertos */}
+            {tournament.status === "Aberto" ? (
+                /* Jogadores Inscritos - Para torneios abertos */
+                <div className={styles.mesasCard}>
+                  <h2 className={styles.cardTitulo}>Usuários inscritos</h2>
+                  <span className={styles.infoJogadores}>
                 {jogadoresInscritos.length} {jogadoresInscritos.length === 1 ? 'jogador' : 'jogadores'}
               </span>
-              {jogadoresInscritos.length > 0 ? (
-                  <ul className={styles.playerList}>
-                    {jogadoresInscritos.map((player, index) => (
-                        <li key={player.id} className={styles.playerItem}>
-                          <div className={styles.playerInfoLeft}>
-                            <span className={styles.numeroJogador}>{index + 1}.</span>
-                            <span className={styles.nomeJogador}>{player.username}</span>
-                          </div>
+                  {jogadoresInscritos.length > 0 ? (
+                      <ul className={styles.playerList}>
+                        {jogadoresInscritos.map((player, index) => (
+                            <li key={player.id} className={styles.playerItem}>
+                              <div className={styles.playerInfoLeft}>
+                                <span className={styles.numeroJogador}>{index + 1}.</span>
+                                <span className={styles.nomeJogador}>{player.username}</span>
+                              </div>
 
-                          <button
-                              className={styles.removePlayerBtn}
-                              onClick={() => handleRemoverInscricaoAberto(player.id, player.username)}
-                              title="Remover jogador"
-                          >
-                            <FiTrash2 size={16} />
-                          </button>
-                        </li>
-                    ))}
-                  </ul>
+                              <button
+                                  className={styles.removePlayerBtn}
+                                  onClick={() => handleRemoverInscricaoAberto(player.id, player.username)}
+                                  title="Remover jogador"
+                              >
+                                <FiTrash2 size={16} />
+                              </button>
+                            </li>
+                        ))}
+                      </ul>
 
-              ) : (
-                <div className={styles.mensagemVazia}>Nenhum jogador inscrito ainda.</div>
-              )}
-            </div>
-          ) : resultadoFinalSelecionado ? (
-            /* Ranking Final - Quando resultado final é selecionado */
-            <CardRanking
-              tournamentId={tournament.id}
-              isRankingFinal={true}
-              titulo="🏆 Ranking Final do Torneio"
-              subtitulo="Classificação final com todas as métricas"
-              mostrarMetricasAvancadas={true}
-            />
-          ) : (
-            /* Mesas Participantes - Para torneios em andamento */
-            <>
-              <div className={styles.mesasCard}>
-                <h2 className={styles.cardTitulo}>Mesas participantes</h2>
-                {erro && (
-                  <div className={styles.mensagemErro}>
-                    {erro}
-                  </div>
-                )}
-                {carregandoMesas ? (
-                  <div className={styles.loading}>Carregando mesas...</div>
-                ) : (
-                  <div className={styles.mesasGrid}>
-                    {mesas.filter(m => m.numero_mesa !== 0).length > 0 ? (
-                      mesas
-                        .filter(m => m.numero_mesa !== 0)
-                        .map((mesa) => (
-                        <MesaCard
-                            key={mesa.id}
-                            mesaId={mesa.id}
-                            numeroMesa={mesa.numero_mesa}
-                            time1={mesa.time1}
-                            time2={mesa.time2}
-                          status={mesa.status}
-                            pontuacaoTime1={mesa.pontuacao_time_1}
-                            pontuacaoTime2={mesa.pontuacao_time_2}
-                            onConfirmarResultado={handleConfirmarResultado}
-                            onEditarEmparelhamento={handleEditarEmparelhamentoMesa}
-                            showSelectsAlways={true}
-                            jogadoresDaMesa={mesa.jogadores || []}
-                            jogadoresDisponiveis={
-                              [{ id: 0, username: "--- Vazio ---"}].concat(
-                                jogadoresInscritos.map((jogador) => ({
-                                  id: jogador.id_usuario,
-                                  username: jogador.username
-                                }))
-                              )
-                            }
-                            onAlterarJogador={handleAlterarJogadorMesa}
-                            onRecarregarMesas={() => rodadaSelecionada && carregarMesasDaRodada(rodadaSelecionada)}
-                            rodadaSelecionada={rodadaSelecionada}
-                            isLoja={true}
-                          />
-                        ))
-                    ) : rodadaSelecionada?.status !== "Aguardando_Emparelhamento" ? (
-                      <p className={styles.mensagemVazia}>Nenhuma mesa criada ainda.</p>
+                  ) : (
+                      <div className={styles.mensagemVazia}>Nenhum jogador inscrito ainda.</div>
+                  )}
+                </div>
+            ) : resultadoFinalSelecionado ? (
+                /* Ranking Final - Quando resultado final é selecionado */
+                <CardRanking
+                    tournamentId={tournament.id}
+                    isRankingFinal={true}
+                    titulo="🏆 Ranking Final do Torneio"
+                    subtitulo="Classificação final com todas as métricas"
+                    mostrarMetricasAvancadas={true}
+                />
+            ) : (
+                /* Mesas Participantes - Para torneios em andamento */
+                <>
+                  <div className={styles.mesasCard}>
+                    <h2 className={styles.cardTitulo}>Mesas participantes</h2>
+                    {erro && (
+                        <div className={styles.mensagemErro}>
+                          {erro}
+                        </div>
+                    )}
+                    {carregandoMesas ? (
+                        <div className={styles.loading}>Carregando mesas...</div>
                     ) : (
-                      <div className={styles.mensagemVazia}>
-                        <p><strong>📝 Fase de Emparelhamento</strong></p>
-                        <p>Use o botão "Emparelhar Auto" acima para criar as mesas automaticamente.</p>
-                      </div>
+                        <div className={styles.mesasGrid}>
+                          {mesas.filter(m => m.numero_mesa !== 0).length > 0 ? (
+                              mesas
+                                  .filter(m => m.numero_mesa !== 0)
+                                  .map((mesa) => (
+                                      <MesaCard
+                                          key={mesa.id}
+                                          mesaId={mesa.id}
+                                          numeroMesa={mesa.numero_mesa}
+                                          time1={mesa.time1}
+                                          time2={mesa.time2}
+                                          status={mesa.status}
+                                          pontuacaoTime1={mesa.pontuacao_time_1}
+                                          pontuacaoTime2={mesa.pontuacao_time_2}
+                                          onConfirmarResultado={handleConfirmarResultado}
+                                          onEditarEmparelhamento={handleEditarEmparelhamentoMesa}
+                                          showSelectsAlways={true}
+                                          jogadoresDaMesa={mesa.jogadores || []}
+                                          jogadoresDisponiveis={
+                                            [{ id: 0, username: "--- Vazio ---"}].concat(
+                                                jogadoresInscritos.map((jogador) => ({
+                                                  id: jogador.id_usuario,
+                                                  username: jogador.username
+                                                }))
+                                            )
+                                          }
+                                          onAlterarJogador={handleAlterarJogadorMesa}
+                                          onRecarregarMesas={() => rodadaSelecionada && carregarMesasDaRodada(rodadaSelecionada)}
+                                          rodadaSelecionada={rodadaSelecionada}
+                                          isLoja={true}
+                                      />
+                                  ))
+                          ) : rodadaSelecionada?.status !== "Aguardando_Emparelhamento" ? (
+                              <p className={styles.mensagemVazia}>Nenhuma mesa criada ainda.</p>
+                          ) : (
+                              <div className={styles.mensagemVazia}>
+                                <p><strong>📝 Fase de Emparelhamento</strong></p>
+                                <p>Use o botão "Emparelhar Auto" acima para criar as mesas automaticamente.</p>
+                              </div>
+                          )}
+                        </div>
                     )}
                   </div>
-                )}
-              </div>
 
-              {/* Participantes Sobressalentes */}
-              <div className={styles.sobressalentesCard}>
-                <h2 className={styles.cardTitulo}>Participantes sobressalentes</h2>
-                <div className={styles.sobressalentesList}>
-                  {sobressalentes.length > 0 ? (
-                    sobressalentes.map((participante) => (
-                      <div key={participante.id} className={styles.sobressalenteItem}>
-                        {participante.nome}
-                      </div>
-                    ))
-                  ) : (
-                    <p className={styles.mensagemVazia}>Nenhum participante sobressalente.</p>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Coluna Direita - Informações */}
-        <div className={styles.colunaDireita}>
-          {/* Premiação */}
-          <div className={styles.cardPremiacaoWrapper}>
-            <CardSuperior
-              count={tournament.incricao_gratuita ? "Gratuito" :
-                tournament.valor_incricao ?
-                  new Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(tournament.valor_incricao) : "Não informado"}
-              label="Premiação"
-              icon={FiGift}
-              selected={false}
-            />
+                  {/* Participantes Sobressalentes */}
+                  <div className={styles.sobressalentesCard}>
+                    <h2 className={styles.cardTitulo}>Participantes sobressalentes</h2>
+                    <div className={styles.sobressalentesList}>
+                      {sobressalentes.length > 0 ? (
+                          sobressalentes.map((participante) => (
+                              <div key={participante.id} className={styles.sobressalenteItem}>
+                                {participante.nome}
+                              </div>
+                          ))
+                      ) : (
+                          <p className={styles.mensagemVazia}>Nenhum participante sobressalente.</p>
+                      )}
+                    </div>
+                  </div>
+                </>
+            )}
           </div>
 
-          {/* Informações do Torneio */}
-          <CardInfoTorneio
-            title="Informações do Torneio"
-            name={tournament.nome}
-            date={new Date(tournament.data_inicio).toLocaleDateString("pt-BR")}
-            time={new Date(tournament.data_inicio).toLocaleTimeString("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-            location={tournament.loja_nome || 'Loja não especificada'}
-            price={
-              tournament.incricao_gratuita
-                ? "Gratuito"
-                : tournament.valor_incricao
-                  ? new Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(tournament.valor_incricao)
-                  : "Não informado"
-            }
-            players={jogadoresInscritos.length}
-          />
-
-          {/* Regras da Partida */}
-          <RegrasPartida regras={regrasPartida} />
-
-          {/* Ranking - Usando componente CardRanking com métricas avançadas */}
-          {tournament.status !== "Aberto" && rodadaSelecionada && !resultadoFinalSelecionado && (
-            <CardRanking
-              tournamentId={tournament.id}
-              rodadaId={rodadaSelecionada.id}
-              titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
-              subtitulo="Pontuação acumulada com métricas avançadas"
-              limite={10}
-              mostrarMetricasAvancadas={true}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Modal Gerenciar Inscrições (LOJA) */}
-      {mostrarModalInscricoes && tournament?.id && (
-          <ModalGerenciarInscricoes
-              torneioId={tournament.id}
-              torneioStatus={tournament.status}
-              onClose={() => setMostrarModalInscricoes(false)}
-          />
-      )}
-
-
-      {/* Modal de Edição */}
-      {modalEditarAberto && (
-        <div className={modalStyles.overlayModal} onClick={fecharModalEdicao}>
-          <div className={modalStyles.modalConteudo} onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className={modalStyles.modalHeader}>
-              <h2 className={modalStyles.modalTitulo}>Editar Torneio</h2>
-              <button
-                onClick={fecharModalEdicao}
-                className={modalStyles.modalCloseButton}
-              >
-                ×
-              </button>
+          {/* Coluna Direita - Informações */}
+          <div className={styles.colunaDireita}>
+            {/* Premiação */}
+            <div className={styles.cardPremiacaoWrapper}>
+              <CardSuperior
+                  count={tournament.incricao_gratuita ? "Gratuito" :
+                      tournament.valor_incricao ?
+                          new Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(tournament.valor_incricao) : "Não informado"}
+                  label="Premiação"
+                  icon={FiGift}
+                  selected={false}
+              />
             </div>
 
-            {/* Content */}
-            {editandoTorneio ? (
-              <div className={modalStyles.loadingContainer}>
-                <div>Salvando alterações...</div>
-              </div>
-            ) : (
-              <div className={modalStyles.modalBody}>
-                {/* Informações Básicas */}
-                <div className={modalStyles.secao}>
-                  <h3 className={modalStyles.tituloSessao}>
-                    ℹ️ Informações Básicas
-                  </h3>
+            {/* Informações do Torneio */}
+            <CardInfoTorneio
+                title="Informações do Torneio"
+                name={tournament.nome}
+                date={new Date(tournament.data_inicio).toLocaleDateString("pt-BR")}
+                time={new Date(tournament.data_inicio).toLocaleTimeString("pt-BR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+                location={tournament.loja_nome || 'Loja não especificada'}
+                price={
+                  tournament.incricao_gratuita
+                      ? "Gratuito"
+                      : tournament.valor_incricao
+                          ? new Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(tournament.valor_incricao)
+                          : "Não informado"
+                }
+                players={jogadoresInscritos.length}
+            />
 
-                  <div className={modalStyles.grupoInputs}>
-                    <div className={modalStyles.inputGroup}>
-                      <label className={modalStyles.inputLabel}>
-                        Nome do Torneio *
-                      </label>
-                      <input
-                        type="text"
-                        value={editNome}
-                        onChange={(e) => setEditNome(e.target.value)}
-                        className={modalStyles.input}
-                        placeholder="Ex: Championship Commander - Janeiro 2025"
-                      />
-                    </div>
+            {/* Regras da Partida */}
+            <RegrasPartida regras={regrasPartida} />
 
-                    <div className={modalStyles.inputComIcone}>
-                      <label className={modalStyles.inputLabel}>
-                        Data e Hora *
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={editDataHora}
-                        onChange={(e) => setEditDataHora(e.target.value)}
-                        className={modalStyles.inputDatetime}
-                      />
-                    </div>
-                  </div>
+            {/* Ranking - Usando componente CardRanking com métricas avançadas */}
+            {tournament.status !== "Aberto" && rodadaSelecionada && !resultadoFinalSelecionado && (
+                <CardRanking
+                    tournamentId={tournament.id}
+                    rodadaId={rodadaSelecionada.id}
+                    titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
+                    subtitulo="Pontuação acumulada com métricas avançadas"
+                    limite={10}
+                    mostrarMetricasAvancadas={true}
+                />
+            )}
+          </div>
+        </div>
 
-                  <div className={modalStyles.textareaContainer}>
-                    <label className={modalStyles.inputLabel}>
-                      Descrição (opcional)
-                    </label>
-                    <textarea
-                      value={editDescricao}
-                      onChange={(e) => setEditDescricao(e.target.value)}
-                      className={modalStyles.textarea}
-                      placeholder="Breve descrição do torneio..."
-                      rows={4}
-                    />
-                  </div>
+        {/* Modal Gerenciar Inscrições (LOJA) */}
+        {mostrarModalInscricoes && tournament?.id && (
+            <ModalGerenciarInscricoes
+                torneioId={tournament.id}
+                torneioStatus={tournament.status}
+                onClose={() => setMostrarModalInscricoes(false)}
+            />
+        )}
+
+
+        {/* Modal de Edição */}
+        {modalEditarAberto && (
+            <div className={modalStyles.overlayModal} onClick={fecharModalEdicao}>
+              <div className={modalStyles.modalConteudo} onClick={(e) => e.stopPropagation()}>
+                {/* Header */}
+                <div className={modalStyles.modalHeader}>
+                  <h2 className={modalStyles.modalTitulo}>Editar Torneio</h2>
+                  <button
+                      onClick={fecharModalEdicao}
+                      className={modalStyles.modalCloseButton}
+                  >
+                    ×
+                  </button>
                 </div>
 
-                {/* Regras */}
-                <div className={modalStyles.secao}>
-                  <h3 className={modalStyles.tituloSessao}>
-                    📋 Regras da Partida *
-                  </h3>
-                  <textarea
-                    value={editRegras}
-                    onChange={(e) => setEditRegras(e.target.value)}
-                    className={modalStyles.textarea}
-                    placeholder="Descreva as regras do torneio..."
-                    rows={6}
+                {/* Content */}
+                {editandoTorneio ? (
+                    <div className={modalStyles.loadingContainer}>
+                      <div>Salvando alterações...</div>
+                    </div>
+                ) : (
+                    <div className={modalStyles.modalBody}>
+                      {/* Informações Básicas */}
+                      <div className={modalStyles.secao}>
+                        <h3 className={modalStyles.tituloSessao}>
+                          ℹ️ Informações Básicas
+                        </h3>
+
+                        <div className={modalStyles.grupoInputs}>
+                          <div className={modalStyles.inputGroup}>
+                            <label className={modalStyles.inputLabel}>
+                              Nome do Torneio *
+                            </label>
+                            <input
+                                type="text"
+                                value={editNome}
+                                onChange={(e) => setEditNome(e.target.value)}
+                                className={modalStyles.input}
+                                placeholder="Ex: Championship Commander - Janeiro 2025"
+                            />
+                          </div>
+
+                          <div className={modalStyles.inputComIcone}>
+                            <label className={modalStyles.inputLabel}>
+                              Data e Hora *
+                            </label>
+                            <input
+                                type="datetime-local"
+                                value={editDataHora}
+                                onChange={(e) => setEditDataHora(e.target.value)}
+                                className={modalStyles.inputDatetime}
+                            />
+                          </div>
+                        </div>
+
+                        <div className={modalStyles.textareaContainer}>
+                          <label className={modalStyles.inputLabel}>
+                            Descrição (opcional)
+                          </label>
+                          <textarea
+                              value={editDescricao}
+                              onChange={(e) => setEditDescricao(e.target.value)}
+                              className={modalStyles.textarea}
+                              placeholder="Breve descrição do torneio..."
+                              rows={4}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Regras */}
+                      <div className={modalStyles.secao}>
+                        <h3 className={modalStyles.tituloSessao}>
+                          📋 Regras da Partida *
+                        </h3>
+                        <textarea
+                            value={editRegras}
+                            onChange={(e) => setEditRegras(e.target.value)}
+                            className={modalStyles.textarea}
+                            placeholder="Descreva as regras do torneio..."
+                            rows={6}
+                        />
+                      </div>
+
+                      {/* Configuração de Inscrição */}
+                      <div className={modalStyles.secao}>
+                        <h3 className={modalStyles.tituloSessao}>
+                          💰 Inscrição
+                        </h3>
+
+                        <div className={modalStyles.grupoRadio}>
+                          <label className={modalStyles.inputLabel}>
+                            Modalidade de Inscrição *
+                          </label>
+                          <div className={modalStyles.radioGroup}>
+                            <input
+                                type="radio"
+                                id="gratuito-edit"
+                                value="gratuito"
+                                checked={editModalidadeInscricao === "gratuito"}
+                                onChange={(e) => {
+                                  setEditModalidadeInscricao(e.target.value)
+                                  if (e.target.value === "gratuito") {
+                                    setEditValorInscricao("R$ 0,00")
+                                  }
+                                }}
+                                className={modalStyles.radioInput}
+                            />
+                            <label htmlFor="gratuito-edit" className={modalStyles.radioLabel}>
+                              Gratuito
+                            </label>
+
+                            <input
+                                type="radio"
+                                id="pago-edit"
+                                value="pago"
+                                checked={editModalidadeInscricao === "pago"}
+                                onChange={(e) => setEditModalidadeInscricao(e.target.value)}
+                                className={modalStyles.radioInput}
+                            />
+                            <label htmlFor="pago-edit" className={modalStyles.radioLabel}>
+                              Pago
+                            </label>
+                          </div>
+                        </div>
+
+                        {editModalidadeInscricao === "pago" && (
+                            <div className={modalStyles.inputLimitado}>
+                              <label className={modalStyles.inputLabel}>
+                                Valor da Inscrição
+                              </label>
+                              <input
+                                  type="text"
+                                  value={editValorInscricao}
+                                  onChange={(e) => {
+                                    const formatted = formatarValorEditar(e.target.value);
+                                    setEditValorInscricao(formatted);
+                                  }}
+                                  className={modalStyles.input}
+                                  placeholder="R$ 0,00"
+                              />
+                            </div>
+                        )}
+                      </div>
+
+                      {/* Limite de Vagas */}
+                      <div className={modalStyles.secao}>
+                        <h3 className={modalStyles.tituloSessao}>
+                          👥 Limite de Vagas
+                        </h3>
+
+                        <div className={modalStyles.grupoRadio}>
+                          <label className={modalStyles.inputLabel}>
+                            Tipo de Vagas *
+                          </label>
+                          <div className={modalStyles.radioGroup}>
+                            <input
+                                type="radio"
+                                id="ilimitadas-edit"
+                                value="ilimitadas"
+                                checked={editVagasLimitadas === "ilimitadas"}
+                                onChange={(e) => {
+                                  setEditVagasLimitadas(e.target.value)
+                                  setEditCapacidadeMaxima("")
+                                }}
+                                className={modalStyles.radioInput}
+                            />
+                            <label htmlFor="ilimitadas-edit" className={modalStyles.radioLabel}>
+                              Vagas ilimitadas
+                            </label>
+
+                            <input
+                                type="radio"
+                                id="limitadas-edit"
+                                value="limitadas"
+                                checked={editVagasLimitadas === "limitadas"}
+                                onChange={(e) => setEditVagasLimitadas(e.target.value)}
+                                className={modalStyles.radioInput}
+                            />
+                            <label htmlFor="limitadas-edit" className={modalStyles.radioLabel}>
+                              Vagas limitadas
+                            </label>
+                          </div>
+                        </div>
+
+                        {editVagasLimitadas === "limitadas" && (
+                            <div className={modalStyles.inputLimitado}>
+                              <label className={modalStyles.inputLabel}>
+                                Capacidade Máxima *
+                              </label>
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <input
+                                    type="number"
+                                    value={editCapacidadeMaxima}
+                                    onChange={(e) => setEditCapacidadeMaxima(e.target.value)}
+                                    className={modalStyles.input}
+                                    placeholder="32"
+                                    min="1"
+                                    style={{ width: '120px', marginRight: '0.5rem' }}
+                                />
+                                <span style={{ color: 'var(--var-cor-cinza-placeholder)', fontSize: '14px' }}>jogadores</span>
+                              </div>
+                            </div>
+                        )}
+                      </div>
+
+                      {/* Sistema de Pontuação */}
+                      <div className={modalStyles.secao}>
+                        <h3 className={modalStyles.tituloSessao}>
+                          🎯 Sistema de Pontuação
+                        </h3>
+
+                        <div className={modalStyles.grupoInputs}>
+                          <div className={modalStyles.inputGroup}>
+                            <label className={modalStyles.inputLabel}>
+                              Vitória
+                            </label>
+                            <input
+                                type="number"
+                                value={editPontuacaoVitoria}
+                                onChange={(e) => setEditPontuacaoVitoria(e.target.value)}
+                                className={modalStyles.input}
+                                min="0"
+                            />
+                          </div>
+
+                          <div className={modalStyles.inputGroup}>
+                            <label className={modalStyles.inputLabel}>
+                              Derrota
+                            </label>
+                            <input
+                                type="number"
+                                value={editPontuacaoDerrota}
+                                onChange={(e) => setEditPontuacaoDerrota(e.target.value)}
+                                className={modalStyles.input}
+                                min="0"
+                            />
+                          </div>
+
+                          <div className={modalStyles.inputGroup}>
+                            <label className={modalStyles.inputLabel}>
+                              Empate
+                            </label>
+                            <input
+                                type="number"
+                                value={editPontuacaoEmpate}
+                                onChange={(e) => setEditPontuacaoEmpate(e.target.value)}
+                                className={modalStyles.input}
+                                min="0"
+                            />
+                          </div>
+
+                          <div className={modalStyles.inputGroup}>
+                            <label className={modalStyles.inputLabel}>
+                              Bye
+                            </label>
+                            <input
+                                type="number"
+                                value={editPontuacaoBye}
+                                onChange={(e) => setEditPontuacaoBye(e.target.value)}
+                                className={modalStyles.input}
+                                min="0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                )}
+
+                {/* Footer */}
+                <div className={modalStyles.modalFooter}>
+                  <Button
+                      label="Cancelar"
+                      onClick={fecharModalEdicao}
+                      backgroundColor="#6c757d"
+                      width="auto"
+                  />
+                  <Button
+                      label={editandoTorneio ? "Salvando..." : "Salvar Alterações"}
+                      onClick={salvarEdicaoTorneio}
+                      width="auto"
+                      disabled={editandoTorneio}
                   />
                 </div>
-
-                {/* Configuração de Inscrição */}
-                <div className={modalStyles.secao}>
-                  <h3 className={modalStyles.tituloSessao}>
-                    💰 Inscrição
-                  </h3>
-
-                  <div className={modalStyles.grupoRadio}>
-                    <label className={modalStyles.inputLabel}>
-                      Modalidade de Inscrição *
-                    </label>
-                    <div className={modalStyles.radioGroup}>
-                      <input
-                        type="radio"
-                        id="gratuito-edit"
-                        value="gratuito"
-                        checked={editModalidadeInscricao === "gratuito"}
-                        onChange={(e) => {
-                          setEditModalidadeInscricao(e.target.value)
-                          if (e.target.value === "gratuito") {
-                            setEditValorInscricao("R$ 0,00")
-                          }
-                        }}
-                        className={modalStyles.radioInput}
-                      />
-                      <label htmlFor="gratuito-edit" className={modalStyles.radioLabel}>
-                        Gratuito
-                      </label>
-
-                      <input
-                        type="radio"
-                        id="pago-edit"
-                        value="pago"
-                        checked={editModalidadeInscricao === "pago"}
-                        onChange={(e) => setEditModalidadeInscricao(e.target.value)}
-                        className={modalStyles.radioInput}
-                      />
-                      <label htmlFor="pago-edit" className={modalStyles.radioLabel}>
-                        Pago
-                      </label>
-                    </div>
-                  </div>
-
-                  {editModalidadeInscricao === "pago" && (
-                    <div className={modalStyles.inputLimitado}>
-                      <label className={modalStyles.inputLabel}>
-                        Valor da Inscrição
-                      </label>
-                      <input
-                        type="text"
-                        value={editValorInscricao}
-                        onChange={(e) => {
-                          const formatted = formatarValorEditar(e.target.value);
-                          setEditValorInscricao(formatted);
-                        }}
-                        className={modalStyles.input}
-                        placeholder="R$ 0,00"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Limite de Vagas */}
-                <div className={modalStyles.secao}>
-                  <h3 className={modalStyles.tituloSessao}>
-                    👥 Limite de Vagas
-                  </h3>
-
-                  <div className={modalStyles.grupoRadio}>
-                    <label className={modalStyles.inputLabel}>
-                      Tipo de Vagas *
-                    </label>
-                    <div className={modalStyles.radioGroup}>
-                      <input
-                        type="radio"
-                        id="ilimitadas-edit"
-                        value="ilimitadas"
-                        checked={editVagasLimitadas === "ilimitadas"}
-                        onChange={(e) => {
-                          setEditVagasLimitadas(e.target.value)
-                          setEditCapacidadeMaxima("")
-                        }}
-                        className={modalStyles.radioInput}
-                      />
-                      <label htmlFor="ilimitadas-edit" className={modalStyles.radioLabel}>
-                        Vagas ilimitadas
-                      </label>
-
-                      <input
-                        type="radio"
-                        id="limitadas-edit"
-                        value="limitadas"
-                        checked={editVagasLimitadas === "limitadas"}
-                        onChange={(e) => setEditVagasLimitadas(e.target.value)}
-                        className={modalStyles.radioInput}
-                      />
-                      <label htmlFor="limitadas-edit" className={modalStyles.radioLabel}>
-                        Vagas limitadas
-                      </label>
-                    </div>
-                  </div>
-
-                  {editVagasLimitadas === "limitadas" && (
-                    <div className={modalStyles.inputLimitado}>
-                      <label className={modalStyles.inputLabel}>
-                        Capacidade Máxima *
-                      </label>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <input
-                          type="number"
-                          value={editCapacidadeMaxima}
-                          onChange={(e) => setEditCapacidadeMaxima(e.target.value)}
-                          className={modalStyles.input}
-                          placeholder="32"
-                          min="1"
-                          style={{ width: '120px', marginRight: '0.5rem' }}
-                        />
-                        <span style={{ color: 'var(--var-cor-cinza-placeholder)', fontSize: '14px' }}>jogadores</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Sistema de Pontuação */}
-                <div className={modalStyles.secao}>
-                  <h3 className={modalStyles.tituloSessao}>
-                    🎯 Sistema de Pontuação
-                  </h3>
-
-                  <div className={modalStyles.grupoInputs}>
-                    <div className={modalStyles.inputGroup}>
-                      <label className={modalStyles.inputLabel}>
-                        Vitória
-                      </label>
-                      <input
-                        type="number"
-                        value={editPontuacaoVitoria}
-                        onChange={(e) => setEditPontuacaoVitoria(e.target.value)}
-                        className={modalStyles.input}
-                        min="0"
-                      />
-                    </div>
-
-                    <div className={modalStyles.inputGroup}>
-                      <label className={modalStyles.inputLabel}>
-                        Derrota
-                      </label>
-                      <input
-                        type="number"
-                        value={editPontuacaoDerrota}
-                        onChange={(e) => setEditPontuacaoDerrota(e.target.value)}
-                        className={modalStyles.input}
-                        min="0"
-                      />
-                    </div>
-
-                    <div className={modalStyles.inputGroup}>
-                      <label className={modalStyles.inputLabel}>
-                        Empate
-                      </label>
-                      <input
-                        type="number"
-                        value={editPontuacaoEmpate}
-                        onChange={(e) => setEditPontuacaoEmpate(e.target.value)}
-                        className={modalStyles.input}
-                        min="0"
-                      />
-                    </div>
-
-                    <div className={modalStyles.inputGroup}>
-                      <label className={modalStyles.inputLabel}>
-                        Bye
-                      </label>
-                      <input
-                        type="number"
-                        value={editPontuacaoBye}
-                        onChange={(e) => setEditPontuacaoBye(e.target.value)}
-                        className={modalStyles.input}
-                        min="0"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
               </div>
-            )}
-
-            {/* Footer */}
-            <div className={modalStyles.modalFooter}>
-              <Button
-                label="Cancelar"
-                onClick={fecharModalEdicao}
-                backgroundColor="#6c757d"
-                width="auto"
-              />
-              <Button
-                label={editandoTorneio ? "Salvando..." : "Salvar Alterações"}
-                onClick={salvarEdicaoTorneio}
-                width="auto"
-                disabled={editandoTorneio}
-              />
             </div>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {/*modal para inscrever um jogador; ele cadastra e depois inscreve-o no torneio*/}
+        {/*F5 manual para permitir que a loja inscreva +1 jogador sem precisar que se recarregue a página a cada vez*/}
+        {showModalInscricao && tournament && (
+            <ModalInscricaoJogador
+                torneioId={tournament.id}
+                torneioNome={tournament.nome}
+                onClose={fecharModalInscricaoEAatualizar}
+                onSuccess={fecharModalInscricaoEAatualizar}
+            />
+        )}
+      </div>
   );
 };
 
