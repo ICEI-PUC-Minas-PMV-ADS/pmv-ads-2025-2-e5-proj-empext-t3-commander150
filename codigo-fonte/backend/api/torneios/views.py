@@ -1,6 +1,7 @@
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+from django_filters import rest_framework as filters
 from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -78,7 +79,18 @@ class EditarEmparelhamentoSerializer(serializers.Serializer):
 
         return data
 
-
+class TorneioFilter(filters.FilterSet):
+    status = filters.CharFilter(method='filter_status')
+    
+    def filter_status(self, queryset, name, value):
+        # Divide por vírgula e remove espaços extras
+        status_list = [s.strip() for s in value.split(',')]
+        return queryset.filter(status__in=status_list)
+    
+    class Meta:
+        model = Torneio
+        fields = ['status']
+        
 class TorneioViewSet(viewsets.ModelViewSet):
     """
     Endpoint da API para gerenciamento de torneios.
@@ -92,7 +104,8 @@ class TorneioViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
     permission_classes = [IsLojaOuAdmin | IsApenasLeitura]
 
-
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = TorneioFilter  # Usa o filtro customizado para aceitar múltiplos status
 
     def get_queryset(self):
         """

@@ -8,8 +8,18 @@
   flex-direction: column;
 }
 
-h3{
+h3, h4{
   color: var(--var-cor-branca);
+}
+
+.estadoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color:  var(--var-cor-branca);
+  font-family: "Poppins", sans-serif;
 }
 
 /* HERO */

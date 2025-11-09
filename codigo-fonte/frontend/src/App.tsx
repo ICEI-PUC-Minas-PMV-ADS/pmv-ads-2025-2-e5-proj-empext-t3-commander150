@@ -7,219 +7,363 @@ import b1 from "./assets/b1.png";
 import b2 from "./assets/b2.png";
 import b3 from "./assets/b3.png";
 
-// Importa o CardTorneio já pronto
+// Componentes
 import CardTorneio from "./components/CardTorneio";
 import ModalInscricaoJogador from "./components/ModalInscricaoJogador";
-
-// Importa ícones do react-icons
-import { FaUsers } from "react-icons/fa";
-
-// Importa a Navbar
 import Navbar from "./components/Navbar";
 
-// Importa serviços e tipos
-import { buscarTorneios, tratarErroTorneio } from "./services/torneioServico";
+// Ícones
+import { FaUsers } from "react-icons/fa";
+
+// Serviços, contextos e tipos
+import { buscarTorneiosAtivos, tratarErroTorneio } from "./services/torneioServico";
 import { useSessao } from "./contextos/AuthContexto";
 import type { ITorneio } from "./tipos/tipos";
+
+// Utilitários
 import Swal from 'sweetalert2';
+
+// Constantes para configuração
+const CONFIG = {
+  PAGINA_INICIAL: 1,
+  LIMITE_TORNEIOS: 20,
+  BANNERS_PADRAO: [b1, b2, b3] as const,
+} as const;
+
+// Mapeamento de banners do backend para imagens locais
+const IMAGENS_BANNER: Record<string, string> = {
+  "b1.png": b1,
+  "b2.png": b2,
+  "b3.png": b3,
+};
+
+// ============================
+// HOOKS PERSONALIZADOS
+// ============================
+
+/**
+ * Hook para gerenciar o estado dos torneios
+ * Centraliza a lógica de carregamento, erro e dados
+ */
+const useTorneios = () => {
+  const [torneios, setTorneios] = useState<ITorneio[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  /**
+   * Carrega torneios ativos da API
+   */
+  const carregarTorneios = async () => {
+    try {
+      setCarregando(true);
+      setErro(null);
+      
+      const resposta = await buscarTorneiosAtivos(
+        CONFIG.PAGINA_INICIAL, 
+        CONFIG.LIMITE_TORNEIOS
+      );
+      
+      // Extrai torneios da resposta (suporta array direto ou formato paginado)
+      const torneiosExtraidos = extrairTorneiosDaResposta(resposta);
+      setTorneios(torneiosExtraidos);
+      
+    } catch (error) {
+      console.error("Erro ao carregar torneios:", error);
+      const mensagemErro = tratarErroTorneio(error);
+      setErro(mensagemErro);
+      setTorneios([]);
+      
+      // Mostra alerta de erro para o usuário
+      Swal.fire({
+        title: 'Erro ao carregar torneios',
+        text: mensagemErro,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  /**
+   * Recarrega os torneios (útil após ações como inscrição)
+   */
+  const recarregarTorneios = async () => {
+    await carregarTorneios();
+  };
+
+  return {
+    torneios,
+    carregando,
+    erro,
+    carregarTorneios,
+    recarregarTorneios,
+  };
+};
+
+/**
+ * Hook para gerenciar o modal de inscrição
+ */
+const useModalInscricao = (onSucessoInscricao: () => void) => {
+  const [modalAberto, setModalAberto] = useState(false);
+  const [torneioSelecionado, setTorneioSelecionado] = useState<{ 
+    id: number; 
+    nome: string 
+  } | null>(null);
+
+  const abrirModal = (torneioId: number, torneioNome: string) => {
+    setTorneioSelecionado({ id: torneioId, nome: torneioNome });
+    setModalAberto(true);
+  };
+
+  const fecharModal = () => {
+    setModalAberto(false);
+    setTorneioSelecionado(null);
+  };
+
+  const handleSucesso = () => {
+    fecharModal();
+    onSucessoInscricao();
+  };
+
+  return {
+    modalAberto,
+    torneioSelecionado,
+    abrirModal,
+    fecharModal,
+    handleSucesso,
+  };
+};
+
+// ============================
+// UTILITÁRIOS
+// ============================
+
+/**
+ * Extrai array de torneios da resposta da API
+ * Suporta tanto array direto quanto formato paginado
+ */
+const extrairTorneiosDaResposta = (resposta: any): ITorneio[] => {
+  if (Array.isArray(resposta)) {
+    return resposta;
+  }
+  
+  if (resposta?.results && Array.isArray(resposta.results)) {
+    return resposta.results;
+  }
+  
+  console.error("Estrutura de resposta inesperada:", resposta);
+  return [];
+};
+
+/**
+ * Formata data no formato DD.MM.AA
+ */
+const formatarData = (data: string): string => {
+  const date = new Date(data);
+  const dia = date.getDate().toString().padStart(2, '0');
+  const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+  const ano = date.getFullYear().toString().slice(-2);
+  return `${dia}.${mes}.${ano}`;
+};
+
+/**
+ * Formata hora no formato HH:MM
+ */
+const formatarHora = (data: string): string => {
+  return new Date(data).toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+/**
+ * Obtém imagem do banner do torneio
+ * Se não houver banner, retorna um aleatório dos padrões
+ */
+const obterImagemBanner = (banner: string | null): string => {
+  if (!banner) {
+    return CONFIG.BANNERS_PADRAO[
+      Math.floor(Math.random() * CONFIG.BANNERS_PADRAO.length)
+    ];
+  }
+
+  const nomeArquivo = banner.split('/').pop() || '';
+  return IMAGENS_BANNER[nomeArquivo] || banner;
+};
+
+/**
+ * Gera tags para exibição no card do torneio
+ * Baseado nas propriedades do torneio
+ */
+const obterTagsTorneio = (torneio: ITorneio): Array<{ 
+  texto: string; 
+  icone?: React.ReactNode 
+}> => {
+  const tags: Array<{ texto: string; icone?: React.ReactNode }> = [
+    { texto: "2v2", icone: <FaUsers /> }
+  ];
+
+  // Adiciona tag de gratuito/pago
+  tags.push({
+    texto: torneio.incricao_gratuita ? "Gratuito" : "Pago"
+  });
+
+  // Adiciona tag de vagas limitadas se aplicável
+  if (torneio.vagas_limitadas) {
+    tags.push({ texto: "Vagas limitadas" });
+  }
+
+  return tags;
+};
+
+// ============================
+// COMPONENTES DE APOIO
+// ============================
+
+/**
+ * Componente para exibir estado de carregamento
+ */
+const EstadoCarregando: React.FC = () => (
+  <div className={estilos.estadoContainer}>
+    <h4>Carregando torneios...</h4>
+  </div>
+);
+
+/**
+ * Componente para exibir estado de erro
+ */
+const EstadoErro: React.FC<{ mensagem: string }> = ({ mensagem }) => (
+  <div className={estilos.estadoContainer}>
+    <h4>Erro ao carregar torneios</h4>
+    <p>{mensagem}</p>
+  </div>
+);
+
+/**
+ * Componente para exibir quando não há torneios
+ */
+const EstadoVazio: React.FC = () => (
+  <div className={estilos.estadoContainer}>
+    <h4>Nenhum torneio disponível no momento</h4>
+  </div>
+);
+
+/**
+ * Seção Hero da landing page
+ */
+const HeroSection: React.FC = () => (
+  <section className={estilos.hero}>
+    <div className={estilos.heroConteudo}>
+      <h1 className={estilos.titulo}>Commander 150</h1>
+      <p className={estilos.subtitulo}>
+        Sistema para torneios 2v2 de Magic: The Gathering. <br />
+        Encontre seu parceiro, monte sua estratégia e domine o multiverso!
+      </p>
+    </div>
+  </section>
+);
+
+/**
+ * Seção de listagem de torneios
+ */
+interface ListaTorneiosProps {
+  torneios: ITorneio[];
+  carregando: boolean;
+  erro: string | null;
+  usuario: any;
+  onAbrirModalInscricao: (id: number, nome: string) => void;
+}
+
+const ListaTorneiosSection: React.FC<ListaTorneiosProps> = ({
+  torneios,
+  carregando,
+  erro,
+  usuario,
+  onAbrirModalInscricao,
+}) => {
+  // Renderiza estado apropriado baseado no status
+  if (carregando) return <EstadoCarregando />;
+  if (erro) return <EstadoErro mensagem={erro} />;
+  if (!torneios.length) return <EstadoVazio />;
+
+  return (
+    <div className={estilos.gridTorneios}>
+      {torneios.map((torneio) => (
+        <CardTorneio 
+          key={torneio.id}
+          id={torneio.id}
+          imagem={obterImagemBanner(torneio.banner || null)}
+          titulo={torneio.nome}
+          data={formatarData(torneio.data_inicio)}
+          hora={formatarHora(torneio.data_inicio)}
+          dataOriginal={torneio.data_inicio}
+          tags={obterTagsTorneio(torneio)}
+          loja={torneio.loja_nome}
+          status={torneio.status}
+          usuario={usuario}
+          // Técnica de conditional property - só passa onInscreverJogador se for loja
+          {...(usuario?.tipo === 'LOJA' && {
+            onInscreverJogador: () => onAbrirModalInscricao(torneio.id, torneio.nome)
+          })}
+        />
+      ))}
+    </div>
+  );
+};
+
+// ============================
+// COMPONENTE PRINCIPAL
+// ============================
 
 function App() {
   // Hook para acessar dados do usuário logado
   const { usuario } = useSessao();
   
-  // Estados para gerenciar os torneios
-  const [torneios, setTorneios] = useState<ITorneio[]>([]);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState<string | null>(null);
+  // Gerenciamento de estado dos torneios
+  const { 
+    torneios, 
+    carregando, 
+    erro, 
+    carregarTorneios, 
+    recarregarTorneios 
+  } = useTorneios();
 
-  // Estados para o modal de inscrição de jogador
-  const [modalAberto, setModalAberto] = useState(false);
-  const [torneioSelecionado, setTorneioSelecionado] = useState<{ id: number; nome: string } | null>(null);
+  // Gerenciamento do modal de inscrição
+  const {
+    modalAberto,
+    torneioSelecionado,
+    abrirModal,
+    fecharModal,
+    handleSucesso,
+  } = useModalInscricao(recarregarTorneios);
 
-  // Função para formatar data
-    const formatarData = (data: string) => {
-    const date = new Date(data);
-    const dia = date.getDate().toString().padStart(2, '0');
-    const mes = (date.getMonth() + 1).toString().padStart(2, '0');
-    const ano = date.getFullYear().toString().slice(-2);
-    return `${dia}.${mes}.${ano}`;
-  };
-
-  // Função para formatar hora
-  const formatarHora = (data: string) => {
-    return new Date(data).toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  // Mapeamento de banners do backend para imagens locais
-  const imagensBanner: { [key: string]: string } = {
-    "b1.png": b1,
-    "b2.png": b2,
-    "b3.png": b3
-  };
-
-  // Função para obter imagem do banner
-  const obterImagemBanner = (banner: string | null) => {
-    if (banner) {
-      
-      const nomeArquivo = banner.split('/').pop() || '';
-            if (imagensBanner[nomeArquivo]) {
-        return imagensBanner[nomeArquivo];
-      }
-      
-      return banner;
-    }
-    const imagens = [b1, b2, b3];
-    return imagens[Math.floor(Math.random() * imagens.length)];
-  };
-
-  // Função para obter tags do torneio
-  const obterTagsTorneio = (torneio: ITorneio) => {
-    const tags: Array<{ texto: string; icone?: React.ReactNode }> = [
-      { texto: "2v2", icone: <FaUsers /> }
-    ];
-
-    if (torneio.incricao_gratuita) {
-      tags.push({ texto: "Gratuito" });
-    } else {
-      tags.push({ texto: "Pago" });
-    }
-
-    if (torneio.vagas_limitadas) {
-      tags.push({ texto: "Vagas limitadas" });
-    }
-
-    return tags;
-  };
-
-  // Função para abrir modal de inscrição de jogador
-  const handleAbrirModalInscricao = (torneioId: number, torneioNome: string) => {
-    setTorneioSelecionado({ id: torneioId, nome: torneioNome });
-    setModalAberto(true);
-  };
-
-  // Função para fechar modal
-  const handleFecharModal = () => {
-    setModalAberto(false);
-    setTorneioSelecionado(null);
-  };
-
-  // Função para recarregar torneios após inscrição bem-sucedida
-  const handleSucessoInscricao = async () => {
-    try {
-      const resposta = await buscarTorneios(1, 20);
-      if (resposta && Array.isArray(resposta)) {
-        setTorneios(resposta);
-      } else if (resposta && resposta.results && Array.isArray(resposta.results)) {
-        setTorneios(resposta.results);
-      }
-    } catch (error) {
-      console.error("Erro ao recarregar torneios:", error);
-    }
-  };
-
-  // Buscar torneios quando o componente carregar
+  // Carrega torneios quando o componente monta
   useEffect(() => {
-    const carregarTorneios = async () => {
-      try {
-        setCarregando(true);
-        const resposta = await buscarTorneios(1, 20); // Buscar primeira página com até 20 torneios
-        
-        // Verificar se a resposta tem a estrutura esperada
-        if (resposta && Array.isArray(resposta)) {
-          // API retorna array direto
-          setTorneios(resposta);
-          setErro(null);
-        } else if (resposta && resposta.results && Array.isArray(resposta.results)) {
-          // API retorna formato paginado
-          setTorneios(resposta.results);
-          setErro(null);
-        } else {
-          console.error("Estrutura de resposta inesperada:", resposta);
-          setTorneios([]);
-          setErro("Formato de resposta inesperado da API");
-        }
-      } catch (error) {
-        console.error("Erro ao carregar torneios:", error);
-        const mensagemErro = tratarErroTorneio(error);
-        setErro(mensagemErro);
-        setTorneios([]); // Garantir que torneios seja um array vazio em caso de erro
-        
-        Swal.fire({
-          title: 'Erro ao carregar torneios',
-          text: mensagemErro,
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      } finally {
-        setCarregando(false);
-      }
-    };
-
     carregarTorneios();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={estilos.app}>
       {/* Navbar sempre visível */}
       <Navbar />
 
-      {/* HERO */}
-      <section className={estilos.hero}>
-        <div className={estilos.heroConteudo}>
-          <h1 className={estilos.titulo}>Commander 150</h1>
-          <p className={estilos.subtitulo}>
-            Sistema para torneios 2v2 de Magic: The Gathering. <br />
-            Encontre seu parceiro, monte sua estratégia e domine o multiverso!
-          </p>
-        </div>
-      </section>
+      {/* Seção Hero */}
+      <HeroSection />
 
-      {/* LISTAGEM DE TORNEIOS */}
+      {/* Seção de Listagem de Torneios */}
       <section className={estilos.listaTorneios}>
         <h2 className={estilos.tituloSecao}>
           {usuario?.tipo === 'LOJA' ? 'Meus torneios' : 'Torneios disponíveis'}
         </h2>
         
-        {carregando ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <h3>Carregando torneios...</h3>
-          </div>
-        ) : erro ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <h3>Erro ao carregar torneios</h3>
-            <p>{erro}</p>
-          </div>
-        ) : !torneios || torneios.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <h3>Nenhum torneio disponível no momento</h3>
-          </div>
-        ) : (
-          <div className={estilos.gridTorneios}>
-            {torneios && torneios.map((torneio) => (
-              <CardTorneio 
-                key={torneio.id}
-                id={torneio.id}
-                imagem={obterImagemBanner(torneio.banner || null)}
-                titulo={torneio.nome}
-                data={formatarData(torneio.data_inicio)}
-                hora={formatarHora(torneio.data_inicio)}
-                dataOriginal={torneio.data_inicio}
-                tags={obterTagsTorneio(torneio)}
-                loja={torneio.loja_nome}
-                status={torneio.status}
-                usuario={usuario}
-                onInscreverJogador={
-                  usuario?.tipo === 'LOJA' 
-                    ? () => handleAbrirModalInscricao(torneio.id, torneio.nome)
-                    : undefined
-                }
-              />
-            ))}
-          </div>
-        )}
+        <ListaTorneiosSection
+          torneios={torneios}
+          carregando={carregando}
+          erro={erro}
+          usuario={usuario}
+          onAbrirModalInscricao={abrirModal}
+        />
       </section>
 
       {/* Modal de inscrição de jogador */}
@@ -227,8 +371,8 @@ function App() {
         <ModalInscricaoJogador
           torneioId={torneioSelecionado.id}
           torneioNome={torneioSelecionado.nome}
-          onClose={handleFecharModal}
-          onSuccess={handleSucessoInscricao}
+          onClose={fecharModal}
+          onSuccess={handleSucesso}
         />
       )}
     </div>

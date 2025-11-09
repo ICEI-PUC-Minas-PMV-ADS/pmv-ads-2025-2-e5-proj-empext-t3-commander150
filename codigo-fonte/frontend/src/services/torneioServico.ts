@@ -24,23 +24,52 @@ import { AxiosError } from "axios";
 import type { AxiosResponse } from "axios";
 
 /**
- * Busca todos os torneios com paginação.
+ * Busca todos os torneios com paginação e filtro opcional por status.
  * 
  * @param pagina - Número da página (opcional, padrão: 1)
  * @param limite - Quantidade de itens por página (opcional, padrão: 10)
+ * @param status - Filtro opcional por status do torneio
  * @returns Lista paginada de torneios
  */
 export const buscarTorneios = async (
   pagina: number = 1, 
-  limite: number = 10
+  limite: number = 10,
 ): Promise<IListaTorneios> => {
   const resposta = await api.get('/torneios/torneios/', {
     params: {
       page: pagina,
-      page_size: limite
+      page_size: limite,
     }
   });
   return resposta.data;
+};
+
+/** Busca torneios por status com paginação.
+ * 
+ * @param pagina - Número da página (opcional, padrão: 1)
+ * @param limite - Quantidade de itens por página (opcional, padrão: 10)
+ * @param status - Status ou lista de status para filtrar
+ * @returns Lista paginada de torneios filtrados por status
+ * */
+export const buscarTorneiosPorStatus = async (
+  pagina: number = 1, 
+  limite: number = 10,
+  status?: string | string[]
+): Promise<IListaTorneios> => {
+  const resposta = await api.get('/torneios/torneios/', {
+    params: {
+      page: pagina,
+      page_size: limite,
+      status: Array.isArray(status) ? status.join(',') : status
+    }
+  });
+  return resposta.data;
+};
+
+/** Busca torneios com status Aberto ou Em Andamento.
+ * **/
+export const buscarTorneiosAtivos = async (): Promise<IListaTorneios> => {
+  return buscarTorneiosPorStatus(1, 10, ['Aberto', 'Em Andamento']);
 };
 
 /**
@@ -136,28 +165,6 @@ export const removerTorneio = async (id: number): Promise<void> => {
   await api.delete(`/torneios/torneios/${id}/`);
 };
 
-/**
- * Busca torneios por status.
- * 
- * @param status - Status dos torneios a buscar
- * @param pagina - Número da página (opcional, padrão: 1)
- * @param limite - Quantidade de itens por página (opcional, padrão: 10)
- * @returns Lista paginada de torneios com o status especificado
- */
-export const buscarTorneiosPorStatus = async (
-  status: string,
-  pagina: number = 1, 
-  limite: number = 10
-): Promise<IListaTorneios> => {
-  const resposta = await api.get('/torneios/torneios/', {
-    params: {
-      status: status,
-      page: pagina,
-      page_size: limite
-    }
-  });
-  return resposta.data;
-};
 
 /**
  * Busca torneios por loja.
