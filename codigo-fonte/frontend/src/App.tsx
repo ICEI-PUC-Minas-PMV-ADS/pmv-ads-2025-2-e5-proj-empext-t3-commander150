@@ -58,10 +58,7 @@ const useTorneios = () => {
       setCarregando(true);
       setErro(null);
       
-      const resposta = await buscarTorneiosAtivos(
-        CONFIG.PAGINA_INICIAL, 
-        CONFIG.LIMITE_TORNEIOS
-      );
+      const resposta = await buscarTorneiosAtivos();
       
       // Extrai torneios da resposta (suporta array direto ou formato paginado)
       const torneiosExtraidos = extrairTorneiosDaResposta(resposta);
