@@ -37,7 +37,7 @@ export interface ITorneioCriacao {
   descricao?: string;
   status: string;
   regras: string;
-  banner?: File;
+  banner?: string;
   vagas_limitadas: boolean;
   qnt_vagas?: number;
   incricao_gratuita: boolean;
