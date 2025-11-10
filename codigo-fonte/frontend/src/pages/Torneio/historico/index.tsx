@@ -10,6 +10,7 @@ import {
     buscarAgrupadoPorAba,
     buscarAgrupadoPorAbaLoja,
     desinscreverDoTorneio,
+    contarInscritosTorneio,
 } from "../../../services/torneioServico";
 import Swal from "sweetalert2";
 import { useSessao } from "../../../contextos/AuthContexto";
@@ -113,18 +114,42 @@ const HistoricoTorneios: React.FC = () => {
         setErro(null);
         try {
             if (isLoja) {
+                // LOJA: funcao auxiliar para trazer o total de inscritos em cada torneio.
                 const { seus, andamento, historico } = await buscarAgrupadoPorAbaLoja();
-                setInscritos(seus || []);
-                setAndamento(andamento || []);
-                setHistorico(historico || []);
+
+                const anexarQtdInscritos = async (lista: any[]) => {
+                    return Promise.all(
+                        (lista || []).map(async (t) => {
+                            try {
+                                const total = await contarInscritosTorneio(t.id); // loja enxerga todos
+                                return { ...t, qnt_inscritos: total };
+                            } catch {
+                                return t;
+                            }
+                        })
+                    );
+                };
+
+                const [seusComQtd, andamentoComQtd, historicoComQtd] = await Promise.all([
+                    anexarQtdInscritos(seus),
+                    anexarQtdInscritos(andamento),
+                    anexarQtdInscritos(historico),
+                ]);
+
+                setInscritos(seusComQtd);
+                setAndamento(andamentoComQtd);
+                setHistorico(historicoComQtd);
             } else {
+                // JOGADOR: nao se tentará contar porque a API devolve somente a própria inscrição (regra do backend)
                 const { abertos, andamento, historico } = await buscarAgrupadoPorAba();
+
                 setInscritos(abertos || []);
                 setAndamento(andamento || []);
                 setHistorico(historico || []);
             }
         } catch (e: any) {
-            setErro("Não foi possível carregar seus torneios.");
+            console.error(e);
+            setErro("Não foi possível carregar os torneios.");
         } finally {
             setCarregando(false);
         }
@@ -251,19 +276,21 @@ const HistoricoTorneios: React.FC = () => {
                 : t.valor_incricao
                     ? `R$ ${String(t.valor_incricao).replace(".", ",")}`
                     : "—",
-            players: Number(t.qnt_inscritos ?? t.inscritos ?? 0),
+
+            ...(isLoja ? {players: Number(t.qnt_inscritos ?? t.inscritos ?? 0) } : {}),
             tournamentId: t.id,
+
         };
     };
 
-    // Renderiza ações (botões)
+    // Renderizacao de acoes (botoes)
     const renderActionFor = (t: any) => {
-        // ✅ Mostrar ações somente na ABA "inscritos" (Abertos)
+        // passa a mostrar ações somente na ABA "inscritos" (Abertos)
         if (aba !== "inscritos") return null;
 
         const tid = Number(t.id);
 
-        // Se for LOJA, mostrar botão de inscrever jogador
+        // Se for LOJA, mostrar botao de inscrever jogador
         if (isLoja) {
             return (
                  <div onClick={(e) => e.stopPropagation()}> {/* Div que para a propagação */}
@@ -280,7 +307,7 @@ const HistoricoTorneios: React.FC = () => {
             );
         }
 
-        // Se for JOGADOR, mostrar botão Desinscrever-se
+        // Se for JOGADOR, mostrar botao Desinscrever-se
         return (
             <Button
                 label={loadingAcao[tid] ? "Desinscrevendo..." : "Desinscrever-se"}
@@ -376,6 +403,7 @@ const HistoricoTorneios: React.FC = () => {
                                     <CardInfoTorneio
                                         key={t.id}
                                         {...mapToCardInfo(t)}
+                                        hidePlayers={!isLoja}
                                         action={renderActionFor(t)}
                                         onClick={() => handleCardClick(t.id)} // Passa a função de clique
                                     />

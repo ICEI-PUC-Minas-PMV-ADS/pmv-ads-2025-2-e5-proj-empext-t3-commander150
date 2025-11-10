@@ -71,8 +71,9 @@ const CardTorneio = ({
 
   // Função para lidar com o clique no card
   const handleClick = async () => {
-    // Se for loja, não navega ao clicar no card
+    // Se for loja, navega para página de histórico na aba "Seus Torneios"
     if (usuario?.tipo === 'LOJA') {
+      navigate('/historico/');
       return;
     }
 

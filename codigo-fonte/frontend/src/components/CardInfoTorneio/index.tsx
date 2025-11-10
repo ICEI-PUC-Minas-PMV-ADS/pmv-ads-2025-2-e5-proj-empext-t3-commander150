@@ -10,11 +10,12 @@ interface CardInfoTorneioProps {
   time: string;
   location: string;
   price: string;
-  players: number;
+  players?: number;
   className?: string;
   tournamentId?: number;
   action?: React.ReactNode;
   onClick?: () => void; // Nova prop para handle click
+  hidePlayers?: boolean;
 }
 
 const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
@@ -29,6 +30,7 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
   tournamentId,
   action,
   onClick, // Recebe a função via prop
+  hidePlayers = false,
 }) => {
   return (
     <div
@@ -55,9 +57,11 @@ const CardInfoTorneio: React.FC<CardInfoTorneioProps> = ({
         <div>
           <FaMoneyBillWave /> {price}
         </div>
-        <div>
-          <FiUsers /> {players} jogadores inscritos
-        </div>
+        {!hidePlayers && players !== undefined && (
+            <div>
+              <FiUsers /> {players} jogadores inscritos
+            </div>
+        )}
       </div>
 
       {action ? <div className={styles.actions}>{action}</div> : null}
