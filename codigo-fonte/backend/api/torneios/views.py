@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from django.utils import timezone
 
 from django.db import transaction
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Case, When, Value, IntegerField
 import random
 
 from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador, RankingParcial
@@ -109,14 +109,35 @@ class TorneioViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Retorna lista de torneios com filtros apropriados.
+        Retorna lista de torneios com filtros apropriados e ordenação híbrida.
+
+        Ordenação:
+        1. Por status (prioridade):
+           - Em Andamento (prioridade 1)
+           - Aberto (prioridade 2)
+           - Outros status (prioridade 3)
+        2. Por data de início (crescente)
+
+        Filtros:
         - Admins: Veem todos os torneios
         - Lojas: Veem apenas seus próprios torneios
         - Outros: Veem todos (somente leitura)
         """
+        # Define a ordenação híbrida por status e data
+        queryset_base = Torneio.objects.annotate(
+            prioridade=Case(
+                When(status='Em Andamento', then=Value(1)),
+                When(status='Aberto', then=Value(2)),
+                default=Value(3),
+                output_field=IntegerField()
+            )
+        ).order_by('prioridade', 'data_inicio')
+
+        # Aplica filtro específico para lojas
         if self.request.user.is_authenticated and self.request.user.tipo == 'LOJA':
-            return Torneio.objects.filter(id_loja=self.request.user)
-        return Torneio.objects.all()
+            return queryset_base.filter(id_loja=self.request.user)
+
+        return queryset_base
 
     @swagger_auto_schema(
         request_body=TorneioSerializer,
