@@ -68,7 +68,7 @@ const InformacaoTorneio: React.FC = () => {
               hour: "2-digit",
               minute: "2-digit",
             })}
-            location={`Loja ${torneio.id_loja}`}
+            location={`Loja ${torneio.loja_nome}`}
             price={
               torneio.incricao_gratuita
                 ? "Gratuito"
@@ -79,7 +79,8 @@ const InformacaoTorneio: React.FC = () => {
                   }).format(torneio.valor_incricao)
                   : "Não informado"
             }
-            players={torneio.qnt_vagas || 0}
+            hidePlayers
+            //players={torneio.qnt_vagas || 0}
           />
           </div>
           <div className={styles.CardDescricao}>
