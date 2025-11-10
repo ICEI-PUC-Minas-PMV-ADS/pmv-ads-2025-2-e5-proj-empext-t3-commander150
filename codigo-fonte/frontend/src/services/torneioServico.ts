@@ -634,7 +634,7 @@ export const editarEmparelhamentoManual = async (
   return response.data;
 };
 
-// Função para finalizar torneio (mantém compatibilidade)
+// Função para  (mantém compatibilidade)
 export const finalizarTorneio = async (id: number): Promise<{
   message: string;
   ranking: Array<{
@@ -662,6 +662,20 @@ export const cancelarTorneio = async (id: number): Promise<{
   const resposta = await api.post(`/torneios/torneios/${id}/cancelar/`, {
     confirmacao: true
   });
+  return resposta.data;
+};
+
+/**
+ * Inscreve um jogador existente em um torneio usando apenas o email
+ *
+ * @param dadosInscricao - Dados da inscrição (torneio_id e email)
+ * @returns Confirmação da inscrição
+ */
+export const inscreverJogadorPorEmail = async (dadosInscricao: {
+  torneio_id: number;
+  email: string;
+}): Promise<{ message: string; inscricao: any }> => {
+  const resposta = await api.post('/torneios/inscricoes/inscrever_por_email/', dadosInscricao);
   return resposta.data;
 };
 
@@ -862,4 +876,3 @@ export async function reativarJogadorNoTorneioComoLoja(
       { withCredentials: true }
   );
 }
-
