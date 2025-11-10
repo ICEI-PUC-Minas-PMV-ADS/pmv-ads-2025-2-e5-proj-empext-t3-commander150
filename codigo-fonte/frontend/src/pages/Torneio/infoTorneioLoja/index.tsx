@@ -1753,7 +1753,6 @@ const InformacaoTorneioLoja: React.FC = () => {
                     rodadaId={rodadaSelecionada.id}
                     titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
                     subtitulo="Pontuação acumulada com métricas avançadas"
-                    limite={10}
                     mostrarMetricasAvancadas={true}
                 />
             )}
