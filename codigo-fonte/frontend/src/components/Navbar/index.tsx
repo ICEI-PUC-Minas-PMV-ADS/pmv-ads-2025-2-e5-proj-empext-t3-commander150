@@ -223,7 +223,7 @@ export default function Navbar() {
                     </button>
                     <button
                       className="mobile-dropdown-item"
-                      onClick={() => handleNavItemClick("/cadastro")}
+                      onClick={() => handleNavItemClick("/cadastrar")}
                     >
                       Cadastrar
                     </button>
