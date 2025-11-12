@@ -69,7 +69,9 @@ export default function Intervalo() {
       text: 'Sua partida foi finalizada com sucesso',
       icon: 'success',
       confirmButtonText: 'OK'
-    });
+    }).then(() => {
+    window.location.reload();
+  });
   };
 
   const verificarEAtualizarMesa = async () => {
@@ -292,12 +294,21 @@ export default function Intervalo() {
     <div className={styles.container}>
       {/* CABEÇALHO */}
       <div className={styles.header}>
-        <div>
-          <h1 className={styles.titulo}>Intervalo</h1>
-          <p className={styles.subtitulo}>
-            {torneio?.nome}
-          </p>
-        </div>
+        {resultadoFinalSelecionado ? (
+          <div>
+            <h1 className={styles.titulo}>Resultado Final</h1>
+            <p className={styles.subtitulo}>
+              {torneio?.nome}
+            </p>
+          </div> 
+        ): (
+          <div>
+            <h1 className={styles.titulo}>Intervalo</h1>
+            <p className={styles.subtitulo}>
+              {torneio?.nome}
+            </p>
+          </div> 
+        )}
         <div className={styles.rodadaBadge}>
           <DropdownRodadas
             tournamentId={torneio?.id}
@@ -308,7 +319,7 @@ export default function Intervalo() {
             tournamentStatus={torneio?.status}
           />
         </div>
-      </div>
+    </div>
       <div className={styles.gridContainer}>
         {/* COLUNA ESQUERDA - Conteúdo principal baseado na seleção */}
         <div className={styles.colunaEsquerda}>
