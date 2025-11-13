@@ -197,21 +197,6 @@ const CardRanking: React.FC<RankingProps> = ({
                   {/* Métricas avançadas - só mostra se estiver habilitado E tiver dados */}
                   {(mostrarMetricasAvancadas && temMetricasAvancadas) && jogador.mw_percentage !== undefined && (
                     <div className={styles.metricas}>
-                      <div className={styles.metricaItem} title="Match Win % - Seu aproveitamento individual">
-                        <span className={styles.metricaLabel}>MW%:</span>
-                        <span className={styles.metricaValor}>{formatarPorcentagem(jogador.mw_percentage)}</span>
-                      </div>
-
-                      <div className={styles.metricaItem} title="Opponent Match Win % - Força dos seus oponentes">
-                        <span className={styles.metricaLabel}>OMW%:</span>
-                        <span className={styles.metricaValor}>{formatarPorcentagem(jogador.omw_percentage)}</span>
-                      </div>
-
-                      <div className={styles.metricaItem} title="Partner Match Win % - Força dos seus parceiros">
-                        <span className={styles.metricaLabel}>PMW%:</span>
-                        <span className={styles.metricaValor}>{formatarPorcentagem(jogador.pmw_percentage)}</span>
-                      </div>
-
                       <div
                         className={`${styles.metricaItem} ${styles.metricaBalanco} ${classeBalanco}`}
                         title="Balanço (OMW% - PMW%) - Mérito individual. Positivo = venceu com parceiros fracos. Negativo = teve parceiros fortes."
@@ -221,6 +206,21 @@ const CardRanking: React.FC<RankingProps> = ({
                           <span className={styles.iconeBalanco}>{iconeBalanco}</span>
                           {formatarBalanco(jogador.balanco)}
                         </span>
+                      </div>
+
+                      <div className={styles.metricaItem} title="Opponent Match Win % - Força dos seus oponentes">
+                        <span className={styles.metricaLabel}>OMW%:</span>
+                        <span className={styles.metricaValor}>{formatarPorcentagem(jogador.omw_percentage)}</span>
+                      </div>
+
+                      <div className={styles.metricaItem} title="Match Win % - Seu aproveitamento individual">
+                        <span className={styles.metricaLabel}>MW%:</span>
+                        <span className={styles.metricaValor}>{formatarPorcentagem(jogador.mw_percentage)}</span>
+                      </div>
+
+                      <div className={styles.metricaItem} title="Partner Match Win % - Força dos seus parceiros">
+                        <span className={styles.metricaLabel}>PMW%:</span>
+                        <span className={styles.metricaValor}>{formatarPorcentagem(jogador.pmw_percentage)}</span>
                       </div>
                     </div>
                   )}

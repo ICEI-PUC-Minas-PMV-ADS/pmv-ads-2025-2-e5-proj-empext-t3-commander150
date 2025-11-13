@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from django.utils import timezone
 
 from django.db import transaction
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Case, When, Value, IntegerField
 import random
 
 from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador, RankingParcial
@@ -109,14 +109,35 @@ class TorneioViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Retorna lista de torneios com filtros apropriados.
+        Retorna lista de torneios com filtros apropriados e ordenação híbrida.
+
+        Ordenação:
+        1. Por status (prioridade):
+           - Em Andamento (prioridade 1)
+           - Aberto (prioridade 2)
+           - Outros status (prioridade 3)
+        2. Por data de início (crescente)
+
+        Filtros:
         - Admins: Veem todos os torneios
         - Lojas: Veem apenas seus próprios torneios
         - Outros: Veem todos (somente leitura)
         """
+        # Define a ordenação híbrida por status e data
+        queryset_base = Torneio.objects.annotate(
+            prioridade=Case(
+                When(status='Em Andamento', then=Value(1)),
+                When(status='Aberto', then=Value(2)),
+                default=Value(3),
+                output_field=IntegerField()
+            )
+        ).order_by('prioridade', 'data_inicio')
+
+        # Aplica filtro específico para lojas
         if self.request.user.is_authenticated and self.request.user.tipo == 'LOJA':
-            return Torneio.objects.filter(id_loja=self.request.user)
-        return Torneio.objects.all()
+            return queryset_base.filter(id_loja=self.request.user)
+
+        return queryset_base
 
     @swagger_auto_schema(
         request_body=TorneioSerializer,
@@ -1124,6 +1145,84 @@ class InscricaoViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
 
 
+    @action(detail=False, methods=['post'], permission_classes=[IsLojaOuAdmin])
+    def inscrever_por_email(self, request):
+        """
+        Permite que lojistas inscrevam jogadores existentes em torneios apenas informando o email.
+        """
+        torneio_id = request.data.get('torneio_id')
+        email = request.data.get('email')
+
+        if not torneio_id or not email:
+            return Response(
+                {"detail": "torneio_id e email são obrigatórios"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            torneio = Torneio.objects.get(id=torneio_id)
+        except Torneio.DoesNotExist:
+            return Response(
+                {"detail": "Torneio não encontrado"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Verificar se o torneio pertence à loja (ou se é admin)
+        print(f"User tipo: {request.user.tipo}, Torneio loja: {torneio.id_loja}, User: {request.user}")
+        if request.user.tipo != 'ADMIN' and torneio.id_loja != request.user:
+            return Response(
+                {"detail": "Acesso negado a este torneio"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Validar status do torneio
+        if torneio.status != 'Aberto':
+            return Response(
+                {"detail": "Só é possível inscrever jogadores em torneios com status 'Aberto'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            usuario = Usuario.objects.get(email=email, tipo='JOGADOR')
+        except Usuario.DoesNotExist:
+            return Response(
+                {"detail": f"Nenhum jogador encontrado com o email {email}"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Verificar se o jogador já está inscrito
+        if Inscricao.objects.filter(id_usuario=usuario, id_torneio=torneio).exists():
+            return Response(
+                {"detail": f"O jogador {usuario.username} já está inscrito neste torneio"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Verificar limite de vagas se aplicável
+        if torneio.vagas_limitadas and torneio.qnt_vagas is not None:
+            inscritos_ativos = Inscricao.objects.filter(
+                id_torneio=torneio
+            ).exclude(status='Cancelado').count()
+
+            if inscritos_ativos >= torneio.qnt_vagas:
+                return Response(
+                    {"detail": "Limite de vagas atingido para este torneio"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        # Criar inscrição
+        inscricao = Inscricao.objects.create(
+            id_usuario=usuario,
+            id_torneio=torneio,
+            status='Inscrito'
+        )
+
+        serializer = InscricaoSerializer(inscricao)
+        return Response({
+            'message': f'Jogador {usuario.username} inscrito com sucesso no torneio',
+            'inscricao': serializer.data
+        }, status=status.HTTP_201_CREATED)
+
+
 class RodadaViewSet(viewsets.ModelViewSet):
     """
     Endpoint para visualizar e gerenciar as rodadas de um torneio.
@@ -1361,6 +1460,7 @@ class RodadaViewSet(viewsets.ModelViewSet):
             jogadores_sobressalentes = []
 
         return Response(list(jogadores_sobressalentes), status=200)
+
 
     @swagger_auto_schema(
         method='get',

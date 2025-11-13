@@ -1670,6 +1670,7 @@ const InformacaoTorneioLoja: React.FC = () => {
                                           onRecarregarMesas={() => rodadaSelecionada && carregarMesasDaRodada(rodadaSelecionada)}
                                           rodadaSelecionada={rodadaSelecionada}
                                           isLoja={true}
+                                          torneioStatus={tournament.status}
                                       />
                                   ))
                           ) : rodadaSelecionada?.status !== "Aguardando_Emparelhamento" ? (
@@ -1753,7 +1754,6 @@ const InformacaoTorneioLoja: React.FC = () => {
                     rodadaId={rodadaSelecionada.id}
                     titulo={`🏆 Ranking - Rodada ${rodadaSelecionada.numero_rodada}`}
                     subtitulo="Pontuação acumulada com métricas avançadas"
-                    limite={10}
                     mostrarMetricasAvancadas={true}
                 />
             )}

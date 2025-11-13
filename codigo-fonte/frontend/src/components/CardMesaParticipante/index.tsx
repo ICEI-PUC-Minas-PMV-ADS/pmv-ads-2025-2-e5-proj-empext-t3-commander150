@@ -32,6 +32,7 @@ interface MesaCardProps {
   rodadaSelecionada?: any; // informação da rodada selecionada
   onRecarregarMesas?: () => void; // callback para recarregar mesas
   isLoja?: boolean; // indica se o usuário atual é loja
+  torneioStatus?: string; // status do torneio (para verificar se está finalizado)
 }
 
 const MesaCard: React.FC<MesaCardProps> = ({
@@ -52,13 +53,18 @@ const MesaCard: React.FC<MesaCardProps> = ({
   rodadaSelecionada,
   onRecarregarMesas,
   isLoja = false,
+  torneioStatus,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isResultadoModalOpen, setIsResultadoModalOpen] = useState(false);
 
   const handleEditClick = () => {
-    // Se for loja e rodada estiver em andamento, abrir modal de resultado
-    if (isLoja && rodadaSelecionada?.status?.toLowerCase()?.includes("andamento")) {
+    // Se for loja e rodada estiver em andamento ou finalizada, abrir modal de resultado
+    // Só permite edição se o torneio estiver "Em Andamento"
+    const statusLower = rodadaSelecionada?.status?.toLowerCase();
+    const torneioEmAndamento = torneioStatus?.toLowerCase().includes("andamento");
+
+    if (isLoja && torneioEmAndamento && (statusLower?.includes("andamento") || statusLower?.includes("finalizad"))) {
       setIsResultadoModalOpen(true);
     } else {
       setIsModalOpen(true);
@@ -99,8 +105,8 @@ const MesaCard: React.FC<MesaCardProps> = ({
       <div className={styles.mesaContainer}>
         <div className={styles.header}>
           <h3 className={styles.title}>Mesa {numeroMesa}</h3>
-          {/* Botão de edição para loja informar resultados */}
-          {(isLoja && statusRodadaLower?.includes("andamento") && !emFaseEmparelhamento) && (
+          {/* Botão de edição para loja informar resultados - só aparece se torneio estiver "Em Andamento" */}
+          {(isLoja && torneioStatus?.toLowerCase().includes("andamento") && (statusRodadaLower?.includes("andamento") || statusRodadaLower?.includes("finalizad")) && !emFaseEmparelhamento) && (
             <button className={styles.editButton} onClick={handleEditClick}>
               <FiEdit />
             </button>

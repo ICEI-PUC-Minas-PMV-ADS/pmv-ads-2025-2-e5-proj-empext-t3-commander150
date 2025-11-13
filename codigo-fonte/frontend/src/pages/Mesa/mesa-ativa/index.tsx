@@ -9,9 +9,10 @@ import Swal from 'sweetalert2';
 import { CardSuperior } from '../../../components/CardSuperior';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
+import CardRanking from '../../../components/CardRanking';
+import RegrasPartida from '../../../components/CardRegrasPartida';
 import { BsGrid3X3Gap } from 'react-icons/bs';
 import { GiPodium } from 'react-icons/gi';
-import { FaDollarSign } from 'react-icons/fa';
 
 interface MesaAtivaProps {
   rodadaId: number;
@@ -211,35 +212,26 @@ export default function MesaAtivaComponent({
         </div>
       </div>
 
-      <div className={styles.gridContainer}>
-        <div className={styles.cardsEsquerda}>
-          <CardSuperior
-            count={mesa.numero_mesa === 0 ? "BYE" : mesa.numero_mesa}
-            label="Sua Mesa"
-            icon={BsGrid3X3Gap}
-            selected={false}
-          />
-          <CardSuperior
-            count={mesa.numero_rodada}
-            secondaryCount={torneio?.quantidade_rodadas || undefined}
-            label="Rodada"
-            icon={GiPodium}
-            selected={false}
-          />
-        </div>
-        <div className={styles.cardsDireita}>
-          <CardSuperior
-            count={torneio?.valor_incricao || 0}
-            label="Premiação"
-            icon={FaDollarSign}
-            selected={false}
-          />
-        </div>
-      </div>
-
       {/* CONTEÚDO PRINCIPAL */}
       <div className={styles.gridContainer}>
         <div className={styles.colunaEsquerda}>
+          {/* Cards Superiores */}
+          <div className={styles.cardsEsquerda}>
+            <CardSuperior
+              count={mesa.numero_mesa === 0 ? "BYE" : mesa.numero_mesa}
+              label="Sua Mesa"
+              icon={BsGrid3X3Gap}
+              selected={false}
+            />
+            <CardSuperior
+              count={mesa.numero_rodada}
+              secondaryCount={torneio?.quantidade_rodadas || undefined}
+              label="Rodada"
+              icon={GiPodium}
+              selected={false}
+            />
+          </div>
+
           {/* Sua Partida */}
           <div className={styles.partidaCard}>
             <h2 className={styles.cardTitulo}>Sua Partida - Mesa {mesa.numero_mesa}</h2>
@@ -317,6 +309,23 @@ export default function MesaAtivaComponent({
               backgroundColor="var(--var-cor-secundaria)"
             />
           </div>
+        </div>
+
+        {/* COLUNA DIREITA - Ranking e Regras */}
+        <div className={styles.colunaDireita}>
+          {/* Ranking da Rodada */}
+          <CardRanking
+            tournamentId={torneioId}
+            rodadaId={rodadaId}
+            titulo={`🏆 Ranking - Rodada ${mesa.numero_rodada}`}
+            subtitulo="Pontuação acumulada com métricas avançadas"
+            mostrarMetricasAvancadas={true}
+          />
+
+          {/* Regras da Partida */}
+          {regras && (
+            <RegrasPartida regras={regras} />
+          )}
         </div>
       </div>
     </div>
