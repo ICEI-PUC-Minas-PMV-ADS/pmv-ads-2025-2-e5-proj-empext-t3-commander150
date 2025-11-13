@@ -1670,6 +1670,7 @@ const InformacaoTorneioLoja: React.FC = () => {
                                           onRecarregarMesas={() => rodadaSelecionada && carregarMesasDaRodada(rodadaSelecionada)}
                                           rodadaSelecionada={rodadaSelecionada}
                                           isLoja={true}
+                                          torneioStatus={tournament.status}
                                       />
                                   ))
                           ) : rodadaSelecionada?.status !== "Aguardando_Emparelhamento" ? (
