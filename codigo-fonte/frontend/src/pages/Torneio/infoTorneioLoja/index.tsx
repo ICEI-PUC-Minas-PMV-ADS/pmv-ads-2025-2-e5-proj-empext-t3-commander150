@@ -1706,20 +1706,6 @@ const InformacaoTorneioLoja: React.FC = () => {
 
           {/* Coluna Direita - Informações */}
           <div className={styles.colunaDireita}>
-            {/* Premiação */}
-            <div className={styles.cardPremiacaoWrapper}>
-              <CardSuperior
-                  count={tournament.incricao_gratuita ? "Gratuito" :
-                      tournament.valor_incricao ?
-                          new Intl.NumberFormat("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          }).format(tournament.valor_incricao) : "Não informado"}
-                  label="Premiação"
-                  icon={FiGift}
-                  selected={false}
-              />
-            </div>
 
             {/* Informações do Torneio */}
             <CardInfoTorneio
