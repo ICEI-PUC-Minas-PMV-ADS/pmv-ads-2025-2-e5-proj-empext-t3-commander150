@@ -3,8 +3,11 @@ import type { ITorneio } from "../../../tipos/tipos";
 import { buscarTorneioPorId, tratarErroTorneio } from "../../../services/torneioServico";
 import styles from "./styles.module.css";
 import CardInfoTorneio from "../../../components/CardInfoTorneio";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import RegrasPartida from "../../../components/CardRegrasPartida";
+import Button from "../../../components/Button";
+
+type Aba = "inscritos" | "andamento" | "historico";
 
 const InformacaoTorneio: React.FC = () => {
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
@@ -12,6 +15,16 @@ const InformacaoTorneio: React.FC = () => {
   const [erro, setErro] = useState<string | null>(null);
   const [regras, setRegras] = useState<string>("");
   const { id } = useParams<{ id: string }>();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const state = location.state as { aba?: Aba } | null;
+  const abaOrigem: Aba = state?.aba ?? "inscritos";
+
+  const handleVoltarHistorico = () => {
+      navigate("/historico", { state: { aba: abaOrigem } });
+  };
 
   // Buscar dados do torneio
   useEffect(() => {
@@ -47,6 +60,16 @@ const InformacaoTorneio: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Informações do torneio</h1>
+          <div className={styles.buttonVoltarWrapper}>
+              <Button
+                  label="Voltar"
+                  onClick={handleVoltarHistorico}
+                  width="auto"
+                  height="44px"
+                  paddingHorizontal="24px"
+                  fontSize="14px"
+              />
+          </div>
       </div>
       
       {erro && (
