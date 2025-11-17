@@ -23,7 +23,7 @@ import ModalGerenciarInscricoes from "../../../components/ModalGerenciarInscrico
 import { removerJogadorDoTorneioComoLoja } from "../../../services/torneioServico";
 import ModalInscricaoJogador from "../../../components/ModalInscricaoJogador";
 import Modal from "../../../components/Modal";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Button from "../../../components/Button";
 import CardRanking from "../../../components/CardRanking";
 import Swal from 'sweetalert2';
@@ -100,6 +100,11 @@ const InformacaoTorneioLoja: React.FC = () => {
   const [editQuantidadeRodadas, setEditQuantidadeRodadas] = useState("");
 
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  const handleVoltarHistorico = () => {
+    navigate("/historico");
+  };
   const urlParams = new URLSearchParams(window.location.search);
   const preselectResult = urlParams.get('preselect') === 'result';
 
@@ -1404,6 +1409,14 @@ const InformacaoTorneioLoja: React.FC = () => {
             {tournament.status === "Aberto" && (
                 <>
                   <Button
+                      label="Voltar"
+                      onClick={handleVoltarHistorico}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="24px"
+                      fontSize="14px"
+                  />
+                  <Button
                       label="Inscrever Jogador"
                       onClick={abrirModalInscricao}
                       width="auto"
@@ -1455,6 +1468,14 @@ const InformacaoTorneioLoja: React.FC = () => {
             {/* Botões para torneio "Em Andamento" */}
             {tournament.status === "Em Andamento" && (
                 <>
+                  <Button
+                      label="Voltar"
+                      onClick={handleVoltarHistorico}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="24px"
+                      fontSize="14px"
+                  />
                   {/* Se há rodada atual "Em Andamento" */}
                   {rodadaSelecionada?.status === "Em Andamento" && (
                       <Button
@@ -1535,6 +1556,18 @@ const InformacaoTorneioLoja: React.FC = () => {
 
             {/* Dropdown de Rodadas - Aparece apenas para torneios em andamento ou finalizados */}
             {tournament.status !== "Aberto" && (
+                <>
+                  {tournament.status === "Finalizado" && (
+                      <Button
+                          label="Voltar"
+                          onClick={handleVoltarHistorico}
+                          width="auto"
+                          height="44px"
+                          paddingHorizontal="24px"
+                          fontSize="14px"
+                      />
+                  )}
+
                 <div className={styles.rodadaDropdownContainer}>
                   <button
                       className={styles.rodadaDropdownButton}
@@ -1565,6 +1598,7 @@ const InformacaoTorneioLoja: React.FC = () => {
                             </div>
                         ))}
                         {tournament.status === "Finalizado" && (
+
                             <div
                                 className={`${styles.rodadaDropdownItem} ${
                                     resultadoFinalSelecionado ? styles.rodadaAtiva : ''
@@ -1578,6 +1612,7 @@ const InformacaoTorneioLoja: React.FC = () => {
                       </div>
                   )}
                 </div>
+              </>
             )}
           </div>
         </div>
