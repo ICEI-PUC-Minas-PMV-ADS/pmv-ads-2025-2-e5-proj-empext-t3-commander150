@@ -57,8 +57,10 @@ li {
   text-align: left;
   color: var(--var-cor-cinza-titulos);
   margin-top: -20px;
-  margin-bottom: 30px
-
+  margin-bottom: 30px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .detalhesTorneio {
@@ -72,19 +74,59 @@ li {
 
 .linhaInfo {
   display: flex;
-  justify-content: space-between; 
+  justify-content: flex-start;
   align-items: center;
-  width: 100%; /* garante que ocupe toda a linha */
-  gap: 15px;
+  width: 100%;
+  gap: 20px;
   font-size: 0.9rem;
   color: #ddd;
+  flex-wrap: wrap;
 }
 
-/* adiciona espaçamento entre os itens dentro das divs da esquerda e direita */
-.linhaInfo > div {
+.infoEsquerda,
+.infoDireita {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.itemInfo span {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Para mobile, ajustar layout */
+@media (max-width: 768px) {
+  .linhaInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .infoEsquerda,
+  .infoDireita {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .itemInfo {
+    white-space: normal;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .itemInfo span {
+    word-break: break-word;
+  }
 }
 
 .jogadoresInscritos {
@@ -163,4 +205,7 @@ li {
   font-weight: 400;
   font-style: regular;
   color: #ddd;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }

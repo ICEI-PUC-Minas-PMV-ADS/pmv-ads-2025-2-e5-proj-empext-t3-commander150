@@ -19,6 +19,7 @@ interface ITorneioCompleto extends ITorneio {
   incricao_gratuita: boolean;
   valor_incricao?: number | null;
   data_inicio: string;
+  loja_nome: string;
 }
 
 import { FaCalendarAlt, FaClock, FaStore, FaMoneyBillAlt } from "react-icons/fa";
@@ -231,16 +232,24 @@ const InscricaoTorneio: React.FC = () => {
 
           <div className={estilos.detalhesTorneio}>
             <div className={estilos.linhaInfo}>
-              <div style={{justifyItems: '20px' }}>
-                <FaCalendarAlt /> <span>{formatarData(torneio.data_inicio)}</span>
-                <FaClock /> <span>{formatarHora(torneio.data_inicio)}</span>
+              <div className={estilos.infoEsquerda}>
+                <div className={estilos.itemInfo}>
+                  <FaCalendarAlt /> <span>{formatarData(torneio.data_inicio)}</span>
+                </div>
+                <div className={estilos.itemInfo}>
+                  <FaClock /> <span>{formatarHora(torneio.data_inicio)}</span>
+                </div>
               </div>
-              <div>
-                <FaStore /> <span>Loja: {torneio.id_loja}</span>
-                <FaMoneyBillAlt /> <span>{formatarValor(torneio.valor_incricao)}</span>
+              <div className={estilos.infoDireita}>
+                <div className={estilos.itemInfo}>
+                  <FaStore /> <span>{torneio.loja_nome}</span>
+                </div>
+                <div className={estilos.itemInfo}>
+                  <FaMoneyBillAlt /> <span>{formatarValor(torneio.valor_incricao, torneio.incricao_gratuita)}</span>
+                </div>
               </div>
             </div>
-            
+
           </div>
         </section>
 

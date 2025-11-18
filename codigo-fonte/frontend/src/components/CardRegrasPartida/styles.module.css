@@ -5,6 +5,10 @@
   border: var(--var-borda-section);
   color: var(--var-cor-branca);
   font-family: "Poppins", sans-serif;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .title {
@@ -29,6 +33,10 @@
   font-size: 14px;
   line-height: 1.5;
   text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 .icon {

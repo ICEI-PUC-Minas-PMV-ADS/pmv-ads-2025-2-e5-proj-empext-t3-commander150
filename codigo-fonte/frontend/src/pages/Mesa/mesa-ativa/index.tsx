@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { buscarMinhaMesaNaRodada, reportarResultadoMesa } from '../../../services/mesaServico';
 import { buscarTorneioPorId } from '../../../services/torneioServico';
 import type { IMesaAtiva, ITorneio } from '../../../tipos/tipos';
+import { useSessao } from '../../../contextos/AuthContexto';
 import styles from '../styles.module.css';
 import Swal from 'sweetalert2';
 import { CardSuperior } from '../../../components/CardSuperior';
@@ -21,13 +22,14 @@ interface MesaAtivaProps {
   onVoltarParaIntervalo?: () => void;
 }
 
-export default function MesaAtivaComponent({ 
-  rodadaId, 
-  torneioId, 
+export default function MesaAtivaComponent({
+  rodadaId,
+  torneioId,
   onMesaFinalizada,
-  onVoltarParaIntervalo 
+  onVoltarParaIntervalo
 }: MesaAtivaProps) {
   const navigate = useNavigate();
+  const { usuario } = useSessao();
   const [mesa, setMesa] = useState<IMesaAtiva | null>(null);
   const [torneio, setTorneio] = useState<ITorneio | null>(null);
   const [loading, setLoading] = useState(true);
@@ -195,8 +197,13 @@ export default function MesaAtivaComponent({
     return <div className={styles.container}><div className={styles.error}>Mesa não encontrada</div></div>;
   }
 
+  // Identificar você e sua dupla
   const meuTime = mesa.meu_time === 1 ? mesa.time_1 : mesa.time_2;
   const timeAdversario = mesa.meu_time === 1 ? mesa.time_2 : mesa.time_1;
+
+  // Separar você da sua dupla baseado no id_usuario do usuário logado
+  const voce = meuTime.find(j => j.id_usuario === usuario?.id) || meuTime[0];
+  const suaDupla = meuTime.find(j => j.id_usuario !== usuario?.id) || meuTime[1];
 
   return (
     <div className={styles.container}>
@@ -235,25 +242,57 @@ export default function MesaAtivaComponent({
           {/* Sua Partida */}
           <div className={styles.partidaCard}>
             <h2 className={styles.cardTitulo}>Sua Partida - Mesa {mesa.numero_mesa}</h2>
-            <p className={styles.statusPartida}>Partida em andamento</p>
+            <p className={styles.statusPartida}>Disposição da Mesa</p>
+            <p className={styles.descricaoMesa}>Você está sentado em frente ao adversário e na diagonal da sua dupla</p>
 
-            <div className={styles.dupla}>
-              <div className={styles.duplaHeader}>
-                <span className={styles.duplaNomes}>
-                  {meuTime.map(j => j.username).join(' & ')}
-                </span>
-                <span className={styles.duplaTag}>Sua Dupla</span>
+            {/* Layout da Mesa */}
+            <div className={styles.mesaLayout}>
+              {/* Linha Superior: VOCÊ e ADV1 */}
+              <div className={styles.posicaoTopoEsquerda}>
+                <div className={`${styles.jogadorCard} ${styles.voce}`}>
+                  <div className={styles.jogadorNome}>{voce?.username || 'Você'}</div>
+                  <div className={styles.jogadorPosicao}>Você</div>
+                </div>
+              </div>
+
+              <div className={styles.posicaoTopoDireita}>
+                <div className={`${styles.jogadorCard} ${styles.adversario}`}>
+                  <div className={styles.jogadorNome}>{timeAdversario[0]?.username || 'Adversário'}</div>
+                  <div className={styles.jogadorPosicao}>À sua frente</div>
+                </div>
+              </div>
+
+              {/* Centro da Mesa */}
+              <div className={styles.centroMesa}>
+                <div className={styles.mesaIcone}>🎴</div>
+                <div className={styles.mesaTexto}>MESA</div>
+              </div>
+
+              {/* Linha Inferior: ADV2 e SUA DUPLA */}
+              <div className={styles.posicaoBaseEsquerda}>
+                <div className={`${styles.jogadorCard} ${styles.adversario}`}>
+                  <div className={styles.jogadorNome}>{timeAdversario[1]?.username || 'Adversário'}</div>
+                  <div className={styles.jogadorPosicao}>Ao seu lado</div>
+                </div>
+              </div>
+
+              <div className={styles.posicaoBaseDireita}>
+                <div className={`${styles.jogadorCard} ${styles.dupla}`}>
+                  <div className={styles.jogadorNome}>{suaDupla?.username || 'Sua Dupla'}</div>
+                  <div className={styles.jogadorPosicao}>Sua Dupla</div>
+                </div>
               </div>
             </div>
 
-            <div className={styles.vs}>VS</div>
-
-            <div className={styles.dupla}>
-              <div className={styles.duplaHeader}>
-                <span className={styles.duplaNomes}>
-                  {timeAdversario.map(j => j.username).join(' & ')}
-                </span>
-                <span className={styles.duplaTagAdversario}>Dupla Adversária</span>
+            {/* Legenda das Duplas */}
+            <div className={styles.legendaDuplas}>
+              <div className={styles.legendaItem}>
+                <span className={`${styles.legendaCor} ${styles.corVoce}`}></span>
+                <span>Sua Dupla: {voce?.username} & {suaDupla?.username}</span>
+              </div>
+              <div className={styles.legendaItem}>
+                <span className={`${styles.legendaCor} ${styles.corAdversario}`}></span>
+                <span>Adversários: {timeAdversario.map(j => j.username).join(' & ')}</span>
               </div>
             </div>
           </div>

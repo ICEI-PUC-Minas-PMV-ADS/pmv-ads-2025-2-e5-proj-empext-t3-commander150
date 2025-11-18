@@ -4,8 +4,10 @@
   padding: 16px;
   font-family: "Poppins", sans-serif;
   color: var(--var-cor-branca);
-  width: 320px;
+  width: 100%;
+  max-width: 400px;
   border: var(--var-borda-section);
+  box-sizing: border-box;
 }
 
 .tournamentHeader {
@@ -23,6 +25,9 @@
   font-size: 14px;
   margin: 8px 0 12px;
   color: var(--var-cor-cinza-titulos);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .tournamentInfo {
@@ -31,6 +36,8 @@
   gap: 8px 16px;
   font-size: 14px;
   margin-bottom: 12px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .tournamentInfo svg {
