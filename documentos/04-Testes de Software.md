@@ -105,7 +105,7 @@ Este documento apresenta os casos de teste de **Sucesso** e **Insucesso** para a
 
 
 ### ETAPA 4
-Criar casos de teste da etapa 4
+Os testes realizados na Etapa 4 consistiram na reexecução dos mesmos testes da Etapa 3, porém sobre a aplicação completa com backend e frontend já em ambiente de deploy.
  
 # Evidências de Testes de Software
 
@@ -1034,7 +1034,7 @@ Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, u
 Evidências apresentadas na tabela ETAPA 3 da Parte 2 - Testes por pares
 
 ### ETAPA 4
-Colocar evidências de teste da etapa 4
+Os testes realizados na Etapa 4 consistiram na reexecução dos mesmos testes da Etapa 3, porém sobre a aplicação completa com backend e frontend já em ambiente de deploy.
 
 
 ## Parte 2 - Testes por pares
@@ -2159,5 +2159,5 @@ A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade d
 </table>
 
 ### ETAPA 4
-Colocar evidências de teste da etapa 4
+Os testes realizados na Etapa 4 consistiram na reexecução dos mesmos testes da Etapa 3, porém sobre a aplicação completa com backend e frontend já em ambiente de deploy.
 
