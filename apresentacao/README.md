@@ -7,6 +7,7 @@ Apresentação da proposta da solução (Etapa 1) disponível <a href="Apresenta
   * descrição do cliente,
   * objetivo da aplicação,
   * telas principais,
+  * <a href="apresentacao/manual_simplificado_commander150.pdf">manual de uso</a>
   * pontos positivos e desafios da experiência extensionista,
   * conclusão da equipe.
   
