@@ -13,7 +13,7 @@ A implantação do Commander150 foi planejada para garantir estabilidade, dispon
 ### Tecnologias utilizadas
 **Backend**
 
-- Linguagem: Python 3.12
+- Linguagem: Python
 - Framework: Django + Django REST Framework (API RESTful)
 - Banco de Dados: PostgreSQL
 - Autenticação: JWT
