@@ -7,7 +7,7 @@ Apresentação da proposta da solução (Etapa 1) disponível <a href="Apresenta
   * descrição do cliente,
   * objetivo da aplicação,
   * telas principais,
-  * <a href="apresentacao/manual_simplificado_commander150.pdf">manual de uso</a>
+  * <a href="[apresentacao/manual_simplificado_commander150.pdf](https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e5-proj-empext-t3-commander150/blob/a7e423ec3a3a3d155d8fa99fc25f43c8e595066c/apresentacao/manual_simplificado_commander150.pdf)">manual de uso</a>
   * pontos positivos e desafios da experiência extensionista,
   * conclusão da equipe.
   
