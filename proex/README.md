@@ -1,1 +1,1 @@
-Você deve colocar aqui o relatório gerado na entrega do APC (sistema de Atividades e Práticas curriculares).
+O relatório gerado na entrega do APC (sistema de Atividades e Práticas curriculares) será assinado digitalmente pelo professor do projeto. A visualização do relatório da APC pode ser encontrada <a href="https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e5-proj-empext-t3-commander150/blob/main/proex/APR_visualizacao_relatorio_de_Atividades_e_praticas_curriculares.PDF">aqui.</a>
