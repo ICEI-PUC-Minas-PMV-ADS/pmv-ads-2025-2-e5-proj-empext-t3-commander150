@@ -11,9 +11,6 @@ Apresentação da proposta da solução (Etapa 1) disponível <a href="Apresenta
   * pontos positivos e desafios da experiência extensionista,
   * conclusão da equipe.
   
-- Vídeo de apresentação da solução:
-  * tamanho do arquivo limitado a 90Mb;
-  * taxa de FPS limitada a 30 quadros por segundo;
-  * resolução HD (720p) ou Full HD (1080p);
-  * formato mp4.
+- Vídeo de apresentação da solução: 
+  * O vídeo da apresentação pode ser encontrado <a href="https://drive.google.com/file/d/19g4YQ04TuwWPUKbrCzCmxydcA1A15RgC/view?usp=sharing">aqui</a>.
 
