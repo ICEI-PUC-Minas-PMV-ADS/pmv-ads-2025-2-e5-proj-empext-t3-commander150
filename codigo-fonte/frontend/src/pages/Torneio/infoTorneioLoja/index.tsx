@@ -71,6 +71,21 @@ const InformacaoTorneioLoja: React.FC = () => {
   const abrirModalInscricao = () => setShowModalInscricao(true);
   const fecharModalInscricaoEAatualizar = async () => {
     setShowModalInscricao(false);
+
+    // Recarregar lista de jogadores inscritos
+    if (tournament?.id) {
+      try {
+        const jogadoresData = await buscarInscricoesAtivasCompletas(tournament.id);
+        const jogadores = jogadoresData.map(j => ({
+          id: j.id,
+          username: j.username,
+          id_usuario: j.id_usuario
+        }));
+        setJogadoresInscritos(jogadores);
+      } catch (error) {
+        console.error('Erro ao recarregar jogadores inscritos:', error);
+      }
+    }
   };
 
   const [iniciandoTorneio, setIniciandoTorneio] = useState(false);
@@ -104,6 +119,13 @@ const InformacaoTorneioLoja: React.FC = () => {
 
   const handleVoltarHistorico = () => {
     navigate("/historico");
+  };
+
+  // Função auxiliar para converter data/hora sem conversão de timezone
+  // Remove o 'Z' para que seja interpretado como hora local, não UTC
+  const parseDataHoraLocal = (dataString: string): Date => {
+    const dataLimpa = dataString.replace('Z', '').replace(/\.\d{3}/, '');
+    return new Date(dataLimpa);
   };
   const urlParams = new URLSearchParams(window.location.search);
   const preselectResult = urlParams.get('preselect') === 'result';
@@ -353,14 +375,49 @@ const InformacaoTorneioLoja: React.FC = () => {
     // Preencher estados com dados atuais
     setEditNome(tournament.nome || "");
     setEditDescricao(tournament.descricao || "");
-    setEditDataHora(tournament.data_inicio ? new Date(tournament.data_inicio).toISOString().slice(0, 16) : "");
+
+    // Carregar data/hora para o input datetime-local
+    // Se a data vem com 'Z' (UTC), new Date() converte para local automaticamente
+    // Se vem sem timezone, new Date() interpreta como local
+    if (tournament.data_inicio) {
+      // Remover sufixo 'Z' se existir para interpretar como hora local
+      const dataString = tournament.data_inicio.replace('Z', '').replace(/\.\d{3}/, '');
+
+      // Se a string já está no formato correto (YYYY-MM-DDTHH:mm), usar direto
+      if (dataString.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/)) {
+        setEditDataHora(dataString.slice(0, 16)); // Pega apenas YYYY-MM-DDTHH:mm
+      } else {
+        // Caso contrário, fazer parsing e extrair componentes
+        const dataLocal = new Date(dataString);
+        const ano = dataLocal.getFullYear();
+        const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
+        const dia = String(dataLocal.getDate()).padStart(2, '0');
+        const hora = String(dataLocal.getHours()).padStart(2, '0');
+        const minuto = String(dataLocal.getMinutes()).padStart(2, '0');
+        setEditDataHora(`${ano}-${mes}-${dia}T${hora}:${minuto}`);
+      }
+    } else {
+      setEditDataHora("");
+    }
+
     setEditRegras(tournament.regras || "");
     setEditModalidadeInscricao(tournament.incricao_gratuita ? "gratuito" : "pago");
-    setEditValorInscricao(
-        tournament.valor_incricao && typeof tournament.valor_incricao === 'number'
-            ? `R$ ${tournament.valor_incricao.toFixed(2).replace('.', ',')}`
-            : "R$ 0,00"
-    );
+
+    // Corrigir carregamento do valor da inscrição
+    if (!tournament.incricao_gratuita && tournament.valor_incricao !== null && tournament.valor_incricao !== undefined) {
+      const valorNumerico = typeof tournament.valor_incricao === 'number'
+        ? tournament.valor_incricao
+        : parseFloat(tournament.valor_incricao);
+
+      if (!isNaN(valorNumerico) && valorNumerico > 0) {
+        setEditValorInscricao(`R$ ${valorNumerico.toFixed(2).replace('.', ',')}`);
+      } else {
+        setEditValorInscricao("R$ 0,00");
+      }
+    } else {
+      setEditValorInscricao("R$ 0,00");
+    }
+
     setEditVagasLimitadas(tournament.vagas_limitadas ? "limitadas" : "ilimitadas");
     setEditCapacidadeMaxima(tournament.qnt_vagas ? tournament.qnt_vagas.toString() : "");
     setEditPontuacaoVitoria(tournament.pontuacao_vitoria?.toString() || "3");
@@ -436,7 +493,18 @@ const InformacaoTorneioLoja: React.FC = () => {
         dadosAtualizacao.descricao = editDescricao.trim();
       }
       dadosAtualizacao.regras = editRegras.trim();
-      dadosAtualizacao.data_inicio = new Date(editDataHora).toISOString();
+
+      // Construir string ISO manualmente para preservar a hora local exata
+      // O campo datetime-local retorna "2024-01-15T20:35" e queremos salvar exatamente 20:35 no banco
+      // Salvamos sem 'Z' para que o backend interprete como está
+      const dataLocal = new Date(editDataHora);
+      const ano = dataLocal.getFullYear();
+      const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
+      const dia = String(dataLocal.getDate()).padStart(2, '0');
+      const hora = String(dataLocal.getHours()).padStart(2, '0');
+      const minuto = String(dataLocal.getMinutes()).padStart(2, '0');
+      const segundo = String(dataLocal.getSeconds()).padStart(2, '0');
+      dadosAtualizacao.data_inicio = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
       dadosAtualizacao.incricao_gratuita = editModalidadeInscricao === "gratuito";
       if (editModalidadeInscricao === "pago") {
         dadosAtualizacao.valor_incricao = parseFloat(editValorInscricao.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
@@ -1746,8 +1814,8 @@ const InformacaoTorneioLoja: React.FC = () => {
             <CardInfoTorneio
                 title="Informações do Torneio"
                 name={tournament.nome}
-                date={new Date(tournament.data_inicio).toLocaleDateString("pt-BR")}
-                time={new Date(tournament.data_inicio).toLocaleTimeString("pt-BR", {
+                date={parseDataHoraLocal(tournament.data_inicio).toLocaleDateString("pt-BR")}
+                time={parseDataHoraLocal(tournament.data_inicio).toLocaleTimeString("pt-BR", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}

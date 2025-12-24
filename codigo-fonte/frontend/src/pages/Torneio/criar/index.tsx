@@ -71,10 +71,30 @@ const CriarTorneio: React.FC = () => {
 
   // Função para mapear dados do formulário para o formato da API
   const mapearDadosParaAPI = async (): Promise<ITorneioCriacao> => {
-    // Converter data/hora para ISO string
-    const dataHoraInicio = dataHoraTorneio 
-      ? new Date(dataHoraTorneio).toISOString()
-      : new Date().toISOString();
+    // Construir string ISO manualmente para preservar a hora local exata
+    // O campo datetime-local retorna "2024-01-15T20:35" e queremos salvar exatamente 20:35 no banco
+    // Salvamos sem 'Z' para que o backend interprete como está
+    let dataHoraInicio: string;
+    if (dataHoraTorneio) {
+      const dataLocal = new Date(dataHoraTorneio);
+      const ano = dataLocal.getFullYear();
+      const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
+      const dia = String(dataLocal.getDate()).padStart(2, '0');
+      const hora = String(dataLocal.getHours()).padStart(2, '0');
+      const minuto = String(dataLocal.getMinutes()).padStart(2, '0');
+      const segundo = String(dataLocal.getSeconds()).padStart(2, '0');
+      dataHoraInicio = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
+    } else {
+      // Se não forneceu data/hora, usar a data/hora atual com mesma lógica
+      const agora = new Date();
+      const ano = agora.getFullYear();
+      const mes = String(agora.getMonth() + 1).padStart(2, '0');
+      const dia = String(agora.getDate()).padStart(2, '0');
+      const hora = String(agora.getHours()).padStart(2, '0');
+      const minuto = String(agora.getMinutes()).padStart(2, '0');
+      const segundo = String(agora.getSeconds()).padStart(2, '0');
+      dataHoraInicio = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
+    }
 
     // Converter valor monetário para número
     const valorNumerico = modalidadeInscricao === "pago" 

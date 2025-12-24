@@ -172,7 +172,9 @@ def calcular_mw_ajustado(
 ) -> Optional[float]:
     """
     Calcula MW% do jogador_alvo até rodada_numero,
-    EXCLUINDO rodadas onde jogou com/contra jogador_ref.
+    EXCLUINDO:
+    - Rodadas onde jogou com/contra jogador_ref (compartilhadas)
+    - Rodadas com bye (não conta para tiebreaker)
 
     Args:
         jogador_alvo: ID do jogador cuja força queremos calcular
@@ -189,6 +191,12 @@ def calcular_mw_ajustado(
     rodadas_validas = 0
 
     for r in range(1, rodada_numero + 1):
+        # Verificar se o jogador_alvo teve bye nesta rodada
+        parceiro_alvo = dados['parceiros'][jogador_alvo].get(r)
+        if parceiro_alvo is None:
+            # É bye - ignorar esta rodada completamente
+            continue
+
         # Verificar se jogaram juntos nesta rodada
         foi_parceiro = (
             r in dados['parceiros'][jogador_ref] and
@@ -200,7 +208,7 @@ def calcular_mw_ajustado(
         )
 
         if not (foi_parceiro or foi_oponente):
-            # Rodada válida - incluir pontos
+            # Rodada válida - incluir pontos (já sabemos que não é bye)
             pontos_validos += dados['pontos_por_rodada'][jogador_alvo].get(r, 0)
             rodadas_validas += 1
 
@@ -222,6 +230,9 @@ def calcular_metricas_jogador(
     """
     Calcula todas as métricas de um jogador até a rodada especificada.
 
+    IMPORTANTE: Byes são EXCLUÍDOS dos cálculos de MW%, OMW% e PMW%
+    (critérios de desempate), mas INCLUÍDOS na pontuação total.
+
     Args:
         jogador_id: ID do jogador
         rodada_numero: Até qual rodada calcular
@@ -236,13 +247,24 @@ def calcular_metricas_jogador(
     parceiros_hist = dados['parceiros'][jogador_id]
     oponentes_hist = dados['oponentes'][jogador_id]
 
-    # 1. Pontos Totais (usando pré-calculado)
+    # 1. Pontos Totais (usando pré-calculado) - INCLUI bye para classificação geral
     pontos_totais = dados['mw_base'][jogador_id]
 
-    # 2. MW%
-    num_rodadas = dados['num_rodadas_jogadas'][jogador_id]
-    pontos_maximos = num_rodadas * torneio.pontuacao_vitoria
-    mw = pontos_totais / pontos_maximos if pontos_maximos > 0 else 0
+    # 2. MW% - EXCLUI byes (apenas partidas realmente disputadas)
+    pontos_reais = 0
+    rodadas_reais = 0
+
+    for r in range(1, rodada_numero + 1):
+        if r in pontos_por_rodada:
+            parceiro = parceiros_hist.get(r)
+            # Se parceiro é None, é bye - ignorar para cálculo de MW%
+            if parceiro is not None:
+                pontos_reais += pontos_por_rodada[r]
+                rodadas_reais += 1
+
+    # MW% baseado apenas em partidas reais (sem byes)
+    pontos_maximos = rodadas_reais * torneio.pontuacao_vitoria
+    mw = pontos_reais / pontos_maximos if pontos_maximos > 0 else 0
     mw = max(mw, 0.01)  # Floor de 1%
 
     # 3. Coletar oponentes e parceiros únicos
