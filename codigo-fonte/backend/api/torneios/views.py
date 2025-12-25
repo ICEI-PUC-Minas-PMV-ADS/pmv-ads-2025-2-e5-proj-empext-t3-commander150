@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django.utils import timezone
+from datetime import timedelta
 
 from django.db import transaction
 from django.db.models import Sum, Count, Q, Case, When, Value, IntegerField
@@ -122,7 +123,14 @@ class TorneioViewSet(viewsets.ModelViewSet):
         - Admins: Veem todos os torneios
         - Lojas: Veem apenas seus próprios torneios
         - Outros: Veem todos (somente leitura)
+        - Torneios com status "Aberto" são ocultados após 1h de tolerância do horário de início
+          (permite inscrições de última hora e pequenos atrasos)
         """
+        agora = timezone.now()
+
+        # Tolerância de 1 hora após o início do torneio
+        limite_tolerancia = agora - timedelta(hours=1)
+
         # Define a ordenação híbrida por status e data
         queryset_base = Torneio.objects.annotate(
             prioridade=Case(
@@ -132,6 +140,12 @@ class TorneioViewSet(viewsets.ModelViewSet):
                 output_field=IntegerField()
             )
         ).order_by('prioridade', 'data_inicio')
+
+        # Filtra torneios "Aberto" com data/hora passada (com tolerância de 1h)
+        # Mantém torneios que NÃO são "Aberto" OU que são "Aberto" mas iniciaram há menos de 1h
+        queryset_base = queryset_base.filter(
+            Q(~Q(status='Aberto') | Q(status='Aberto', data_inicio__gte=limite_tolerancia))
+        )
 
         # Aplica filtro específico para lojas
         if self.request.user.is_authenticated and self.request.user.tipo == 'LOJA':
