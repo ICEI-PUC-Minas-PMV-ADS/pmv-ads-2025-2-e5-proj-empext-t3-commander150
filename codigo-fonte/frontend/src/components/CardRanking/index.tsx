@@ -13,6 +13,7 @@ interface RankingProps {
   limite?: number;
   className?: string;
   mostrarMetricasAvancadas?: boolean; // Nova prop para mostrar métricas detalhadas
+  compact?: boolean; // Modo compacto/minimalista para caber tudo na tela
   onRankingCarregado?: (ranking: IJogadorRanking[]) => void;
   onErro?: (erro: string) => void;
 }
@@ -26,6 +27,7 @@ const CardRanking: React.FC<RankingProps> = ({
   limite,
   className = '',
   mostrarMetricasAvancadas = false,
+  compact = false,
   onRankingCarregado,
   onErro
 }) => {
@@ -148,7 +150,7 @@ const CardRanking: React.FC<RankingProps> = ({
 
   const containerClass = `${styles.container} ${className} ${
     isRankingFinal ? styles.rankingFinal : styles.rankingParcial
-  }`;
+  } ${compact ? styles.compact : ''}`;
 
   // Se não há limite definido, mostrar todos para ranking final
   const rankingParaExibir = limite ? ranking.slice(0, limite) : ranking;
@@ -176,7 +178,7 @@ const CardRanking: React.FC<RankingProps> = ({
       ) : erro ? (
         <div className={styles.erro}>{erro}</div>
       ) : rankingParaExibir.length > 0 ? (
-        <div className={styles.rankingContainer}>
+        <div className={`${styles.rankingContainer} ${compact ? styles.rankingContainerCompact : ''}`}>
           {rankingParaExibir.map((jogador) => {
             const emoji = getEmojiPosicao(jogador.posicao);
             const classePosicao = getClassePosicao(jogador.posicao);
@@ -184,18 +186,74 @@ const CardRanking: React.FC<RankingProps> = ({
             const iconeBalanco = getIconeBalanco(jogador.balanco);
 
             return (
-              <div key={jogador.jogador_id} className={styles.rankingItem}>
-                <div className={`${styles.rankingPosicao} ${classePosicao}`}>
+              <div key={jogador.jogador_id} className={`${styles.rankingItem} ${compact ? styles.rankingItemCompact : ''}`}>
+                <div className={`${styles.rankingPosicao} ${classePosicao} ${compact ? styles.rankingPosicaoCompact : ''}`}>
                   {emoji || <span>{jogador.posicao}º</span>}
                 </div>
-                <div className={styles.rankingInfo}>
-                  <div className={styles.rankingHeader}>
-                    <span className={styles.rankingNome}>{jogador.jogador_nome}</span>
-                    <span className={styles.rankingPontos}>{jogador.pontos} pts</span>
+                <div className={`${styles.rankingInfo} ${compact ? styles.rankingInfoCompact : ''}`}>
+                  <div className={`${styles.rankingHeader} ${compact ? styles.rankingHeaderCompact : ''}`}>
+                    <span className={`${styles.rankingNome} ${compact ? styles.rankingNomeCompact : ''}`}>{jogador.jogador_nome}</span>
+
+                    {compact ? (
+                      <>
+                        {/* MOBILE - Formato antigo com badge */}
+                        <div className={`${styles.rankingPontosWrapper} ${styles.rankingPontosWrapperCompactMobile}`}>
+                          <span className={`${styles.rankingPontos} ${styles.rankingPontosCompact}`}>
+                            {jogador.pontos} pts
+                          </span>
+                          {temMetricasAvancadas && jogador.balanco !== undefined && (
+                            <span className={`${styles.balancoInlineMobile} ${classeBalanco}`}>
+                              {iconeBalanco} {formatarBalanco(jogador.balanco)}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* DESKTOP - Formato abreviado com todos os tiebreakers */}
+                        <div className={`${styles.rankingPontosWrapper} ${styles.rankingPontosWrapperCompactDesktop}`}>
+                          <span className={styles.tiebreaker}>
+                            <span className={styles.tiebreakerLabel}>PTS:</span>
+                            <span className={`${styles.tiebreakerValue} ${styles.tiebreakerPts}`}>{jogador.pontos}</span>
+                          </span>
+                          {temMetricasAvancadas && jogador.balanco !== undefined && (
+                            <>
+                              <span className={styles.tiebreaker}>
+                                <span className={styles.tiebreakerLabel}>BLÇ:</span>
+                                <span className={`${styles.tiebreakerValue} ${styles.tiebreakerBalanco} ${classeBalanco}`}>
+                                  {formatarBalanco(jogador.balanco)}
+                                </span>
+                              </span>
+                              <span className={styles.tiebreaker}>
+                                <span className={styles.tiebreakerLabel}>OMW%:</span>
+                                <span className={`${styles.tiebreakerValue} ${styles.tiebreakerOmw}`}>
+                                  {formatarPorcentagem(jogador.omw_percentage)}
+                                </span>
+                              </span>
+                              <span className={styles.tiebreaker}>
+                                <span className={styles.tiebreakerLabel}>MW%:</span>
+                                <span className={`${styles.tiebreakerValue} ${styles.tiebreakerMw}`}>
+                                  {formatarPorcentagem(jogador.mw_percentage)}
+                                </span>
+                              </span>
+                              <span className={styles.tiebreaker}>
+                                <span className={styles.tiebreakerLabel}>PMW%:</span>
+                                <span className={`${styles.tiebreakerValue} ${styles.tiebreakerPmw}`}>
+                                  {formatarPorcentagem(jogador.pmw_percentage)}
+                                </span>
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <div className={styles.rankingPontosWrapper}>
+                        {/* Formato normal */}
+                        <span className={styles.rankingPontos}>{jogador.pontos} pts</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Métricas avançadas - só mostra se estiver habilitado E tiver dados */}
-                  {(mostrarMetricasAvancadas && temMetricasAvancadas) && jogador.mw_percentage !== undefined && (
+                  {/* Métricas avançadas - só mostra se estiver habilitado E tiver dados E não estiver no modo compact */}
+                  {(mostrarMetricasAvancadas && temMetricasAvancadas && !compact) && jogador.mw_percentage !== undefined && (
                     <div className={styles.metricas}>
                       <div
                         className={`${styles.metricaItem} ${styles.metricaBalanco} ${classeBalanco}`}

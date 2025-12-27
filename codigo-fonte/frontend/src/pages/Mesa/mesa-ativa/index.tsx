@@ -232,7 +232,6 @@ export default function MesaAtivaComponent({
             />
             <CardSuperior
               count={mesa.numero_rodada}
-              secondaryCount={torneio?.quantidade_rodadas || undefined}
               label="Rodada"
               icon={GiPodium}
               selected={false}

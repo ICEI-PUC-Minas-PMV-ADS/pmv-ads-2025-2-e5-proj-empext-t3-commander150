@@ -328,7 +328,7 @@ export default function Intervalo() {
               tournamentId={torneio?.id}
               isRankingFinal={true}
               titulo="🏆 Ranking Final do Torneio"
-              mostrarMetricasAvancadas={true}
+              compact={true}
             />
           ) : loadingMesa ? (
             <div className={styles.intervaloCard}>

@@ -118,6 +118,12 @@
   color: var(--var-cor-branca);
 }
 
+.rankingPontosWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .rankingPontos {
   font-size: 0.9rem;
   font-weight: 700;
@@ -220,6 +226,154 @@
 
 .rankingParcial {
   border-left: 4px solid #9b80b6;
+}
+
+/* Modo Compact/Minimalista */
+.compact {
+  padding: 1rem;
+}
+
+.rankingContainerCompact {
+  /* Sem max-height - expande conforme necessário */
+  max-height: none !important;
+  overflow-y: visible !important;
+  overflow-x: visible !important;
+  gap: 0.25rem;
+  padding-right: 0;
+}
+
+.rankingItemCompact {
+  padding: 0.4rem 0.6rem;
+  gap: 0.5rem;
+  background: rgba(155, 128, 182, 0.05);
+  border: 1px solid rgba(155, 128, 182, 0.2);
+}
+
+.rankingItemCompact:hover {
+  background: rgba(155, 128, 182, 0.08);
+}
+
+.rankingPosicaoCompact {
+  font-size: 1.1rem;
+  min-width: 35px;
+}
+
+.rankingInfoCompact {
+  gap: 0;
+}
+
+.rankingHeaderCompact {
+  gap: 0.5rem;
+}
+
+.rankingNomeCompact {
+  font-size: 0.85rem;
+}
+
+/* MOBILE - Formato antigo com badge */
+.rankingPontosWrapperCompactMobile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 769px) {
+  .rankingPontosWrapperCompactMobile {
+    display: none !important;
+  }
+}
+
+.balancoInlineMobile {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.balancoInlineMobile.balancoPositivo {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.balancoInlineMobile.balancoNegativo {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.balancoInlineMobile.balancoNeutro {
+  background: rgba(250, 204, 21, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+}
+
+/* DESKTOP - Formato abreviado com tiebreakers */
+.rankingPontosWrapperCompactDesktop {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (min-width: 769px) {
+  .rankingPontosWrapperCompactDesktop {
+    display: flex !important;
+  }
+}
+
+.tiebreaker {
+  font-size: 0.75rem;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Labels (PTS:, BLÇ:, etc) - discretas */
+.tiebreakerLabel {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 0.7;
+}
+
+/* Values (números/porcentagens) - destacadas */
+.tiebreakerValue {
+  font-weight: 700;
+}
+
+.tiebreakerPts {
+  color: var(--var-cor-branca);
+}
+
+.tiebreakerBalanco.balancoPositivo {
+  color: #4ade80;
+}
+
+.tiebreakerBalanco.balancoNegativo {
+  color: #f87171;
+}
+
+.tiebreakerBalanco.balancoNeutro {
+  color: #fbbf24;
+}
+
+.tiebreakerOmw {
+  color: #a78bfa;
+}
+
+.tiebreakerMw {
+  color: #7dd3fc;
+}
+
+.tiebreakerPmw {
+  color: #fbbf24;
+}
+
+.rankingPontosCompact {
+  font-size: 0.75rem;
 }
 
 /* Responsividade */

@@ -1727,8 +1727,8 @@ const InformacaoTorneioLoja: React.FC = () => {
                     tournamentId={tournament.id}
                     isRankingFinal={true}
                     titulo="🏆 Ranking Final do Torneio"
-                    subtitulo="Classificação final com todas as métricas"
-                    mostrarMetricasAvancadas={true}
+                    subtitulo="Classificação final"
+                    compact={true}
                 />
             ) : (
                 /* Mesas Participantes - Para torneios em andamento */
