@@ -148,7 +148,7 @@ class RequisitarTrocaSenhaView(APIView):
         email_msg = EmailMultiAlternatives(
             subject='Redefinição de senha - Commander150',
             body=email_texto_puro,
-            from_email=settings.EMAIL_HOST_USER,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             to=[email],
         )
         email_msg.attach_alternative(email_html, "text/html")
@@ -194,7 +194,7 @@ class ValidarTokenRedefinirSenhaView(APIView):
         email_msg = EmailMultiAlternatives(
             subject='Sua nova senha - Commander150',
             body=email_texto_puro,
-            from_email=settings.EMAIL_HOST_USER,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             to=[email],
         )
         email_msg.attach_alternative(email_html, "text/html")

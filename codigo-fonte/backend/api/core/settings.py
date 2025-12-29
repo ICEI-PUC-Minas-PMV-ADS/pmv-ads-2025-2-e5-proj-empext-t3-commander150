@@ -14,6 +14,7 @@ env = environ.Env(
     DATABASE_URL=(str, "postgres://postgres:123@localhost:5432/commander150"),
     EMAIL_PASSWORD=(str, None),
     EMAIL_USER=(str, None),
+    RESEND_API_KEY=(str, None),
     CORS_ALLOWED_ORIGINS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
     ALLOWED_HOSTS=(list, []),
@@ -48,12 +49,20 @@ DATABASES = {
 # }
 
 # Configuração do envio de emails
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env('EMAIL_USER', default='')
-EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD', default='')
+# Usa Resend em produção (Render) e console em desenvolvimento
+RESEND_API_KEY = env('RESEND_API_KEY', default=None)
+
+if RESEND_API_KEY:
+    # Produção: usa Resend (API HTTP, não bloqueada pelo Render)
+    EMAIL_BACKEND = 'anymail.backends.resend.EmailBackend'
+    ANYMAIL = {
+        "RESEND_API_KEY": RESEND_API_KEY,
+    }
+    DEFAULT_FROM_EMAIL = env('EMAIL_USER', default='noreply@commander150.com')
+else:
+    # Desenvolvimento: imprime emails no console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = env('EMAIL_USER', default='noreply@commander150.com')
 
 # Configuração do CORS e CSRF
 CORS_ALLOW_ALL_ORIGINS = False
@@ -102,6 +111,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'corsheaders',
+    'anymail',
     'torneios',
     'usuarios',
 ]

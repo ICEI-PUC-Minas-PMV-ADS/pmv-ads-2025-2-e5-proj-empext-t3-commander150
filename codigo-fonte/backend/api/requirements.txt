@@ -16,3 +16,5 @@ sqlparse==0.5.3
 tzdata==2025.2
 uritemplate==4.2.0
 gunicorn
+resend==2.19.0
+django-anymail==13.1
