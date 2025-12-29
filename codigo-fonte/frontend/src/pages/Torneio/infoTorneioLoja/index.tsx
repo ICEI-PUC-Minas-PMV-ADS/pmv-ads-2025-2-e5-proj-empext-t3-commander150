@@ -1619,6 +1619,15 @@ const InformacaoTorneioLoja: React.FC = () => {
                       fontSize="14px"
                       backgroundColor="#17a2b8"
                   />
+                  <Button
+                      label="Inscrever Jogador"
+                      onClick={abrirModalInscricao}
+                      width="auto"
+                      height="44px"
+                      paddingHorizontal="20px"
+                      fontSize="14px"
+                      backgroundColor="#28a745"
+                  />
                 </>
             )}
 

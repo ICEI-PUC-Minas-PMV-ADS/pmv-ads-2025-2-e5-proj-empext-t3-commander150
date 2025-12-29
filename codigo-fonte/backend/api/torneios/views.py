@@ -1218,9 +1218,9 @@ class InscricaoViewSet(viewsets.ModelViewSet):
             )
 
         # Validar status do torneio
-        if torneio.status != 'Aberto':
+        if torneio.status not in ['Aberto', 'Em Andamento']:
             return Response(
-                {"detail": "Só é possível inscrever jogadores em torneios com status 'Aberto'"},
+                {"detail": "Só é possível inscrever jogadores em torneios com status 'Aberto' ou 'Em Andamento'"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
