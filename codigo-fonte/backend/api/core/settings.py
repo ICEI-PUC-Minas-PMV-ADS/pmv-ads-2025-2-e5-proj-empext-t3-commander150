@@ -31,6 +31,11 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
+# Configurações para proxy reverso (Render)
+# O Render usa um proxy reverso, então precisamos confiar nos headers X-Forwarded-*
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Configuração do banco de dados padrão Neon
 DATABASES = {
     'default': env.db('DATABASE_URL')
@@ -73,9 +78,10 @@ CSRF_COOKIE_HTTPONLY = False
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
 # Configurações de sessão
-SESSION_COOKIE_PATH = '/api/v1/'
+SESSION_COOKIE_PATH = '/'  # IMPORTANTE: mudado de '/api/v1/' para '/' para funcionar corretamente com CORS
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True  # True em produção (HTTPS)
+SESSION_COOKIE_DOMAIN = None  # Permite que o cookie funcione com diferentes domínios (CORS)
 # Alterado o SESSION_COOKIE_SAMESITE para None, pois o Lax estava dando problemas por conta das origens
 # das requisições. Já que estamos trabalhando com uma API e não um site, é aceitável.
 SESSION_COOKIE_SAMESITE = 'None'
@@ -178,3 +184,37 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Configuração do campo de ID padrão
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging para debug (TEMPORÁRIO - pode ser removido após resolver o problema)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django.contrib.sessions': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
