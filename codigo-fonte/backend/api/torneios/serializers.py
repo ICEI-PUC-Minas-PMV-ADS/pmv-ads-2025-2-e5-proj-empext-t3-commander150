@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
+import pytz
 
 from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador
 
@@ -27,14 +28,25 @@ class TorneioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Torneio
         fields = '__all__'
-    
+
     def validate_data_inicio(self, value):
         """
         Valida se a data de início do torneio não é no passado.
-        Torneios só podem ser criados para datas futuras.
+
+        O frontend sempre envia com timezone -03:00 (São Paulo) explícito.
+        Exemplo: "2026-01-01T19:30:00-03:00"
+
+        O Django com USE_TZ=True converte para UTC ao salvar:
+        - Frontend: 19:30-03:00 (São Paulo)
+        - Banco: 22:30+00 (UTC)
+        - Ao exibir: volta para 19:30 em São Paulo
         """
+        if not value:
+            return value
+
+        # Comparar usando timezone-aware datetimes
         agora = timezone.now()
-        if value and value < agora:
+        if value < agora:
             raise serializers.ValidationError(
                 "A data de início do torneio não pode ser no passado. Torneios devem ser criados apenas para datas futuras."
             )

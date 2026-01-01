@@ -71,11 +71,13 @@ const CriarTorneio: React.FC = () => {
 
   // Função para mapear dados do formulário para o formato da API
   const mapearDadosParaAPI = async (): Promise<ITorneioCriacao> => {
-    // Construir string ISO manualmente para preservar a hora local exata
-    // O campo datetime-local retorna "2024-01-15T20:35" e queremos salvar exatamente 20:35 no banco
-    // Salvamos sem 'Z' para que o backend interprete como está
+    // IMPORTANTE: Envia a hora com timezone de São Paulo (-03:00) EXPLÍCITO
+    // Isso garante que 19:30 selecionado será sempre 19:30 em São Paulo,
+    // independentemente do timezone do servidor em produção
     let dataHoraInicio: string;
     if (dataHoraTorneio) {
+      // O input datetime-local retorna "2024-01-15T20:35" sem timezone
+      // Precisamos adicionar -03:00 para indicar que é hora de São Paulo
       const dataLocal = new Date(dataHoraTorneio);
       const ano = dataLocal.getFullYear();
       const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
@@ -83,9 +85,10 @@ const CriarTorneio: React.FC = () => {
       const hora = String(dataLocal.getHours()).padStart(2, '0');
       const minuto = String(dataLocal.getMinutes()).padStart(2, '0');
       const segundo = String(dataLocal.getSeconds()).padStart(2, '0');
-      dataHoraInicio = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
+      // Sempre adiciona -03:00 (timezone de São Paulo)
+      dataHoraInicio = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}-03:00`;
     } else {
-      // Se não forneceu data/hora, usar a data/hora atual com mesma lógica
+      // Se não forneceu data/hora, usar a data/hora atual em São Paulo
       const agora = new Date();
       const ano = agora.getFullYear();
       const mes = String(agora.getMonth() + 1).padStart(2, '0');
@@ -93,7 +96,7 @@ const CriarTorneio: React.FC = () => {
       const hora = String(agora.getHours()).padStart(2, '0');
       const minuto = String(agora.getMinutes()).padStart(2, '0');
       const segundo = String(agora.getSeconds()).padStart(2, '0');
-      dataHoraInicio = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
+      dataHoraInicio = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}-03:00`;
     }
 
     // Converter valor monetário para número

@@ -184,37 +184,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Configuração do campo de ID padrão
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Logging para debug (TEMPORÁRIO - pode ser removido após resolver o problema)
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django.contrib.sessions': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    },
-}
