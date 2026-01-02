@@ -271,10 +271,7 @@ export default function MesaAtivaComponent({
             <h2 className={styles.cardTitulo}>Sua Partida - Mesa {mesa.numero_mesa}</h2>
             <p className={styles.statusPartida}>Disposição da Mesa por Ranking</p>
             <p className={styles.descricaoMesa}>
-              {minhaPosicao === 1 && 'Você (Pos 1): Adversário à sua frente (Pos 2), adversário ao seu lado (Pos 3). Dupla na diagonal (Pos 4).'}
-              {minhaPosicao === 2 && 'Você (Pos 2): Adversário à sua frente (Pos 1), adversário ao seu lado (Pos 4). Dupla na diagonal (Pos 3).'}
-              {minhaPosicao === 3 && 'Você (Pos 3): Adversário ao seu lado (Pos 1), adversário à sua frente (Pos 4). Dupla na diagonal (Pos 2).'}
-              {minhaPosicao === 4 && 'Você (Pos 4): Adversário à sua frente (Pos 3), adversário ao seu lado (Pos 2). Dupla na diagonal (Pos 1).'}
+              Posicionamento baseado no ranking: melhor ranqueado de cada dupla senta-se à frente do melhor adversário. Sua dupla está sempre na diagonal.
             </p>
 
             {/* Layout da Mesa - Disposição FIXA por Time 1 e Time 2 */}
