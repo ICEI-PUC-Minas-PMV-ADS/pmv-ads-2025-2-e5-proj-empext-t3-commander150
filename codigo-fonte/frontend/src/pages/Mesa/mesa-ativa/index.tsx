@@ -197,27 +197,41 @@ export default function MesaAtivaComponent({
     return <div className={styles.container}><div className={styles.error}>Mesa não encontrada</div></div>;
   }
 
-  // Identificar times baseado em qual time o jogador está
+  // REGRA DE NEGÓCIO: A disposição física da mesa é SEMPRE a mesma
+  // Posição física FIXA baseada em Time 1 e Time 2 (não importa qual é "meu time"):
+  //
+  //     Time1[0]               Time2[0]
+  //     ┌──────────────────────────────────┐
+  //     │                                  │
+  //     │           🎴 MESA                │
+  //     │                                  │
+  //     └──────────────────────────────────┘
+  //     Time2[1]               Time1[1]
+  //
+  // - 1 e 3 estão À FRENTE (verticalmente opostos)
+  // - 2 e 4 estão À FRENTE (verticalmente opostos)
+  // - 1 e 2 estão AO LADO (horizontalmente)
+  // - 3 e 4 estão AO LADO (horizontalmente)
+  // - 1 e 4 são dupla Time 1 (DIAGONAL)
+  // - 2 e 3 são dupla Time 2 (DIAGONAL)
+
+  // Posições FÍSICAS fixas (sempre baseadas em time_1 e time_2)
+  const jogadorPos1 = mesa.time_1[0] || { username: 'Time1-Melhor', id_usuario: 0 }; // Topo Esquerda
+  const jogadorPos2 = mesa.time_2[0] || { username: 'Time2-Melhor', id_usuario: 0 }; // Topo Direita
+  const jogadorPos3 = mesa.time_2[1] || { username: 'Time2-Pior', id_usuario: 0 };   // Base Esquerda
+  const jogadorPos4 = mesa.time_1[1] || { username: 'Time1-Pior', id_usuario: 0 };   // Base Direita
+
+  // Identificar qual é VOCÊ (qual posição você ocupa)
+  const minhaPosicao =
+    jogadorPos1.id_usuario === usuario?.id ? 1 :
+    jogadorPos2.id_usuario === usuario?.id ? 2 :
+    jogadorPos3.id_usuario === usuario?.id ? 3 :
+    jogadorPos4.id_usuario === usuario?.id ? 4 : 1;
+
+  // Identificar você e sua dupla baseado na sua posição
   const meuTime = mesa.meu_time === 1 ? mesa.time_1 : mesa.time_2;
-  const timeAdversario = mesa.meu_time === 1 ? mesa.time_2 : mesa.time_1;
-
-  // Regra de negócio: Posições baseadas em RANKING
-  // meuTime[0] = Melhor ranqueado do meu time (sempre na posição superior)
-  // meuTime[1] = Pior ranqueado do meu time (sempre na posição inferior)
-  // timeAdversario[0] = Melhor ranqueado adversário (frente ao melhor do meu time)
-  // timeAdversario[1] = Pior ranqueado adversário (ao lado do melhor do meu time)
-
-  const melhorDoMeuTime = meuTime[0] || { username: 'Jogador 1', id_usuario: 0 };
-  const piorDoMeuTime = meuTime[1] || { username: 'Jogador 2', id_usuario: 0 };
-  const melhorAdversario = timeAdversario[0] || { username: 'Adversário 1', id_usuario: 0 };
-  const piorAdversario = timeAdversario[1] || { username: 'Adversário 2', id_usuario: 0 };
-
-  // Verificar se você é o melhor ou pior ranqueado do seu time
-  const voceEhMelhor = melhorDoMeuTime.id_usuario === usuario?.id;
-
-  // Identificar você e sua dupla
-  const voce = voceEhMelhor ? melhorDoMeuTime : piorDoMeuTime;
-  const suaDupla = voceEhMelhor ? piorDoMeuTime : melhorDoMeuTime;
+  const voce = meuTime.find(j => j.id_usuario === usuario?.id) || meuTime[0];
+  const suaDupla = meuTime.find(j => j.id_usuario !== usuario?.id) || meuTime[1];
 
   return (
     <div className={styles.container}>
@@ -257,28 +271,40 @@ export default function MesaAtivaComponent({
             <h2 className={styles.cardTitulo}>Sua Partida - Mesa {mesa.numero_mesa}</h2>
             <p className={styles.statusPartida}>Disposição da Mesa por Ranking</p>
             <p className={styles.descricaoMesa}>
-              {voceEhMelhor
-                ? 'Você é o melhor ranqueado da sua dupla. Adversário à sua frente, parceiro na diagonal.'
-                : 'Adversário à sua frente, parceiro na diagonal (melhor ranqueado da dupla).'}
+              {minhaPosicao === 1 && 'Você (Pos 1): Adversário à sua frente (Pos 2), adversário ao seu lado (Pos 3). Dupla na diagonal (Pos 4).'}
+              {minhaPosicao === 2 && 'Você (Pos 2): Adversário à sua frente (Pos 1), adversário ao seu lado (Pos 4). Dupla na diagonal (Pos 3).'}
+              {minhaPosicao === 3 && 'Você (Pos 3): Adversário ao seu lado (Pos 1), adversário à sua frente (Pos 4). Dupla na diagonal (Pos 2).'}
+              {minhaPosicao === 4 && 'Você (Pos 4): Adversário à sua frente (Pos 3), adversário ao seu lado (Pos 2). Dupla na diagonal (Pos 1).'}
             </p>
 
-            {/* Layout da Mesa - Disposição por RANKING */}
+            {/* Layout da Mesa - Disposição FIXA por Time 1 e Time 2 */}
             <div className={styles.mesaLayout}>
-              {/* Linha Superior: Melhor do Meu Time (Esq) vs Melhor Adversário (Dir) */}
+              {/* Posição 1: Topo Esquerda - Time 1 Melhor */}
               <div className={styles.posicaoTopoEsquerda}>
-                <div className={`${styles.jogadorCard} ${melhorDoMeuTime.id_usuario === usuario?.id ? styles.voce : styles.dupla}`}>
-                  <div className={styles.jogadorNome}>{melhorDoMeuTime.username}</div>
+                <div className={`${styles.jogadorCard} ${jogadorPos1.id_usuario === usuario?.id ? styles.voce : (mesa.meu_time === 1 ? styles.dupla : styles.adversario)}`}>
+                  <div className={styles.jogadorNome}>{jogadorPos1.username}</div>
                   <div className={styles.jogadorPosicao}>
-                    {melhorDoMeuTime.id_usuario === usuario?.id ? 'Você' : 'Sua Dupla'}
+                    {jogadorPos1.id_usuario === usuario?.id
+                      ? 'Você'
+                      : (minhaPosicao === 1 ? (mesa.meu_time === 1 ? 'Sua Dupla' : 'Adversário') :
+                         minhaPosicao === 2 ? 'À sua frente' :
+                         minhaPosicao === 3 ? 'Ao seu lado' :
+                         minhaPosicao === 4 ? 'Diagonal' : (mesa.meu_time === 1 ? 'Sua Dupla' : 'Adversário'))}
                   </div>
                 </div>
               </div>
 
+              {/* Posição 2: Topo Direita - Time 2 Melhor */}
               <div className={styles.posicaoTopoDireita}>
-                <div className={`${styles.jogadorCard} ${styles.adversario}`}>
-                  <div className={styles.jogadorNome}>{melhorAdversario.username}</div>
+                <div className={`${styles.jogadorCard} ${jogadorPos2.id_usuario === usuario?.id ? styles.voce : (mesa.meu_time === 2 ? styles.dupla : styles.adversario)}`}>
+                  <div className={styles.jogadorNome}>{jogadorPos2.username}</div>
                   <div className={styles.jogadorPosicao}>
-                    {melhorDoMeuTime.id_usuario === usuario?.id ? 'À sua frente' : 'Diagonal'}
+                    {jogadorPos2.id_usuario === usuario?.id
+                      ? 'Você'
+                      : (minhaPosicao === 1 ? 'À sua frente' :
+                         minhaPosicao === 2 ? (mesa.meu_time === 2 ? 'Sua Dupla' : 'Adversário') :
+                         minhaPosicao === 3 ? 'Diagonal' :
+                         minhaPosicao === 4 ? 'Ao seu lado' : (mesa.meu_time === 2 ? 'Sua Dupla' : 'Adversário'))}
                   </div>
                 </div>
               </div>
@@ -289,21 +315,32 @@ export default function MesaAtivaComponent({
                 <div className={styles.mesaTexto}>MESA</div>
               </div>
 
-              {/* Linha Inferior: Pior Adversário (Esq) vs Pior do Meu Time (Dir) */}
+              {/* Posição 3: Base Esquerda - Time 2 Pior */}
               <div className={styles.posicaoBaseEsquerda}>
-                <div className={`${styles.jogadorCard} ${styles.adversario}`}>
-                  <div className={styles.jogadorNome}>{piorAdversario.username}</div>
+                <div className={`${styles.jogadorCard} ${jogadorPos3.id_usuario === usuario?.id ? styles.voce : (mesa.meu_time === 2 ? styles.dupla : styles.adversario)}`}>
+                  <div className={styles.jogadorNome}>{jogadorPos3.username}</div>
                   <div className={styles.jogadorPosicao}>
-                    {melhorDoMeuTime.id_usuario === usuario?.id ? 'Ao seu lado' : 'À sua frente'}
+                    {jogadorPos3.id_usuario === usuario?.id
+                      ? 'Você'
+                      : (minhaPosicao === 1 ? 'Ao seu lado' :
+                         minhaPosicao === 2 ? 'Diagonal' :
+                         minhaPosicao === 3 ? (mesa.meu_time === 2 ? 'Sua Dupla' : 'Adversário') :
+                         minhaPosicao === 4 ? 'À sua frente' : (mesa.meu_time === 2 ? 'Sua Dupla' : 'Adversário'))}
                   </div>
                 </div>
               </div>
 
+              {/* Posição 4: Base Direita - Time 1 Pior */}
               <div className={styles.posicaoBaseDireita}>
-                <div className={`${styles.jogadorCard} ${piorDoMeuTime.id_usuario === usuario?.id ? styles.voce : styles.dupla}`}>
-                  <div className={styles.jogadorNome}>{piorDoMeuTime.username}</div>
+                <div className={`${styles.jogadorCard} ${jogadorPos4.id_usuario === usuario?.id ? styles.voce : (mesa.meu_time === 1 ? styles.dupla : styles.adversario)}`}>
+                  <div className={styles.jogadorNome}>{jogadorPos4.username}</div>
                   <div className={styles.jogadorPosicao}>
-                    {piorDoMeuTime.id_usuario === usuario?.id ? 'Você' : 'Sua Dupla'}
+                    {jogadorPos4.id_usuario === usuario?.id
+                      ? 'Você'
+                      : (minhaPosicao === 1 ? 'Diagonal' :
+                         minhaPosicao === 2 ? 'Ao seu lado' :
+                         minhaPosicao === 3 ? 'À sua frente' :
+                         minhaPosicao === 4 ? (mesa.meu_time === 1 ? 'Sua Dupla' : 'Adversário') : (mesa.meu_time === 1 ? 'Sua Dupla' : 'Adversário'))}
                   </div>
                 </div>
               </div>
@@ -313,11 +350,11 @@ export default function MesaAtivaComponent({
             <div className={styles.legendaDuplas}>
               <div className={styles.legendaItem}>
                 <span className={`${styles.legendaCor} ${styles.corVoce}`}></span>
-                <span>Sua Dupla: {melhorDoMeuTime.username} & {piorDoMeuTime.username}</span>
+                <span>Sua Dupla (Time {mesa.meu_time}): {voce.username} & {suaDupla.username}</span>
               </div>
               <div className={styles.legendaItem}>
                 <span className={`${styles.legendaCor} ${styles.corAdversario}`}></span>
-                <span>Adversários: {melhorAdversario.username} & {piorAdversario.username}</span>
+                <span>Adversários (Time {mesa.meu_time === 1 ? 2 : 1}): {mesa.meu_time === 1 ? `${jogadorPos2.username} & ${jogadorPos3.username}` : `${jogadorPos1.username} & ${jogadorPos4.username}`}</span>
               </div>
             </div>
           </div>
