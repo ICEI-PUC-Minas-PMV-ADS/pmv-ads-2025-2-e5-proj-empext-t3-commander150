@@ -13,7 +13,7 @@ from django.db import transaction
 from django.db.models import Sum, Count, Q, Case, When, Value, IntegerField
 import random
 
-from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador, RankingParcial
+from .models import Torneio, Inscricao, Rodada, Mesa, MesaJogador, RankingParcial, RodadaJogador
 from usuarios.models import Usuario
 from .permissoes import IsLojaOuAdmin, IsApenasLeitura, IsJogadorNaMesa
 from .serializers import (
@@ -335,14 +335,21 @@ class TorneioViewSet(viewsets.ModelViewSet):
             # Muda status do torneio para 'Em Andamento'
             torneio.status = 'Em Andamento'
             torneio.save(update_fields=['status'])
-            
+
             # Cria Rodada 1
             rodada = Rodada.objects.create(
                 id_torneio=torneio,
                 numero_rodada=1,
                 status='Em Andamento'
             )
-            
+
+            # Salva snapshot dos jogadores inscritos neste momento
+            for inscricao in inscricoes_ativas:
+                RodadaJogador.objects.create(
+                    id_rodada=rodada,
+                    id_usuario=inscricao.id_usuario
+                )
+
             # Pega lista de jogadores e embaralha aleatoriamente
             jogadores = list(inscricoes_ativas.values_list('id_usuario_id', flat=True))
             random.shuffle(jogadores)
@@ -496,6 +503,13 @@ class TorneioViewSet(viewsets.ModelViewSet):
             inscricoes_ativas = Inscricao.objects.filter(
                 id_torneio=torneio
             ).exclude(status='Cancelado')
+
+            # Salva snapshot dos jogadores inscritos neste momento
+            for inscricao in inscricoes_ativas:
+                RodadaJogador.objects.create(
+                    id_rodada=nova_rodada,
+                    id_usuario=inscricao.id_usuario
+                )
 
             total_jogadores = inscricoes_ativas.count()
 

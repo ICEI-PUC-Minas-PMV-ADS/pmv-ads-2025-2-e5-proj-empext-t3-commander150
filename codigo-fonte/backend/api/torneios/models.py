@@ -75,6 +75,26 @@ class Rodada(models.Model):
         return f'Rodada {self.numero_rodada} do {self.id_torneio.nome}'
 
 
+class RodadaJogador(models.Model):
+    """
+    Snapshot dos jogadores inscritos no momento da criação da rodada.
+    Garante que apenas jogadores que estavam inscritos antes da rodada começar
+    possam receber pontuação (incluindo byes).
+    """
+    id_rodada = models.ForeignKey(Rodada, on_delete=models.CASCADE, related_name='jogadores_snapshot')
+    id_usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='rodadas_participadas')
+    data_registro = models.DateTimeField(auto_now_add=True, help_text="Quando o jogador foi registrado no snapshot")
+
+    class Meta:
+        unique_together = ('id_rodada', 'id_usuario')
+        indexes = [
+            models.Index(fields=['id_rodada'], name='rodada_snapshot_idx'),
+        ]
+
+    def __str__(self):
+        return f'{self.id_usuario.username} registrado na {self.id_rodada}'
+
+
 class Mesa(models.Model):
     """
     Representa uma mesa de jogo em uma determinada rodada.

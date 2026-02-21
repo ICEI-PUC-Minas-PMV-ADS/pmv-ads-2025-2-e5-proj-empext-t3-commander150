@@ -21,7 +21,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from typing import Dict, Set, Optional, List, Tuple
 from django.db import transaction
 
-from .models import Torneio, Rodada, Mesa, MesaJogador, Inscricao, RankingParcial
+from .models import Torneio, Rodada, Mesa, MesaJogador, Inscricao, RankingParcial, RodadaJogador
 
 
 # Constante para arredondamento decimal
@@ -122,25 +122,25 @@ def construir_historico_ate_rodada(torneio: Torneio, rodada_numero: int) -> Dict
                 oponentes[j1][rodada.numero_rodada] = jogadores_time_1
                 oponentes[j2][rodada.numero_rodada] = jogadores_time_1
 
-    # Adicionar jogadores com bye (não estão em nenhuma mesa)
-    jogadores_ativos = Inscricao.objects.filter(
-        id_torneio=torneio,
-        status='Inscrito'
-    ).values_list('id_usuario_id', flat=True)
+    # Adicionar jogadores com bye usando snapshot de cada rodada
+    # Busca todos os snapshots de jogadores até a rodada especificada
+    for rodada_obj in rodadas:
+        # Busca jogadores que estavam no snapshot desta rodada
+        jogadores_snapshot = RodadaJogador.objects.filter(
+            id_rodada=rodada_obj
+        ).values_list('id_usuario_id', flat=True)
 
-    for jogador_id in jogadores_ativos:
-        if jogador_id not in pontos_por_rodada:
-            pontos_por_rodada[jogador_id] = {}
-            parceiros[jogador_id] = {}
-            oponentes[jogador_id] = {}
+        for jogador_id in jogadores_snapshot:
+            if jogador_id not in pontos_por_rodada:
+                pontos_por_rodada[jogador_id] = {}
+                parceiros[jogador_id] = {}
+                oponentes[jogador_id] = {}
 
-        # Adicionar byes
-        for r in range(1, rodada_numero + 1):
-            if r not in pontos_por_rodada[jogador_id]:
-                # Jogador teve bye nesta rodada
-                pontos_por_rodada[jogador_id][r] = torneio.pontuacao_bye
-                parceiros[jogador_id][r] = None
-                oponentes[jogador_id][r] = []
+            # Se jogador estava no snapshot mas não jogou nesta rodada = bye
+            if rodada_obj.numero_rodada not in pontos_por_rodada[jogador_id]:
+                pontos_por_rodada[jogador_id][rodada_obj.numero_rodada] = torneio.pontuacao_bye
+                parceiros[jogador_id][rodada_obj.numero_rodada] = None
+                oponentes[jogador_id][rodada_obj.numero_rodada] = []
 
     # Otimização 2: Pré-calcular MW% base
     mw_base = {}
